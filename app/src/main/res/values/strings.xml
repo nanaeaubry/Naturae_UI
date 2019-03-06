@@ -10,4 +10,5 @@
 	<string name="satellite_map">Satellite Map</string>
 	<string name="terrain_map">Terrain Map</string>
 	<string name="google_map_key">Google Map Key</string>
+	<string name="dropped_pin">Dropped Pin</string>
 </resources>

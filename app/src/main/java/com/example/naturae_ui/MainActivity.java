@@ -1,6 +1,6 @@
 package com.example.naturae_ui;
 
-import android.content.Intent;
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
 	private TextView mTextMessage;
+
 
 	private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
 			= new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -40,8 +41,10 @@ public class MainActivity extends AppCompatActivity {
 		BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-		//Show Map on Main Activity
-		Intent nextScreen = new Intent(getApplicationContext(), MapsActivity.class);
-		startActivity(nextScreen);
+
+
+//		//Show Map on Main Activity
+//		Intent nextScreen = new Intent(getApplicationContext(), MapsActivity.class);
+//		startActivity(nextScreen);
 	}
 }
