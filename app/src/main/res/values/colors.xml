@@ -4,6 +4,6 @@
 	<color name="colorPrimaryDark">#00574B</color>
 	<color name="colorAccent">#D81B60</color>
 
-	<color name="forget_password">#0000FF</color>
+	<color name="colorBlue">#0000FF</color>
 	<color name="colorInvalid">#ff0000</color>
 </resources>

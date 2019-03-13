@@ -90,7 +90,7 @@
                 android:textSize="16sp"
                 android:layout_gravity="center"
                 android:textAlignment="center"
-                android:textColor="@color/invalidEmailPassword"/>
+                android:textColor="@color/colorInvalid"/>
 
         </LinearLayout>
 
