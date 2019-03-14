@@ -9,10 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class PostFragment extends Fragment {
+	View mView;
+
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_post, container, false);
-		return view;
+		mView = inflater.inflate(R.layout.fragment_post, container, false);
+		super.onCreate(savedInstanceState);
+
+		return mView;
 	}
 }
