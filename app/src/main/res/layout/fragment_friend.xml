@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/friends_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/title_friend"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="293dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="@string/header_friends"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/removeFriend"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/friend_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="234dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_friend" />
+
+    <View
+        android:id="@+id/addFriend"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="79dp"
+        android:layout_marginEnd="67dp"
+        android:layout_marginBottom="166dp"
+        android:background="@drawable/ic_add_black_24dp"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/removeFriend"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_friend"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <View
+        android:id="@+id/removeFriend"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="94dp"
+        android:layout_marginBottom="166dp"
+        android:background="@drawable/ic_remove_black_24dp"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addFriend"
+        app:layout_constraintTop_toBottomOf="@+id/title_friend" />
+</android.support.constraint.ConstraintLayout>
