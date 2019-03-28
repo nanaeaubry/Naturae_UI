@@ -52,4 +52,13 @@ public class Helper {
     }
 
 
+    public static boolean isConfirmPasswrodValid(String password, String confirmPassword){
+        if(password.contentEquals(confirmPassword)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
 }
