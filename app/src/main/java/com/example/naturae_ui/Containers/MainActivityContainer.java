@@ -1,4 +1,4 @@
-package com.example.naturae_ui;
+package com.example.naturae_ui.Containers;
 
 
 
@@ -9,9 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.example.naturae_ui.Fragments.MapFragment;
+import com.example.naturae_ui.Fragments.PostFragment;
+import com.example.naturae_ui.Fragments.ProfileFragment;
+import com.example.naturae_ui.R;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivityContainer extends AppCompatActivity{
 
 	/**
 	 * Enable navigation on bottom bar.
