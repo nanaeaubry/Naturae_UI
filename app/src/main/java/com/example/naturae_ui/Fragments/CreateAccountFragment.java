@@ -21,7 +21,6 @@ public class CreateAccountFragment extends Fragment {
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
 
-
     private Button createAccountButton;
 
     public CreateAccountFragment() {
@@ -54,6 +53,8 @@ public class CreateAccountFragment extends Fragment {
         passwordEditText = (EditText) view.findViewById(R.id.password_edit_text);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirm_password_edit_text);
         createAccountButton = (Button) view.findViewById(R.id.create_account_button);
+
+        setEditTextFocusListener();
 
 
         return view;
@@ -88,4 +89,67 @@ public class CreateAccountFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    /**
+     * Set focus listener for all of the edit text field
+     */
+    private void setEditTextFocusListener(){
+        //Set focus listener for first name edit text
+        firstNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //Check if first name is in a valid format
+                if(!hasFocus){
+
+                }
+            }
+        });
+
+        //Set focus listener for last name edit text
+        lastNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //Check if last name is in a valid format
+                if(!hasFocus){
+
+                }
+            }
+        });
+
+        //Set focus listener for email edit text
+        emailEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //Check if email is in a valid format
+                if(!hasFocus){
+
+                }
+            }
+        });
+
+        //Set focus listener for password edit text
+        passwordEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //Check if password is in a correct format
+                if(!hasFocus){
+
+                }
+            }
+        });
+
+        //Set focus listener for confirm password edit text
+        confirmPasswordEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //Check if the entered confirm password match with the password
+                if(!hasFocus){
+
+                }
+            }
+        });
+
+
+    }
+
 }

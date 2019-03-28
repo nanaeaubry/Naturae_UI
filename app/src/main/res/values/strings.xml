@@ -1,5 +1,10 @@
 <resources>
+
+
+	<string name="dropped_pin">Dropped Pin</string>
+
     <!--Shared Strings-->
+    <string name="google_map_key">Google Map Key</string>
     <string name="app_name">Naturae</string>
     <string name="API_Key">AIzaSyAoLYtlxsSkFQNJ53Dn-x9VoZsrcwSFmjk</string>
     <string name="first_name">First name</string>
