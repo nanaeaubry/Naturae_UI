@@ -1,7 +1,6 @@
 package com.example.naturae_ui.Fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.naturae_ui.R;
@@ -24,14 +24,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     private Button loginButton;
     private Button createAccountButton;
 
+    private View view;
+    private ScrollView rootView;
+
     public LoginFragment() {
         // Required empty public constructor
     }
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -45,7 +46,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
+        view = inflater.inflate(R.layout.fragment_login, container, false);
         //Assign all of the variable in the fragment
         emailEditText = (EditText) view.findViewById(R.id.email_edit_text);
         passwordEditText = (EditText) view.findViewById(R.id.password_edit_text);
@@ -53,12 +54,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         wrongCredentialTextView = (TextView) view.findViewById(R.id.wrong_credential_text_view);
         loginButton = (Button) view.findViewById(R.id.login_button);
         createAccountButton = (Button) view.findViewById(R.id.create_account_button);
+        rootView = (ScrollView) view.findViewById(R.id.login_root_view);
+
 
         //Set up listener
         loginButton.setOnClickListener(this);
         createAccountButton.setOnClickListener(this);
         forgetPasswordTextView.setOnClickListener(this);
-        view.setOnClickListener(this);
+
+        rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                System.out.println("Work");
+            }
+        });
 
         return view;
     }
@@ -93,21 +102,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 break;
             //Create account selected
             case R.id.create_account_button:
+                emailEditText.clearFocus();
+                passwordEditText.clearFocus();
+                mListener.hideKeyboard();
                 break;
             //Forget password selected
             case R.id.forget_password_text_view:
                 break;
-            //Back background selected
-            case R.id.login_fragment:
-                break;
-
         }
 
     }
 
 
     public interface OnFragmentInteractionListener {
-
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction();
+        void hideKeyboard();
     }
 }

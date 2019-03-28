@@ -23,11 +23,13 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     private EditText emailEditText;
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
+    private View view;
     private ScrollView rootView;
     private TextView firstNameErrorTextView, lastNameErrorTextView, emailErrorTextView,
         passwordErrorTextView, confirmPasswordErrorTextView;
 
     private Button createAccountButton;
+
     boolean isFirstNameValid, isLastNameValid, isEmailValid, isPasswordValid, isConfirmPasswordValid;
 
     public CreateAccountFragment() {
@@ -49,7 +51,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_create_account, container, false);
+        view = inflater.inflate(R.layout.fragment_create_account, container, false);
 
         //Initialize fragment variables
         firstNameEditText = (EditText) view.findViewById(R.id.first_name_edit_text);
@@ -80,13 +82,6 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -104,9 +99,13 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         mListener = null;
     }
 
+    /**
+     *
+     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction();
+        void hideKeyboard();
+        void showKeyboard(View view);
     }
 
     @Override
@@ -136,10 +135,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     //Check if first name is in a valid format
                     if(Helper.isNameValid(firstNameEditText.getText().toString())){
                         isFirstNameValid = true;
+                        //Show invalid first name error message
                         firstNameErrorTextView.setVisibility(View.INVISIBLE);
                     }
                     else{
                         isFirstNameValid = false;
+                        //Hide invalid first name error message
                         firstNameErrorTextView.setVisibility(View.VISIBLE);
 
                     }
@@ -156,11 +157,13 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     //Check if last name is in a valid format
                     if(Helper.isNameValid(lastNameEditText.getText().toString())){
                         isLastNameValid = false;
+                        //Show invalid last name error message
                         lastNameErrorTextView.setVisibility(View.VISIBLE);
 
                     }
                     else{
                         isLastNameValid = false;
+                        //Hide invalid last name error message
                         lastNameErrorTextView.setVisibility(View.INVISIBLE);
 
                     }
@@ -178,11 +181,13 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     //Check if email is in a valid format
                     if(Helper.isEmailValid(emailEditText.getText().toString())){
                         isEmailValid = true;
+                        //Show invalid email error message
                         emailErrorTextView.setVisibility(View.INVISIBLE);
 
                     }
                     else{
                         isEmailValid = false;
+                        //Hide invalid email error message
                         emailErrorTextView.setVisibility(View.VISIBLE);
 
                     }
@@ -199,10 +204,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     //Check if password is in a correct format
                     if(Helper.isPasswordValid(passwordEditText.getText().toString())){
                         isPasswordValid = true;
+                        //Show invalid password error message
                         passwordErrorTextView.setVisibility(View.INVISIBLE);
                     }
                     else{
                         isPasswordValid = false;
+                        //Hide invalid password error message
                         passwordErrorTextView.setVisibility(View.VISIBLE);
                     }
 
@@ -219,11 +226,13 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     if(Helper.isConfirmPasswrodValid(passwordEditText.getText().toString(),
                             confirmPasswordEditText.getText().toString())){
                         isConfirmPasswordValid = true;
+                        //Show invalid confirm password error message
                         confirmPasswordErrorTextView.setVisibility(View.INVISIBLE);
                     }
                     else{
 
                         isConfirmPasswordValid = false;
+                        //Hide invalid confirm password error message
                         confirmPasswordErrorTextView.setVisibility(View.VISIBLE);
                     }
                 }
@@ -234,7 +243,10 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus){
-
+                    mListener.hideKeyboard();
+                }
+                else{
+                    mListener.showKeyboard(view);
                 }
             }
         });
