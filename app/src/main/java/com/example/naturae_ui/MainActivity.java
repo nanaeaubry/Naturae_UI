@@ -13,8 +13,6 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity{
 
-
-
 	/**
 	 * Enable navigation on bottom bar.
 	 */
