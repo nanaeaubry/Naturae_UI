@@ -1,12 +1,10 @@
 package com.example.naturae_ui.Util;
 
-import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
 import com.example.naturae_ui.R;
@@ -43,7 +41,14 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
         return viewHolder;
     }
 
-    // binds the data to the TextView in each row
+    /**
+     * Binds friend data to the viewholder items
+     * This is the most expensive block since it will called
+     * every time a view has to appear on the screen, special care has to be taken to ensure performance.
+     * Don't add slow code inside it, like interfaces or onClick events, they belong in the ViewHolder instead.
+     * @param holder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Friend user = friendsList.get(position);
@@ -82,7 +87,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     }
 
     /**
-     * Registers the click listener
+     * Registers the click listener event
      * @param itemClickListener
      */
     public void setClickListener(ClickListener itemClickListener) {
@@ -95,7 +100,4 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     public interface ClickListener {
         void onItemClick(View view, int position);
     }
-
-
-
 }
