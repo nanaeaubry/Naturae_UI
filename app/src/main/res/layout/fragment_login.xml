@@ -3,13 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_background"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context=".Fragments.LoginFragment">
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -76,6 +78,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:text="@string/forget_password"
                 android:textColor="@android:color/white"
                 android:textAlignment="textEnd"/>
@@ -91,6 +95,7 @@
                 android:layout_gravity="center"
                 android:textAlignment="center"
                 android:textColor="@color/colorInvalid"/>
+
 
         </LinearLayout>
 
@@ -117,6 +122,8 @@
                 android:id="@+id/create_account_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:text="@string/create_account" />
         </LinearLayout>
 

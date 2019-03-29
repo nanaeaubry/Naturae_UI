@@ -2,7 +2,6 @@ package com.example.naturae_ui.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -10,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.naturae_ui.R;
@@ -27,7 +24,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private Button loginButton;
     private Button createAccountButton;
 
-    private ConstraintLayout mainLayout;
     private View view;
 
     public LoginFragment() {
@@ -58,8 +54,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         loginButton = (Button) view.findViewById(R.id.login_button);
         createAccountButton = (Button) view.findViewById(R.id.create_account_button);
 
-        mainLayout = (ConstraintLayout) view.findViewById(R.id.main_layout);
-
         //Set up listener
         loginButton.setOnClickListener(this);
         createAccountButton.setOnClickListener(this);
@@ -68,7 +62,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         loginButton.setOnTouchListener(this);
         createAccountButton.setOnTouchListener(this);
         forgetPasswordTextView.setOnTouchListener(this);
-        mainLayout.setOnTouchListener(this);
 
         return view;
     }
@@ -102,17 +95,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
-        //
         switch (v.getId()){
             //Login button selected
             case R.id.login_button:
+                mListener.hideKeyboard();
+
+                break;
             //Create account selected
             case R.id.create_account_button:
-                System.out.println("I got click");
                 mListener.hideKeyboard();
                 break;
             //Forget password selected
             case R.id.forget_password_text_view:
+                mListener.hideKeyboard();
                 break;
         }
     }
@@ -128,10 +123,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     createAccountButton.requestFocus();
                     break;
                 case R.id.forget_password_text_view:
+                    forgetPasswordTextView.requestFocus();
                     break;
             }
+
         }
         return false;
+    }
+
+    private void login(){
+        Thread loginThread = new Thread(()->{
+
+
+        });
     }
 
 }

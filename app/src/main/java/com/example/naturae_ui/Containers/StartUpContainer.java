@@ -17,6 +17,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
 
     private FrameLayout mainLayout;
     private LoginFragment loginFragment;
+    private CreateAccountFragment createAccountFragment;
 
     //Enumerator
     public enum AuthFragmentType {
@@ -32,6 +33,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         setContentView(R.layout.activity_start_up_container);
 
         mainLayout = (FrameLayout) findViewById(R.id.main_display_container);
+
         //Initialize Login Fragment
         loginFragment = new LoginFragment();
 
@@ -51,19 +53,15 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
             case LOGIN:
                 fragmentTransaction.replace(R.id.main_display_container, loginFragment);
                 break;
-            /*case CREATE_ACCOUNT:
-                toolbar.setVisibility(View.VISIBLE);
-                createAccountButton.setVisibility(View.VISIBLE);
-                titleTextView.setText(R.string.create_account_title);
-                goHomeEnable = false;
+            case CREATE_ACCOUNT:
                 fragmentTransaction.replace(R.id.main_display_container, createAccountFragment);
                 break;
-            case FORGOT_PASSWORD:
-                toolbar.setVisibility(View.VISIBLE);
-                createAccountButton.setVisibility(View.GONE);
-                titleTextView.setText(R.string.forget_password_title);
-                fragmentTransaction.replace(R.id.main_display_container, forgetPasswordFragment);
-                break;*/
+//            case FORGOT_PASSWORD:
+//                toolbar.setVisibility(View.VISIBLE);
+//                createAccountButton.setVisibility(View.GONE);
+//                titleTextView.setText(R.string.forget_password_title);
+//                fragmentTransaction.replace(R.id.main_display_container, forgetPasswordFragment);
+//                break;
         }
         if(addToBackStack) {
             fragmentTransaction.addToBackStack(null);
