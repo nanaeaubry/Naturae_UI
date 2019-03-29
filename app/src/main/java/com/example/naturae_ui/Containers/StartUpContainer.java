@@ -1,10 +1,9 @@
 package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -33,7 +32,6 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         setContentView(R.layout.activity_start_up_container);
 
         mainLayout = (FrameLayout) findViewById(R.id.main_display_container);
-
         //Initialize Login Fragment
         loginFragment = new LoginFragment();
 
@@ -83,13 +81,6 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     public void hideKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-    }
-
-    @Override
-    public void showKeyboard(View view) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        view.requestFocus();
-        inputMethodManager.showSoftInput(view, 0);
     }
 
 }

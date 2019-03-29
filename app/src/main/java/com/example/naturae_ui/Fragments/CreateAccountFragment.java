@@ -1,7 +1,6 @@
 package com.example.naturae_ui.Fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -105,7 +104,6 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction();
         void hideKeyboard();
-        void showKeyboard(View view);
     }
 
     @Override
@@ -238,19 +236,6 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                 }
             }
         });
-
-        rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
-                    mListener.hideKeyboard();
-                }
-                else{
-                    mListener.showKeyboard(view);
-                }
-            }
-        });
-
 
     }
 

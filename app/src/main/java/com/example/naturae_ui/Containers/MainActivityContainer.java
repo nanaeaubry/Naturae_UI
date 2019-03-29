@@ -75,11 +75,4 @@ public class MainActivityContainer extends AppCompatActivity implements CreateAc
 		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 		inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 	}
-
-	@Override
-	public void showKeyboard(View view) {
-		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		view.requestFocus();
-		inputMethodManager.showSoftInput(view, 0);
-	}
 }
