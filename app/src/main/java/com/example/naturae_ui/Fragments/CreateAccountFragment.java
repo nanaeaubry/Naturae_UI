@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.Util.Helper;
 
-public class CreateAccountFragment extends Fragment implements View.OnClickListener {
+public class CreateAccountFragment extends Fragment{
 
     private OnFragmentInteractionListener mListener;
     private EditText firstNameEditText;
@@ -23,11 +23,8 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
     private View view;
-    private ScrollView rootView;
     private TextView firstNameErrorTextView, lastNameErrorTextView, emailErrorTextView,
         passwordErrorTextView, confirmPasswordErrorTextView;
-
-    private Button createAccountButton;
 
     boolean isFirstNameValid, isLastNameValid, isEmailValid, isPasswordValid, isConfirmPasswordValid;
 
@@ -58,8 +55,6 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         emailEditText = (EditText) view.findViewById(R.id.email_edit_text);
         passwordEditText = (EditText) view.findViewById(R.id.password_edit_text);
         confirmPasswordEditText = (EditText) view.findViewById(R.id.confirm_password_edit_text);
-        createAccountButton = (Button) view.findViewById(R.id.create_account_button);
-        rootView = view.findViewById(R.id.create_account_root_view);
 
         firstNameErrorTextView = (TextView) view.findViewById(R.id.first_name_error_text_view);
         lastNameErrorTextView = (TextView) view.findViewById(R.id.last_name_error_text_view);
@@ -67,8 +62,9 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         passwordErrorTextView = (TextView) view.findViewById(R.id.password_error_text_view);
         confirmPasswordErrorTextView = (TextView) view.findViewById(R.id.confirm_password_error_text_view);
 
+        Button createAccountButton;
 
-        //Call
+        //Set up focus listener for all of the edit text field
         setEditTextFocusListener();
 
         //Initialize variables
@@ -77,6 +73,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         isEmailValid = false;
         isPasswordValid = false;
         isConfirmPasswordValid = false;
+
 
         return view;
     }
@@ -93,6 +90,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mListener.hideProgressBar();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -104,22 +107,9 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction();
         void hideKeyboard();
+        void showProgressBar();
+        void hideProgressBar();
     }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.login_button:
-                if(isFirstNameValid && isLastNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid){
-
-                }
-                else{
-
-                }
-                break;
-        }
-    }
-
 
     /**
      * Set focus listener for all of the edit text field
@@ -130,8 +120,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
+                    if(firstNameEditText.getText().toString().isEmpty()){
+                        isFirstNameValid = false;
+                        firstNameErrorTextView.setVisibility(View.INVISIBLE);
+                    }
                     //Check if first name is in a valid format
-                    if(Helper.isNameValid(firstNameEditText.getText().toString())){
+                    else if(Helper.isNameValid(firstNameEditText.getText().toString())){
                         isFirstNameValid = true;
                         //Show invalid first name error message
                         firstNameErrorTextView.setVisibility(View.INVISIBLE);
@@ -152,17 +146,21 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
-                    //Check if last name is in a valid format
-                    if(Helper.isNameValid(lastNameEditText.getText().toString())){
+                    if(lastNameEditText.getText().toString().isEmpty()){
                         isLastNameValid = false;
+                        lastNameErrorTextView.setVisibility(View.INVISIBLE);
+                    }
+                    //Check if last name is in a valid format
+                    else if(Helper.isNameValid(lastNameEditText.getText().toString())){
+                        isLastNameValid = true;
                         //Show invalid last name error message
-                        lastNameErrorTextView.setVisibility(View.VISIBLE);
+                        lastNameErrorTextView.setVisibility(View.INVISIBLE);
 
                     }
                     else{
                         isLastNameValid = false;
                         //Hide invalid last name error message
-                        lastNameErrorTextView.setVisibility(View.INVISIBLE);
+                        lastNameErrorTextView.setVisibility(View.VISIBLE);
 
                     }
 
@@ -176,8 +174,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             public void onFocusChange(View v, boolean hasFocus) {
 
                 if(!hasFocus){
+                    if(emailEditText.getText().toString().isEmpty()){
+                        isEmailValid = false;
+                        emailErrorTextView.setVisibility(View.INVISIBLE);
+                    }
                     //Check if email is in a valid format
-                    if(Helper.isEmailValid(emailEditText.getText().toString())){
+                    else if(Helper.isEmailValid(emailEditText.getText().toString())){
                         isEmailValid = true;
                         //Show invalid email error message
                         emailErrorTextView.setVisibility(View.INVISIBLE);
@@ -199,8 +201,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             public void onFocusChange(View v, boolean hasFocus) {
 
                 if(!hasFocus){
+                    if(passwordEditText.getText().toString().isEmpty()){
+                        isPasswordValid = false;
+                        passwordErrorTextView.setVisibility(View.INVISIBLE);
+                    }
                     //Check if password is in a correct format
-                    if(Helper.isPasswordValid(passwordEditText.getText().toString())){
+                    else if(Helper.isPasswordValid(passwordEditText.getText().toString())){
                         isPasswordValid = true;
                         //Show invalid password error message
                         passwordErrorTextView.setVisibility(View.INVISIBLE);
@@ -236,6 +242,9 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                 }
             }
         });
+    }
+
+    private void createAccount(){
 
     }
 

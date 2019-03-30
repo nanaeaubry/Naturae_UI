@@ -9,20 +9,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
 
-public class LoginFragment extends Fragment implements View.OnClickListener, View.OnTouchListener{
+public class LoginFragment extends Fragment implements View.OnClickListener{
 
     //Initialize all of the fragment variables
     private OnFragmentInteractionListener mListener;
     private EditText emailEditText;
     private EditText passwordEditText;
-    private TextView forgetPasswordTextView;
     private TextView wrongCredentialTextView;
-    private Button loginButton;
-    private Button createAccountButton;
+    private ImageView appNameImage;
+
 
     private View view;
 
@@ -49,19 +50,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         //Assign all of the variable in the fragment
         emailEditText = (EditText) view.findViewById(R.id.email_edit_text);
         passwordEditText = (EditText) view.findViewById(R.id.password_edit_text);
-        forgetPasswordTextView = (TextView) view.findViewById(R.id.forget_password_text_view);
         wrongCredentialTextView = (TextView) view.findViewById(R.id.wrong_credential_text_view);
-        loginButton = (Button) view.findViewById(R.id.login_button);
-        createAccountButton = (Button) view.findViewById(R.id.create_account_button);
+        Button forgetPasswordTextView = (Button) view.findViewById(R.id.forget_password_text_view);
+        Button loginButton = (Button) view.findViewById(R.id.login_button);
+        Button createAccountButton = (Button) view.findViewById(R.id.create_account_button);
+        appNameImage = (ImageView) view.findViewById(R.id.app_name_image_view);
 
         //Set up listener
         loginButton.setOnClickListener(this);
         createAccountButton.setOnClickListener(this);
         forgetPasswordTextView.setOnClickListener(this);
-
-        loginButton.setOnTouchListener(this);
-        createAccountButton.setOnTouchListener(this);
-        forgetPasswordTextView.setOnTouchListener(this);
 
         return view;
     }
@@ -78,6 +76,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mListener.hideProgressBar();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -87,53 +91,41 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction();
         void hideKeyboard();
+        void showProgressBar();
+        void hideProgressBar();
+        void beginFragment(StartUpContainer.AuthFragmentType fragmentType, boolean setTransition,
+                           boolean addToBackStack);
     }
 
-    //On Click listener
+    //Create on click listener
     @Override
     public void onClick(View v) {
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
-
         switch (v.getId()){
             //Login button selected
             case R.id.login_button:
+                String email = emailEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
                 mListener.hideKeyboard();
-
                 break;
             //Create account selected
             case R.id.create_account_button:
-                mListener.hideKeyboard();
+                mListener.beginFragment(StartUpContainer.AuthFragmentType.CREATE_ACCOUNT, true,
+                        true);
                 break;
             //Forget password selected
             case R.id.forget_password_text_view:
-                mListener.hideKeyboard();
+                mListener.beginFragment(StartUpContainer.AuthFragmentType.FORGOT_PASSWORD, true,
+                        true);
                 break;
         }
+        appNameImage.requestFocus();
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            switch (v.getId()) {
-                case R.id.login_button:
-                    loginButton.requestFocus();
-                    break;
-                case R.id.create_account_button:
-                    createAccountButton.requestFocus();
-                    break;
-                case R.id.forget_password_text_view:
-                    forgetPasswordTextView.requestFocus();
-                    break;
-            }
-
-        }
-        return false;
-    }
-
+    /**
+     * Preform login process
+     */
     private void login(){
         Thread loginThread = new Thread(()->{
-
 
         });
     }

@@ -7,13 +7,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_background"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
     tools:context=".Fragments.LoginFragment">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/app_name_image_view"
@@ -23,10 +21,11 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:contentDescription=""
+            android:contentDescription="@string/app_name_image_description"
             android:src="@drawable/app_name"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:focusedByDefault="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -55,7 +54,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/email"
                     android:inputType="textEmailAddress"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white"
+                    android:importantForAutofill="no" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -72,25 +72,24 @@
                     android:hint="@string/password"
                     android:inputType="textPassword"
                     android:textColor="@android:color/white"
-                    android:textColorHint="@android:color/white" />
+                    android:textColorHint="@android:color/white"
+                    android:importantForAutofill="no" />
             </android.support.design.widget.TextInputLayout>
 
-            <TextView
+            <Button
                 android:id="@+id/forget_password_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_gravity="right"
+                android:background="@android:color/transparent"
                 android:text="@string/forget_password"
-                android:textColor="@android:color/white"
-                android:textAlignment="textEnd"/>
+                android:textColor="@android:color/white"/>
 
             <TextView
                 android:id="@+id/wrong_credential_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 android:visibility="invisible"
                 android:text="@string/invalid_email_password"
                 android:textSize="16sp"
@@ -102,6 +101,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -116,13 +116,15 @@
                 android:id="@+id/login_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/login" />
+                android:text="@string/login"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/create_account_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/create_account" />
+                android:text="@string/create_account"
+                android:textSize="18sp" />
         </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>

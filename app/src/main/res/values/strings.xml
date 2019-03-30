@@ -11,6 +11,7 @@
     <string name="last_name">Last name</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="back_button"><![CDATA[<]]></string>
 
     <!--Map-->
     <string name="title_map">Map</string>
@@ -39,6 +40,7 @@
     <string name="login">Login</string>
     <string name="create_account">Create Account</string>
     <string name="invalid_email_password">Invalid username or password</string>
+    <string name="app_name_image_description">App name image</string>
 
     <!--Authentication-->
     <string name="authentication_message">An email message with a 6-digit authentication code was just
@@ -49,6 +51,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="code">Code</string>
+
 
     <!--Create Account-->
 

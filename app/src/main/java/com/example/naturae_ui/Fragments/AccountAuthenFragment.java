@@ -20,7 +20,7 @@ public class AccountAuthenFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static AccountAuthenFragment newInstance(String param1, String param2) {
+    public static AccountAuthenFragment newInstance() {
         AccountAuthenFragment fragment = new AccountAuthenFragment();
         return fragment;
     }
@@ -56,6 +56,6 @@ public class AccountAuthenFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction();
     }
 }

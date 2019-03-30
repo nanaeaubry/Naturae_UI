@@ -21,8 +21,7 @@ import com.example.naturae_ui.Fragments.ProfileFragment;
 import com.example.naturae_ui.R;
 
 
-public class MainActivityContainer extends AppCompatActivity implements CreateAccountFragment.OnFragmentInteractionListener,
-        LoginFragment.OnFragmentInteractionListener {
+public class MainActivityContainer extends AppCompatActivity{
 
 	/**
 	 * Enable navigation on bottom bar.
@@ -63,16 +62,5 @@ public class MainActivityContainer extends AppCompatActivity implements CreateAc
 		MapFragment mapFragment = new MapFragment();
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mapFragment).commit();
 
-	}
-
-    @Override
-    public void onFragmentInteraction() {
-
-    }
-
-    @Override
-	public void hideKeyboard() {
-		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-		inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 	}
 }

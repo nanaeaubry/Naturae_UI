@@ -1,13 +1,17 @@
 package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
+import com.example.naturae_ui.Fragments.AccountAuthenFragment;
 import com.example.naturae_ui.Fragments.CreateAccountFragment;
 import com.example.naturae_ui.Fragments.LoginFragment;
 import com.example.naturae_ui.R;
@@ -18,6 +22,15 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     private FrameLayout mainLayout;
     private LoginFragment loginFragment;
     private CreateAccountFragment createAccountFragment;
+    private AccountAuthenFragment accountAuthenFragment;
+
+    private ConstraintLayout startUpTopNav;
+
+    private Button backButton, rightSideButton;
+    private ProgressBar progressBar;
+
+    public StartUpContainer() {
+    }
 
     //Enumerator
     public enum AuthFragmentType {
@@ -33,12 +46,33 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         setContentView(R.layout.activity_start_up_container);
 
         mainLayout = (FrameLayout) findViewById(R.id.main_display_container);
+        startUpTopNav = (ConstraintLayout) findViewById(R.id.start_up_top_nav_bar);
 
         //Initialize Login Fragment
-        loginFragment = new LoginFragment();
+        loginFragment = LoginFragment.newInstance();
+        createAccountFragment = CreateAccountFragment.newInstance();
+        accountAuthenFragment = AccountAuthenFragment.newInstance();
 
+        backButton = (Button) findViewById(R.id.back_button);
+        rightSideButton = (Button) findViewById(R.id.right_side_button);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         beginFragment(AuthFragmentType.LOGIN, true, false);
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+
+            }
+        });
+
+        rightSideButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     /**
@@ -47,13 +81,21 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
      * @param setTransition  If the fragment should be transitioned in to the viewer
      * @param addToBackStack If the fragment should be added to the activity's back-stack
      */
-    private void beginFragment(AuthFragmentType fragmentType, boolean setTransition, boolean addToBackStack) {
+    @Override
+    public void beginFragment(AuthFragmentType fragmentType, boolean setTransition, boolean addToBackStack) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         switch (fragmentType) {
             case LOGIN:
+                startUpTopNav.setVisibility(View.GONE);
                 fragmentTransaction.replace(R.id.main_display_container, loginFragment);
                 break;
             case CREATE_ACCOUNT:
+                Thread createAccountThread = new Thread(()-> {
+                    rightSideButton.setText(R.string.create);
+
+                });
+                createAccountThread.start();
+                startUpTopNav.setVisibility(View.VISIBLE);
                 fragmentTransaction.replace(R.id.main_display_container, createAccountFragment);
                 break;
 //            case FORGOT_PASSWORD:
@@ -66,9 +108,28 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         if(addToBackStack) {
             fragmentTransaction.addToBackStack(null);
         }
+        showProgressBar();
         fragmentTransaction.commit();
     }
 
+    /**
+     * Handle default back button
+     */
+    @Override
+    public void onBackPressed() {
+        //If the current page is the login page then will will go to the
+        //main apps page
+        getFragmentManager().popBackStackImmediate();
+        if(getFragmentManager().getBackStackEntryCount() == 0){
+            //To allow default back button to go to home page
+            //goHomeEnable = true;
+            startUpTopNav.setVisibility(View.GONE);
+            beginFragment(AuthFragmentType.LOGIN, true, false);
+        }
+        else{
+            super.onBackPressed();
+        }
+    }
 
     @Override
     public void onFragmentInteraction() {
@@ -77,8 +138,21 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
 
     @Override
     public void hideKeyboard() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        if(getCurrentFocus() != null){
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+
+    }
+
+    @Override
+    public void showProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgressBar() {
+        progressBar.setVisibility(View.GONE);
     }
 
 }
