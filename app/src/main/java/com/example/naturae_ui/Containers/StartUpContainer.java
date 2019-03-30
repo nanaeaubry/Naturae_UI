@@ -1,6 +1,7 @@
 package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
@@ -90,8 +91,10 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
                 fragmentTransaction.replace(R.id.main_display_container, loginFragment);
                 break;
             case CREATE_ACCOUNT:
+                rightSideButton.setEnabled(false);
                 Thread createAccountThread = new Thread(()-> {
                     rightSideButton.setText(R.string.create);
+                    rightSideButton.setTextColor(getColor(R.color.createAccount));
 
                 });
                 createAccountThread.start();
@@ -119,7 +122,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     public void onBackPressed() {
         //If the current page is the login page then will will go to the
         //main apps page
-        getFragmentManager().popBackStackImmediate();
+        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         if(getFragmentManager().getBackStackEntryCount() == 0){
             //To allow default back button to go to home page
             //goHomeEnable = true;

@@ -34,7 +34,7 @@ public class Helper {
         if(password.isEmpty()){
             return false;
         }else{
-            return Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$").matcher(password).matches();
+            return Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$").matcher(password).matches();
         }
     }
 
@@ -47,12 +47,12 @@ public class Helper {
         if(name.isEmpty()){
             return false;
         }else{
-            return Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*[_ '-])$").matcher(name).matches();
+            return Pattern.compile("^(=?.*[a-zA-Z0-9_ '-])$").matcher(name).matches();
         }
     }
 
 
-    public static boolean isConfirmPasswrodValid(String password, String confirmPassword){
+    public static boolean isConfirmPasswordValid(String password, String confirmPassword){
         if(password.contentEquals(confirmPassword)){
             return true;
         }else{

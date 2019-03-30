@@ -2,6 +2,8 @@ package com.example.naturae_ui.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +19,11 @@ import com.example.naturae_ui.Util.Helper;
 public class CreateAccountFragment extends Fragment{
 
     private OnFragmentInteractionListener mListener;
-    private EditText firstNameEditText;
-    private EditText lastNameEditText;
-    private EditText emailEditText;
-    private EditText passwordEditText;
-    private EditText confirmPasswordEditText;
-    private View view;
+    private TextInputEditText firstNameEditText;
+    private TextInputEditText lastNameEditText;
+    private TextInputEditText emailEditText;
+    private TextInputEditText passwordEditText;
+    private TextInputEditText confirmPasswordEditText;
     private TextView firstNameErrorTextView, lastNameErrorTextView, emailErrorTextView,
         passwordErrorTextView, confirmPasswordErrorTextView;
 
@@ -47,14 +48,14 @@ public class CreateAccountFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_create_account, container, false);
+        View view = inflater.inflate(R.layout.fragment_create_account, container, false);
 
         //Initialize fragment variables
-        firstNameEditText = (EditText) view.findViewById(R.id.first_name_edit_text);
-        lastNameEditText = (EditText) view.findViewById(R.id.last_name_edit_text);
-        emailEditText = (EditText) view.findViewById(R.id.email_edit_text);
-        passwordEditText = (EditText) view.findViewById(R.id.password_edit_text);
-        confirmPasswordEditText = (EditText) view.findViewById(R.id.confirm_password_edit_text);
+        firstNameEditText = (TextInputEditText) view.findViewById(R.id.first_name_edit_text);
+        lastNameEditText = (TextInputEditText) view.findViewById(R.id.last_name_edit_text);
+        emailEditText = (TextInputEditText) view.findViewById(R.id.email_edit_text);
+        passwordEditText = (TextInputEditText) view.findViewById(R.id.password_edit_text);
+        confirmPasswordEditText = (TextInputEditText) view.findViewById(R.id.confirm_password_edit_text);
 
         firstNameErrorTextView = (TextView) view.findViewById(R.id.first_name_error_text_view);
         lastNameErrorTextView = (TextView) view.findViewById(R.id.last_name_error_text_view);
@@ -91,8 +92,9 @@ public class CreateAccountFragment extends Fragment{
 
     @Override
     public void onResume() {
-        super.onResume();
         mListener.hideProgressBar();
+        super.onResume();
+
     }
 
     @Override
@@ -227,7 +229,7 @@ public class CreateAccountFragment extends Fragment{
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
                     //Check if the entered confirm password match with the password
-                    if(Helper.isConfirmPasswrodValid(passwordEditText.getText().toString(),
+                    if(Helper.isConfirmPasswordValid(passwordEditText.getText().toString(),
                             confirmPasswordEditText.getText().toString())){
                         isConfirmPasswordValid = true;
                         //Show invalid confirm password error message

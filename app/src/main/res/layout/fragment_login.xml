@@ -46,6 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColorHint="@android:color/white"
+                android:background="@drawable/while_rectangle_border"
                 app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
                 <EditText
@@ -55,14 +56,18 @@
                     android:hint="@string/email"
                     android:inputType="textEmailAddress"
                     android:textColor="@android:color/white"
-                    android:importantForAutofill="no" />
+                    android:importantForAutofill="yes"
+                    android:saveEnabled="false"
+                    android:autofillHints="" />
 
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:textColorHint="@android:color/white"
+                android:background="@drawable/while_rectangle_border"
                 app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
                 <EditText
@@ -73,7 +78,8 @@
                     android:inputType="textPassword"
                     android:textColor="@android:color/white"
                     android:textColorHint="@android:color/white"
-                    android:importantForAutofill="no" />
+                    android:importantForAutofill="no"
+                    android:saveEnabled="false"/>
             </android.support.design.widget.TextInputLayout>
 
             <Button
