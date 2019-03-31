@@ -46,10 +46,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColorHint="@android:color/white"
-                android:background="@drawable/while_rectangle_border"
                 app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/email_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -67,10 +66,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:textColorHint="@android:color/white"
-                android:background="@drawable/while_rectangle_border"
                 app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/password_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

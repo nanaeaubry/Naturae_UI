@@ -2,6 +2,7 @@ package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.support.annotation.UiThread;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
@@ -94,8 +95,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
                 rightSideButton.setEnabled(false);
                 Thread createAccountThread = new Thread(()-> {
                     rightSideButton.setText(R.string.create);
-                    rightSideButton.setTextColor(getColor(R.color.createAccount));
-
+                    rightSideButton.setTextColor(getColor(R.color.disableCreateAccount));
                 });
                 createAccountThread.start();
                 startUpTopNav.setVisibility(View.VISIBLE);
@@ -156,6 +156,22 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     @Override
     public void hideProgressBar() {
         progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void upDateCreateButtonStatus(boolean status) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rightSideButton.setEnabled(status);
+                if (status) {
+                    rightSideButton.setTextColor(getColor(R.color.white));
+
+                } else {
+                    rightSideButton.setTextColor(getColor(R.color.disableCreateAccount));
+                }
+            }
+        });
     }
 
 }

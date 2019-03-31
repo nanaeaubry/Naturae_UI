@@ -25,7 +25,7 @@
     <string name="invalid_email">Invalid email</string>
     <string name="invalid_password">Invalid password</string>
     <string name="password_short">Password must be at least 8 characters long</string>
-    <string name="weak_password">At least one of (a<![CDATA[-]]>z, A<![CDATA[-]]>Z, 0<![CDATA[-]]>9, @#$%^<![CDATA[&]]>=, 8 characters long)</string>
+    <string name="weak_password">Minimum 8 characters, a<![CDATA[-]]>z, A<![CDATA[-]]>Z, 0<![CDATA[-]]>9, @#$%^<![CDATA[&]]>=</string>
     <string name="invalid_last_name">Invalid last name</string>
     <string name="invalid_first_name">Invalid first name</string>
     <string name="password_mismatch">Password does not match</string>

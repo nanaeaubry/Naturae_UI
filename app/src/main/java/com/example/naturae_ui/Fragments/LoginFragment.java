@@ -2,6 +2,7 @@ package com.example.naturae_ui.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,12 +16,14 @@ import android.widget.TextView;
 import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
 
+import org.w3c.dom.Text;
+
 public class LoginFragment extends Fragment implements View.OnClickListener{
 
     //Initialize all of the fragment variables
     private OnFragmentInteractionListener mListener;
-    private EditText emailEditText;
-    private EditText passwordEditText;
+    private TextInputEditText emailEditText;
+    private TextInputEditText passwordEditText;
     private TextView wrongCredentialTextView;
     private ImageView appNameImage;
 
@@ -48,8 +51,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_login, container, false);
         //Assign all of the variable in the fragment
-        emailEditText = (EditText) view.findViewById(R.id.email_edit_text);
-        passwordEditText = (EditText) view.findViewById(R.id.password_edit_text);
+        emailEditText = (TextInputEditText) view.findViewById(R.id.email_edit_text);
+        passwordEditText = (TextInputEditText) view.findViewById(R.id.password_edit_text);
         wrongCredentialTextView = (TextView) view.findViewById(R.id.wrong_credential_text_view);
         Button forgetPasswordTextView = (Button) view.findViewById(R.id.forget_password_text_view);
         Button loginButton = (Button) view.findViewById(R.id.login_button);
