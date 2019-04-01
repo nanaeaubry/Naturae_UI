@@ -2,7 +2,6 @@ package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.support.annotation.UiThread;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
@@ -92,10 +91,9 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
                 fragmentTransaction.replace(R.id.main_display_container, loginFragment);
                 break;
             case CREATE_ACCOUNT:
-                rightSideButton.setEnabled(false);
                 Thread createAccountThread = new Thread(()-> {
                     rightSideButton.setText(R.string.create);
-                    rightSideButton.setTextColor(getColor(R.color.disableCreateAccount));
+                    rightSideButton.setTextColor(getColor(R.color.white));
                 });
                 createAccountThread.start();
                 startUpTopNav.setVisibility(View.VISIBLE);
@@ -159,19 +157,8 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     }
 
     @Override
-    public void upDateCreateButtonStatus(boolean status) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                rightSideButton.setEnabled(status);
-                if (status) {
-                    rightSideButton.setTextColor(getColor(R.color.white));
-
-                } else {
-                    rightSideButton.setTextColor(getColor(R.color.disableCreateAccount));
-                }
-            }
-        });
+    public Button getRightSideButton() {
+        return rightSideButton;
     }
 
 }

@@ -20,9 +20,9 @@ public class Helper {
     public static boolean isEmailValid(String email){
         if(email.isEmpty()){
             return false;
-        }else{
-            return Patterns.EMAIL_ADDRESS.matcher(email).matches();
         }
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+
     }
 
     /**
@@ -33,9 +33,9 @@ public class Helper {
     public static boolean isPasswordValid(String password){
         if(password.isEmpty()){
             return false;
-        }else{
-            return Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$").matcher(password).matches();
         }
+        return Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$").matcher(password).matches();
+
     }
 
     /**
@@ -46,18 +46,24 @@ public class Helper {
     public static boolean isNameValid(String name){
         if(name.isEmpty()){
             return false;
-        }else{
-            return Pattern.compile("^(=?.*[a-zA-Z0-9_ '-])$").matcher(name).matches();
         }
+        return Pattern.compile("^([a-zA-Z0-9_ '-]*)$").matcher(name).matches();
+
     }
 
 
     public static boolean isConfirmPasswordValid(String password, String confirmPassword){
         if(password.contentEquals(confirmPassword)){
             return true;
-        }else{
+        }
+        return false;
+    }
+
+    public static boolean doesStringMatch(String firstString, String secondString){
+        if(firstString.compareTo(secondString) > 0){
             return false;
         }
+        return true;
     }
 
 

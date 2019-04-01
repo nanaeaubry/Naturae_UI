@@ -22,7 +22,7 @@
     <string name="terrain_map">Terrain Map</string>
 
     <!--Create Account-->
-    <string name="invalid_email">Invalid email</string>
+    <string name="invalid_email">Invalid email address</string>
     <string name="invalid_password">Invalid password</string>
     <string name="password_short">Password must be at least 8 characters long</string>
     <string name="weak_password">Minimum 8 characters, a<![CDATA[-]]>z, A<![CDATA[-]]>Z, 0<![CDATA[-]]>9, @#$%^<![CDATA[&]]>=</string>
