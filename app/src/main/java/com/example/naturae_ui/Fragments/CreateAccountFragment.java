@@ -116,7 +116,7 @@ public class CreateAccountFragment extends Fragment{
     }
 
     /**
-     *
+     * Create an interface to communicate with StartUpActivity
      */
     public interface OnFragmentInteractionListener {
         void showProgressBar();
@@ -125,7 +125,7 @@ public class CreateAccountFragment extends Fragment{
     }
 
     /**
-     * Set focus listener for all of the edit text field
+     * Set text change listener for all of the edit text field
      */
     private void setEditTextChangeListener(){
         firstNameEditText.addTextChangedListener(new TextWatcher() {
@@ -198,6 +198,9 @@ public class CreateAccountFragment extends Fragment{
 
     }
 
+    /**
+     * Initialize focus listener for all of the edit text field
+     */
     private void setEditTextFocusListener(){
 
         firstNameEditText.setOnFocusChangeListener((v, hasFocus) -> {
@@ -244,6 +247,12 @@ public class CreateAccountFragment extends Fragment{
 
     }
 
+    /**
+     * Check if the data input is valid
+     * @param type which edit text field is to check
+     * @param data string data from the edit text field
+     * @return weather or not to display the error message
+     */
     private boolean checkEditTextFieldValidity(EditTextFieldType type, String data){
         boolean showErrorMessage = false;
         switch (type){
@@ -333,6 +342,10 @@ public class CreateAccountFragment extends Fragment{
         return showErrorMessage;
     }
 
+    /**
+     * show error message to the screen
+     * @param selectedTextView the error message to display
+     */
     private void showErrorMessage(TextView selectedTextView){
         selectedTextView.setVisibility(View.VISIBLE);
     }
@@ -361,10 +374,6 @@ public class CreateAccountFragment extends Fragment{
         if(!isConfirmPasswordValid){
             showErrorMessage(confirmPasswordErrorTextView);
             canCreateAccount = false;
-        }
-
-        if(canCreateAccount){
-
         }
 
     }
