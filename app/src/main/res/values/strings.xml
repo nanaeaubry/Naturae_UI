@@ -10,6 +10,7 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="back_button"><![CDATA[<]]></string>
+    <string name="ok">Ok</string>
 
     <!--Map-->
     <string name="title_map">Map</string>
@@ -31,6 +32,7 @@
     <string name="password_mismatch">Password does not match</string>
     <string name="confirm_password">Confirm password</string>
     <string name="create">Create</string>
+    <string name="create_account_error">There an error while trying to create your account, please try again</string>
 
 
     <!--Login-->

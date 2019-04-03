@@ -1,7 +1,6 @@
 package com.example.naturae_ui.Fragments;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
@@ -14,25 +13,9 @@ import android.widget.TextView;
 
 import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.Server.Test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.ref.WeakReference;
 import java.util.Objects;
-
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.okhttp.OkHttpChannelBuilder;
-
-import com.examples.naturaeproto.Naturae;
-import com.examples.naturaeproto.ServerRequestsGrpc;
-
-import javax.net.SocketFactory;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 
 public class LoginFragment extends Fragment implements View.OnClickListener{
 
@@ -144,40 +127,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
      * Preform login process
      */
     public void login(){
-        new GrpcTask(this).execute();
+        Test newTest = new Test();
+        newTest.printName();
     }
 
-    private static class GrpcTask extends AsyncTask<Void, Void, String>{
-
-        private final WeakReference<Fragment> fragmentReference;
-        private ManagedChannel channel;
-        public GrpcTask(LoginFragment loginFragment) {
-            this.fragmentReference = new WeakReference<>(loginFragment);
-        }
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            try{
-                channel = OkHttpChannelBuilder.forAddress("naturae.host", 443).useTransportSecurity().build();
-                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-                stub.sayHello(Naturae.HelloRequest.newBuilder().setName("Visal").build());
-
-            }catch (Exception e){
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                pw.flush();
-                System.out.printf("Failed... : %n%s", sw);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-        }
-
-    }
 
 }

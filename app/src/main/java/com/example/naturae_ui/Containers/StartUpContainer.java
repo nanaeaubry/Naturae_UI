@@ -38,6 +38,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         LOGIN,
         FORGOT_PASSWORD,
         CREATE_ACCOUNT,
+        ACCOUNT_AUTHENTICATION,
 
     }
 
@@ -46,34 +47,22 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_up_container);
 
-        mainLayout = (FrameLayout) findViewById(R.id.main_display_container);
-        startUpTopNav = (ConstraintLayout) findViewById(R.id.start_up_top_nav_bar);
+        mainLayout = findViewById(R.id.main_display_container);
+        startUpTopNav =  findViewById(R.id.start_up_top_nav_bar);
 
         //Initialize Login Fragment
         loginFragment = LoginFragment.newInstance();
         createAccountFragment = CreateAccountFragment.newInstance();
         accountAuthenFragment = AccountAuthenFragment.newInstance();
 
-        backButton = (Button) findViewById(R.id.back_button);
-        rightSideButton = (Button) findViewById(R.id.right_side_button);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        backButton = findViewById(R.id.back_button);
+        rightSideButton = findViewById(R.id.right_side_button);
+        progressBar = findViewById(R.id.progressBar);
 
         beginFragment(AuthFragmentType.LOGIN, true, false);
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
+        backButton.setOnClickListener(v -> onBackPressed());
 
-            }
-        });
-
-        rightSideButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
     /**
@@ -105,6 +94,8 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
 //                titleTextView.setText(R.string.forget_password_title);
 //                fragmentTransaction.replace(R.id.main_display_container, forgetPasswordFragment);
 //                break;
+            case ACCOUNT_AUTHENTICATION:
+                break;
         }
         if(addToBackStack) {
             fragmentTransaction.addToBackStack(null);
