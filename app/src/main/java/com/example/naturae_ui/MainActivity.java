@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.example.naturae_ui.Fragments.FriendFragment;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -30,6 +31,9 @@ public class MainActivity extends AppCompatActivity{
 					break;
 				case R.id.navigation_post:
 					selectedFragment = new PostFragment();
+					break;
+				case R.id.navigation_chat:
+					selectedFragment = new FriendFragment();
 					break;
 				case R.id.navigation_profile:
 					selectedFragment = new ProfileFragment();
