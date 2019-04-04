@@ -1,13 +1,14 @@
 package com.example.naturae_ui.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,14 @@ import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.Util.Helper;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class CreateAccountFragment extends Fragment{
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+public class CreateAccountFragment extends Fragment implements View.OnFocusChangeListener {
 
     private OnFragmentInteractionListener mListener;
     private TextInputEditText firstNameEditText;
@@ -32,8 +38,6 @@ public class CreateAccountFragment extends Fragment{
         passwordErrorTextView, confirmPasswordErrorTextView;
 
     private boolean isFirstNameValid, isLastNameValid, isEmailValid, isPasswordValid, isConfirmPasswordValid;
-    private Handler checkValidityHandler;
-    private Runnable checkValidityRunnable;
 
     private enum EditTextFieldType{
         FIRST_NAME,
@@ -77,14 +81,15 @@ public class CreateAccountFragment extends Fragment{
         passwordErrorTextView =  view.findViewById(R.id.password_error_text_view);
         confirmPasswordErrorTextView = view.findViewById(R.id.confirm_password_error_text_view);
 
-        Button createAccountButton = mListener.getRightSideButton();
-        checkValidityHandler = new Handler();
+        firstNameEditText.setOnFocusChangeListener(this);
+        lastNameEditText.setOnFocusChangeListener(this);
+        emailEditText.setOnFocusChangeListener(this);
+        passwordEditText.setOnFocusChangeListener(this);
+        confirmPasswordEditText.setOnFocusChangeListener(this);
 
+        Button createAccountButton = mListener.getRightSideButton();
         createAccountButton.setOnClickListener(v -> createAccount());
 
-        //Set up focus listener for all of the edit text field
-        setEditTextChangeListener();
-        setEditTextFocusListener();
 
         //Initialize variables
         isFirstNameValid = false;
@@ -109,8 +114,8 @@ public class CreateAccountFragment extends Fragment{
 
     @Override
     public void onResume() {
-        mListener.hideProgressBar();
         super.onResume();
+        mListener.hideProgressBar();
 
     }
 
@@ -131,273 +136,204 @@ public class CreateAccountFragment extends Fragment{
         Button getRightSideButton();
     }
 
-    /**
-     * Set text change listener for all of the edit text field
-     */
-    private void setEditTextChangeListener(){
-        firstNameEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                //Cancel
-                checkValidityHandler.removeCallbacks(null);
-                checkValidityHandler.postDelayed(() -> {
-                    if(checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, s.toString())){
-                        firstNameErrorTextView.setVisibility(View.VISIBLE);
-                    }else{
-                        firstNameErrorTextView.setVisibility(View.GONE);
-                    }
-                }, 1000);
-
-            }
-        });
-
-        lastNameEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, s.toString());
-
-            }
-        });
-
-        emailEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                checkEditTextFieldValidity(EditTextFieldType.EMAIL, s.toString());
-
-            }
-        });
-
-        passwordEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                checkEditTextFieldValidity(EditTextFieldType.PASSWORD, s.toString());
-            }
-        });
-
-        confirmPasswordEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, s.toString());
-
-            }
-        });
-
-    }
-
-    /**
-     * Initialize focus listener for all of the edit text field
-     */
-    private void setEditTextFocusListener(){
-
-        firstNameEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus){
-                if(checkEditTextFieldValidity(EditTextFieldType.FIRST_NAME, Objects.requireNonNull(firstNameEditText.getText()).toString())){
-                    showErrorMessage(firstNameErrorTextView);
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        TextInputEditText checkEditText = Objects.requireNonNull(getView()).findViewById(v.getId());
+        String inputString = Objects.requireNonNull(checkEditText.getText()).toString();
+        switch (v.getId()){
+            case R.id.first_name_edit_text:
+                checkEditTextFieldValidity(EditTextFieldType.FIRST_NAME, inputString);
+                break;
+            case R.id.last_name_edit_text:
+                checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, inputString);
+                break;
+            case R.id.email_edit_text:
+                checkEditTextFieldValidity(EditTextFieldType.EMAIL, inputString);
+                break;
+            case R.id.password_edit_text:
+                checkEditTextFieldValidity(EditTextFieldType.PASSWORD, inputString);
+                break;
+            case R.id.confirm_password_edit_text:
+                if (inputString.isEmpty()) {
+                    confirmPasswordErrorTextView.setVisibility(GONE);
+                }else{
+                    checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, inputString);
                 }
-
-            }
-        });
-
-        lastNameEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus){
-                if (checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, Objects.requireNonNull(lastNameEditText.getText()).toString())){
-                    showErrorMessage(lastNameErrorTextView);
-                }
-            }
-        });
-
-        emailEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus){
-                if (checkEditTextFieldValidity(EditTextFieldType.EMAIL, Objects.requireNonNull(emailEditText.getText()).toString())){
-                    showErrorMessage(emailErrorTextView);
-                }
-
-            }
-        });
-
-        passwordEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus){
-                if (checkEditTextFieldValidity(EditTextFieldType.PASSWORD, Objects.requireNonNull(passwordEditText.getText()).toString())){
-                    showErrorMessage(passwordErrorTextView);
-                }
-            }
-        });
-
-        confirmPasswordEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus){
-                if (checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, Objects.requireNonNull(passwordEditText.getText()).toString())){
-                    showErrorMessage(confirmPasswordErrorTextView);
-                }
-            }
-        });
-
+                break;
+        }
     }
 
     /**
      * Check if the data input is valid
-     * @param type which edit text field is to check
-     * @param data string data from the edit text field
-     * @return weather or not to display the error message
      */
-    private boolean checkEditTextFieldValidity(EditTextFieldType type, String data){
-        boolean showErrorMessage = false;
+    private void checkEditTextFieldValidity(EditTextFieldType type, String inputString){
         switch (type){
             case FIRST_NAME:
-                if(data.isEmpty()){
+                if (inputString.isEmpty()){
                     isFirstNameValid = false;
-                    firstNameErrorTextView.setVisibility(View.GONE);
                 }
-                else if(Helper.isNameValid(data)){
+                else if (Helper.isNameValid(inputString)) {
                     isFirstNameValid = true;
-                    firstNameErrorTextView.setVisibility(View.GONE);
-                }
-                else{
+                    firstNameErrorTextView.setVisibility(GONE);
+                }else{
                     isFirstNameValid = false;
-                    showErrorMessage = true;
+                    firstNameErrorTextView.setText(R.string.invalid_first_name);
+                    firstNameErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
             case LAST_NAME:
-                if(data.isEmpty()){
+                if (inputString.isEmpty()){
                     isLastNameValid = false;
-                    lastNameErrorTextView.setVisibility(View.GONE);
                 }
-                else if(Helper.isNameValid(data)){
+                else if (Helper.isNameValid(inputString)){
                     isLastNameValid = true;
-                    lastNameErrorTextView.setVisibility(View.GONE);
-                }
-                else{
+
+                    lastNameErrorTextView.setVisibility(GONE);
+                }else{
                     isLastNameValid = false;
-                    showErrorMessage = true;
+                    lastNameErrorTextView.setText(getText(R.string.invalid_last_name));
+                    lastNameErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
             case EMAIL:
-                if(data.isEmpty()){
+                if (inputString.isEmpty()){
                     isEmailValid = false;
-                    emailErrorTextView.setVisibility(View.GONE);
                 }
-                else if(Helper.isEmailValid(data)){
+                else if (Helper.isEmailValid(inputString)){
                     isEmailValid = true;
-                    emailErrorTextView.setVisibility(View.GONE);
-                }
-                else{
+                    emailErrorTextView.setVisibility(GONE);
+
+                }else{
                     isEmailValid = false;
-                    showErrorMessage = true;
+                    emailErrorTextView.setText(getText(R.string.invalid_email));
+                    emailErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
             case PASSWORD:
-                if(data.isEmpty()){
-                    isPasswordValid = false;
-                    passwordErrorTextView.setVisibility(View.GONE);
+                if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().isEmpty()){
+                    isConfirmPasswordValid = false;
+                    confirmPasswordErrorTextView.setVisibility(GONE);
                 }
-                else if(Helper.isPasswordValid(data)){
-                    isPasswordValid = true;
-                    passwordErrorTextView.setVisibility(View.GONE);
-                }
-                else{
-                    isPasswordValid = false;
-                    showErrorMessage = true;
+                else if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().compareTo(inputString) > 0){
+                    isConfirmPasswordValid = true;
+                    confirmPasswordErrorTextView.setVisibility(GONE);
+                }else{
+                    isConfirmPasswordValid = false;
+                    confirmPasswordErrorTextView.setVisibility(VISIBLE);
                 }
 
-                if(Objects.requireNonNull(confirmPasswordEditText.getText()).toString().isEmpty()){
-                    confirmPasswordErrorTextView.setVisibility(View.GONE);
+                if (inputString.isEmpty()){
+                    isPasswordValid = false;
                 }
-                else{
-                    if(Helper.doesStringMatch(data, confirmPasswordEditText.getText().toString())){
-                        confirmPasswordErrorTextView.setVisibility(View.GONE);
-                    }
-                    else{
-                        confirmPasswordErrorTextView.setVisibility(View.VISIBLE);
-                    }
+                else if(Helper.isPasswordValid(inputString)){
+                    isPasswordValid = true;
+                    passwordErrorTextView.setVisibility(GONE);
+                }else{
+                    isPasswordValid = false;
+                    passwordErrorTextView.setText(getText(R.string.invalid_password));
+                    passwordErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
             case CONFIRM_PASSWORD:
-                if(data.isEmpty()){
+                if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().isEmpty()){
                     isConfirmPasswordValid = false;
-                    confirmPasswordErrorTextView.setVisibility(View.GONE);
-                }
-                else if(Helper.doesStringMatch(data, Objects.requireNonNull(passwordEditText.getText()).toString())){
+                    confirmPasswordErrorTextView.setVisibility(GONE);
+                }else if (inputString.compareTo(Objects.requireNonNull(passwordEditText.getText()).toString()) < 1){
                     isConfirmPasswordValid = true;
-                    confirmPasswordErrorTextView.setVisibility(View.GONE);
-                }
-                else{
+                    confirmPasswordErrorTextView.setVisibility(GONE);
+                }else{
                     isConfirmPasswordValid = false;
-                    showErrorMessage = true;
+                    confirmPasswordErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
         }
-        return showErrorMessage;
-    }
-
-    /**
-     * show error message to the screen
-     * @param selectedTextView the error message to display
-     */
-    private void showErrorMessage(TextView selectedTextView){
-        selectedTextView.setVisibility(View.VISIBLE);
     }
 
     /**
      * Try to create user account
      */
     private void createAccount(){
-        boolean canCreateAccount = true;
-        if(!isFirstNameValid){
-            showErrorMessage(firstNameErrorTextView);
-            canCreateAccount = false;
-        }
-        if(!isLastNameValid){
-            showErrorMessage(lastNameErrorTextView);
-            canCreateAccount = false;
-        }
-        if(!isEmailValid){
-            showErrorMessage(emailErrorTextView);
-            canCreateAccount = false;
-        }
-        if(!isPasswordValid){
-            showErrorMessage(passwordErrorTextView);
-            canCreateAccount = false;
-        }
-        if(!isConfirmPasswordValid){
-            showErrorMessage(confirmPasswordErrorTextView);
-            canCreateAccount = false;
-        }
 
-        if(canCreateAccount){
+        if(!isAllInformationValid()){
             mListener.showProgressBar();
-
+            new GrpcCreateAccount(mListener).execute();
         }
 
     }
 
+    /**
+     * Check to make sure all of the information is valid and if any information is not valid it will
+     * display the error
+     * @return true is all information is valid; false is any of the information is not valid
+     */
+    private boolean isAllInformationValid(){
+        //Check to make sure first name is valid
+        if (!isFirstNameValid) {
+            if (Objects.requireNonNull(firstNameEditText.getText()).toString().isEmpty()){
+                firstNameErrorTextView.setText(getText(R.string.empty_first_name));
+                firstNameErrorTextView.setVisibility(VISIBLE);
+            }else {
+                checkEditTextFieldValidity(EditTextFieldType.FIRST_NAME, Objects.requireNonNull(firstNameEditText.getText()).toString());
+            }
+        }
+        //Check to make sure last name is valid
+        if (!isLastNameValid) {
+            if (Objects.requireNonNull(lastNameEditText.getText()).toString().isEmpty()){
+                lastNameErrorTextView.setText(getText(R.string.empty_last_name));
+                lastNameErrorTextView.setVisibility(VISIBLE);
+            }else {
+                checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, lastNameEditText.getText().toString());
+            }
+        }
+        //Check to make sure email is valid
+        if (!isEmailValid){
+            if(Objects.requireNonNull(emailEditText.getText()).toString().isEmpty()){
+                emailErrorTextView.setText(getText(R.string.empty_email));
+                emailErrorTextView.setVisibility(VISIBLE);
+            }else {
+                checkEditTextFieldValidity(EditTextFieldType.EMAIL, emailEditText.getText().toString());
+            }
+        }
+        //Check to make sure password is valid
+        if(!isPasswordValid){
+            if(Objects.requireNonNull(passwordEditText.getText()).toString().isEmpty()){
+                passwordErrorTextView.setText(getText(R.string.empty_password));
+                passwordErrorTextView.setVisibility(VISIBLE);
+            }else {
+                checkEditTextFieldValidity(EditTextFieldType.PASSWORD, passwordEditText.getText().toString());
+            }
+        }
+        //Check to make sure confirm password match
+        if (!isConfirmPasswordValid){
+            checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, Objects.requireNonNull(confirmPasswordEditText.getText()).toString());
+        }
+
+        if(isFirstNameValid && isLastNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private static class GrpcCreateAccount extends AsyncTask<String, Void, String[]>{
+        private final OnFragmentInteractionListener mListener;
+
+        private GrpcCreateAccount(OnFragmentInteractionListener mListener){
+            this.mListener = mListener;
+        }
+
+        @Override
+        protected String[] doInBackground(String... strings) {
+
+            return new String[0];
+        }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            mListener.hideProgressBar();
+            super.onPostExecute(strings);
+
+        }
+    }
 }

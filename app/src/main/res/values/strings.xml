@@ -25,14 +25,17 @@
     <!--Create Account-->
     <string name="invalid_email">Invalid email address</string>
     <string name="invalid_password">Invalid password</string>
-    <string name="password_short">Password must be at least 8 characters long</string>
     <string name="weak_password">Minimum 8 characters, a<![CDATA[-]]>z, A<![CDATA[-]]>Z, 0<![CDATA[-]]>9, @#$%^<![CDATA[&]]>=</string>
     <string name="invalid_last_name">Invalid last name</string>
     <string name="invalid_first_name">Invalid first name</string>
-    <string name="password_mismatch">Password does not match</string>
+    <string name="password_mismatch">Password did not match. Try again.</string>
     <string name="confirm_password">Confirm password</string>
     <string name="create">Create</string>
     <string name="create_account_error">There an error while trying to create your account, please try again</string>
+    <string name="empty_first_name">Enter first name</string>
+    <string name="empty_last_name">Enter last name</string>
+    <string name="empty_email">Enter email address</string>
+    <string name="empty_password">Enter password</string>
 
 
     <!--Login-->
