@@ -1,14 +1,11 @@
 package com.example.naturae_ui.Fragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,17 +16,9 @@ import android.widget.TextView;
 
 import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.Server.NaturaeUser;
-import com.example.naturae_ui.Util.Constants;
 import com.example.naturae_ui.Util.Helper;
-import com.example.naturae_ui.Util.UserUtilities;
-import com.examples.naturaeproto.Naturae;
-import com.examples.naturaeproto.ServerRequestsGrpc;
 
 import java.util.Objects;
-
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 
 public class CreateAccountFragment extends Fragment{
 
@@ -43,6 +32,8 @@ public class CreateAccountFragment extends Fragment{
         passwordErrorTextView, confirmPasswordErrorTextView;
 
     private boolean isFirstNameValid, isLastNameValid, isEmailValid, isPasswordValid, isConfirmPasswordValid;
+    private Handler checkValidityHandler;
+    private Runnable checkValidityRunnable;
 
     private enum EditTextFieldType{
         FIRST_NAME,
@@ -87,6 +78,7 @@ public class CreateAccountFragment extends Fragment{
         confirmPasswordErrorTextView = view.findViewById(R.id.confirm_password_error_text_view);
 
         Button createAccountButton = mListener.getRightSideButton();
+        checkValidityHandler = new Handler();
 
         createAccountButton.setOnClickListener(v -> createAccount());
 
@@ -152,7 +144,16 @@ public class CreateAccountFragment extends Fragment{
 
             @Override
             public void afterTextChanged(Editable s) {
-                checkEditTextFieldValidity(EditTextFieldType.FIRST_NAME,s.toString());
+                //Cancel
+                checkValidityHandler.removeCallbacks(null);
+                checkValidityHandler.postDelayed(() -> {
+                    if(checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, s.toString())){
+                        firstNameErrorTextView.setVisibility(View.VISIBLE);
+                    }else{
+                        firstNameErrorTextView.setVisibility(View.GONE);
+                    }
+                }, 1000);
+
             }
         });
 
@@ -206,6 +207,7 @@ public class CreateAccountFragment extends Fragment{
 
             @Override
             public void afterTextChanged(Editable s) {
+
                 checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, s.toString());
 
             }
@@ -393,69 +395,9 @@ public class CreateAccountFragment extends Fragment{
 
         if(canCreateAccount){
             mListener.showProgressBar();
-            new GrpcTask(mListener, getContext(), getActivity()).execute(
-                    Constants.APP_KEY,
-                    Objects.requireNonNull(firstNameEditText.getText().toString()),
-                    Objects.requireNonNull(lastNameEditText.getText().toString()),
-                    Objects.requireNonNull(emailEditText.getText().toString()),
-                    Objects.requireNonNull(passwordEditText.getText().toString())
-            );
-        }
-
-    }
-
-    private static class GrpcTask extends AsyncTask<String, Void, NaturaeUser>{
-        private ManagedChannel channel;
-        private Context context;
-        private OnFragmentInteractionListener mListener;
-        private FragmentActivity currActivity;
-
-        private GrpcTask(OnFragmentInteractionListener mListener, Context context, FragmentActivity fragmentActivity){
-            this.context = context;
-            this.mListener = mListener;
-            this.currActivity = fragmentActivity;
-        }
-
-        @Override
-        protected NaturaeUser doInBackground(String... params) {
-            NaturaeUser newAccount = null;
-            try {
-                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
-                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-                Naturae.CreateAccountRequest request = Naturae.CreateAccountRequest.newBuilder().setAppKey(params[0]).setFirstName(params[1])
-                        .setLastName(params[2]).setEmail(params[3]).setPassword(params[4]).build();
-                Naturae.CreateAccountReply reply = stub.createAccount(request);
-                if (reply.getErrorListCount() > 0){
-                    newAccount = new NaturaeUser(null, null, null, null,
-                           null, null);
-                }else{
-                    newAccount = new NaturaeUser(params[1], params[2], params[3], reply.getAccessToken(),
-                            reply.getRefreshToken(), "");
-                }
-
-            }
-            catch (Exception e ){
-                System.out.println(e);
-            }
-            return newAccount;
-        }
-
-        @Override
-        protected void onPostExecute(NaturaeUser newAccount) {
-            mListener.hideProgressBar();
-            //Check if the account was able to be created successfully
-            if(newAccount.getEmail() != ""){
-                UserUtilities.cacheUser(context, newAccount);
-                mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, false,
-                        true);
-            }else{
-                AlertDialog.Builder builder = new AlertDialog.Builder(currActivity);
-                builder.setMessage(R.string.create_account_error);
-                builder.setPositiveButton(R.string.ok, (dialog, which) -> dialog.cancel());
-                AlertDialog dialog = builder.create();
-            }
 
         }
+
     }
 
 }

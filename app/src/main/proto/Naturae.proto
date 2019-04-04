@@ -1,8 +1,6 @@
 syntax = "proto3";
-option java_multiple_files = false;
 option java_package = "com.examples.naturaeproto";
-option java_outer_classname = "Naturae";
-option objc_class_prefix = "HLW";
+option go_package = "proto";
 
 
 package naturaeproto;
