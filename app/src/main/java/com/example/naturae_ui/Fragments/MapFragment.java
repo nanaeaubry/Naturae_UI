@@ -41,7 +41,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 	public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		mMapView = (MapView) mView.findViewById(R.id.map);
+		mMapView = mView.findViewById(R.id.map);
 		if(mMapView != null){
 			mMapView.onCreate(null);
 			mMapView.onResume();
@@ -56,9 +56,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 		mGoogleMap = googleMap;
 		googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-		googleMap.addMarker(new MarkerOptions().position(new LatLng(40.689247, -74.044502)).title("Statue of Liberty").snippet("Hope its ok"));
-		CameraPosition Liberty = CameraPosition.builder().target(new LatLng(40.689247, -74.044502)).zoom(16).bearing(0).tilt(45).build();
+		googleMap.addMarker(new MarkerOptions().position(new LatLng(33.7874, -118.1144)).title("Walter Pyramid").snippet("Hope its ok"));
+		CameraPosition Pyramid = CameraPosition.builder().target(new LatLng(33.7874, -118.1144)).zoom(14).bearing(0).tilt(45).build();
 
-		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Liberty));
+		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Pyramid));
 	}
 }
