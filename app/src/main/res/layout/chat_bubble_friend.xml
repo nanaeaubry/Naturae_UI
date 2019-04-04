@@ -8,7 +8,7 @@
     android:clipToPadding="false">
 
     <View
-        android:id="@+id/avatar"
+        android:id="@+id/bubble_friend_avatar"
         android:layout_alignParentLeft="true"
         android:scaleType="centerInside"
         android:background="@drawable/chat_avatar_friend"
@@ -16,21 +16,21 @@
         android:layout_height="34dp" />
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/bubble_friend_username"
         android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/avatar"
-        android:layout_alignTop="@+id/avatar"
+        android:layout_toRightOf="@+id/bubble_friend_avatar"
+        android:layout_alignTop="@+id/bubble_friend_avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
-        android:text="Rose"/>
+        android:text="Rosa"/>
 
     <TextView
+        android:id="@+id/bubble_friend_messageBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/message_body"
-        android:layout_below="@+id/name"
-        android:layout_alignLeft="@+id/name"
+        android:layout_below="@+id/bubble_friend_username"
+        android:layout_alignLeft="@+id/bubble_friend_username"
         android:background="@drawable/chat_bubble_friend"
         android:paddingVertical="12dp"
         android:paddingHorizontal="16dp"

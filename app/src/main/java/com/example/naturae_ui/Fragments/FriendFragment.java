@@ -2,6 +2,7 @@ package com.example.naturae_ui.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +40,7 @@ public class FriendFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_friend, container, false);
 
+        //************SAMPLE DATA******************************************
         Log.d(TAG, "initRecyclerView: init recyclerview.");
         friendsList = new ArrayList<Friend>();
         friendsList.add(new Friend("Jimmy"));
@@ -49,25 +51,47 @@ public class FriendFragment extends Fragment {
         friendsList.add(new Friend("Catherine"));
         friendsList.add(new Friend("Josh"));
         friendsList.add(new Friend("Colin"));
+        //************SAMPLE DATA******************************************
+
 
         RecyclerView recyclerView = view.findViewById(R.id.friend_recycler);
         FriendAdapter adapter = new FriendAdapter(getContext(), friendsList);
 
+        //ONCLICK EVENT DEFINITION
         adapter.setClickListener(new FriendAdapter.ClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                Log.d(TAG, "onItemClick position: " + position);
+            public void onItemClick(View view, int position, Friend friend) {
+                Log.d(TAG, "onFriendClick position: " + position);
+
+                //Assemble new Chat Fragment to pass arguments into
+                ChatFragment chatfragment = new ChatFragment();
+                //Creates a new bundle of capacity 1 to pass in arguments
+                Bundle bundle = new Bundle(1);
+                bundle.putString("argUsername", friend.getName());
+                chatfragment.setArguments(bundle);
+
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+
+                //Acquire container id and switch fragment
+                fragmentTransaction.replace(((ViewGroup)getView().getParent()).getId(), chatfragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+
             }
         });
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        //Creates a simple divider underneath a view
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),
                 DividerItemDecoration.VERTICAL));
+
         return view;
     }
 
     /**
-     * Commits any changes that should be persisted beydond the current user session
+     * Commits any changes that should be persisted beyond the current user session
      * The system calls this method as the first indication that the user is leaving the fragment
      */
     @Override

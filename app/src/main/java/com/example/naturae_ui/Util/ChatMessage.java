@@ -4,20 +4,22 @@ package com.example.naturae_ui.Util;
  * Represents a single message sent by a user or friend
  */
 public class ChatMessage {
-    private String text;
+    private String messageBody;
     //timestamp is formed by toString() call of java.sql.Timestamp
     private String timestamp;
     private String name;
     private boolean isSentByUser;
 
     /**
-     * Initalize message data
-     * @param text
+     * Initalize a text message that was received from the server-end chatlog
+     * @param messageBody
+     * @param name
      * @param timestamp
+     * @param isSentByUser
      */
-    public ChatMessage(String text, String name, String timestamp, boolean isSentByUser){
-        this.text = text;
-        this.timestamp = timestamp;
+    public ChatMessage(String messageBody, String name, String timestamp, boolean isSentByUser){
+        this.messageBody = messageBody;
+        //this.timestamp = timestamp;
         this.isSentByUser = isSentByUser;
         this.name = name;
     }
@@ -25,8 +27,8 @@ public class ChatMessage {
     /**
      * @return the text body of the message as a String
      */
-    public String getText(){
-        return text;
+    public String getMessageBody(){
+        return messageBody;
     }
 
     /**
@@ -36,6 +38,7 @@ public class ChatMessage {
     public String getName(){
         return name;
     }
+
     /**
      * @return the recorded date-time of when the message was sent
      */

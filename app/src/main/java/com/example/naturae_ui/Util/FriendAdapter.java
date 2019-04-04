@@ -23,9 +23,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
      * @param friendsList
      */
     public FriendAdapter(Context context, List<Friend> friendsList){
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.friendsList = friendsList;
-        this.context = context;
     }
 
     /**
@@ -36,6 +36,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
      */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View view = inflater.inflate(R.layout.list_item_friend, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
@@ -64,9 +65,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     }
 
     /**
+     * A ViewHolder describes an item view and metadata about its place within the RecyclerView.
      * Stores and recycles views as they are scrolled off screen
      */
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView usernameView;
         View avatar;
 
@@ -81,7 +83,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
         @Override
         public void onClick(View userView){
             if (clickListener != null) {
-                clickListener.onItemClick(userView, getAdapterPosition());
+                int i = getAdapterPosition();
+                clickListener.onItemClick(userView, i, friendsList.get(i));
             }
         }
     }
@@ -98,6 +101,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
      * FriendFragment implements onItemClick to perform actions
      */
     public interface ClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(View view, int position, Friend friend);
     }
 }

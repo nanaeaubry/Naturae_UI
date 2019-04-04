@@ -8,9 +8,9 @@
     android:clipToPadding="false">
 
     <TextView
+        android:id="@+id/bubble_user_messageBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/message_body"
         android:background="@drawable/chat_bubble_user"
         android:textColor="#fff"
         android:padding="10dp"
