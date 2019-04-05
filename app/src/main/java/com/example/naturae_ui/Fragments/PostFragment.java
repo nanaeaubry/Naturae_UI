@@ -1,9 +1,13 @@
 package com.example.naturae_ui.Fragments;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +15,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.example.naturae_ui.Models.Post;
 import com.example.naturae_ui.R;
 
 public class PostFragment extends Fragment {
@@ -21,6 +26,8 @@ public class PostFragment extends Fragment {
 	AutoCompleteTextView speciesPost;
 	AutoCompleteTextView descriptionPost;
 	Button submitPost;
+	OnPostListener listener;
+
 
 	@Nullable
 	@Override
@@ -59,10 +66,45 @@ public class PostFragment extends Fragment {
 		submitPost.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (TextUtils.isEmpty(titlePost.getText()) || TextUtils.isEmpty(speciesPost.getText()) || TextUtils.isEmpty(descriptionPost.getText())) {
+					new AlertDialog.Builder(getContext())
+							.setTitle("One or more fields are empty").setMessage("Please make sure all fields are correct ")
+							.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+
+								}
+							}).show();
+					return;
+				}
+				Post post = new Post();
+
+
+				post.title = titlePost.getText().toString();
+				post.species = speciesPost.getText().toString();
+				post.description = descriptionPost.getText().toString();
+				listener.onPostCreated(post);
 			}
+
+			;
+
+
 		});
 		return mView;
 	}
 
 
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		try {
+			listener = (OnPostListener) context;
+
+		} catch (ClassCastException c) {
+			throw new ClassCastException(context.toString() + " must implement OnPostListener");
+		}
+	}
+
+	public interface OnPostListener {
+		void onPostCreated(Post post);
+	}
 }
