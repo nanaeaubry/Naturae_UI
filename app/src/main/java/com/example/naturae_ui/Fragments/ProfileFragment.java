@@ -1,4 +1,4 @@
-package com.example.naturae_ui;
+package com.example.naturae_ui.Fragments;
 
 import android.support.v4.app.Fragment;
 
