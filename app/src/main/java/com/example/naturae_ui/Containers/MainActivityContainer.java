@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -45,6 +46,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
 
 		// Load bottom navigation bar
 		navigation = findViewById(R.id.navigation);

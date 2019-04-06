@@ -118,6 +118,7 @@ public class PostFragment extends Fragment {
 				post.description = descriptionPost.getText().toString();
 				post.lat = latLong[0];
 				post.lng = latLong[1];
+				post.image = selectedImage;
 				listener.onPostCreated(post);
 
 				// Cleanup
