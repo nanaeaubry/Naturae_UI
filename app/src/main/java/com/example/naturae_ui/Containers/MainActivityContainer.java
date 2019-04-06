@@ -38,6 +38,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	FrameLayout mFragmentContainer;
 	Fragment mPostFragment;
 	Fragment mProfileFragment;
+	BottomNavigationView navigation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -46,8 +47,10 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		setContentView(R.layout.activity_main);
 
 		// Load bottom navigation bar
-		BottomNavigationView navigation = findViewById(R.id.navigation);
+		navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
+
+
 
 		mPostFragment = new PostFragment();
 
@@ -63,6 +66,27 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 	}
 
+	private void showMap(){
+		mMapView.setVisibility(View.VISIBLE);
+		mFragmentContainer.setVisibility(View.GONE);
+
+
+	}
+
+	private void showPost(){
+		mMapView.setVisibility(View.INVISIBLE);
+		mFragmentContainer.setVisibility(View.VISIBLE);
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPostFragment).commit();
+
+	}
+
+	private void showProfile(){
+		mMapView.setVisibility(View.INVISIBLE);
+		mFragmentContainer.setVisibility(View.VISIBLE);
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mProfileFragment).commit();
+
+	}
+
 	/**
 	 * Enable navigation on bottom bar.
 	 */
@@ -74,19 +98,15 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 			Fragment selectedFragment = null;
 			switch (item.getItemId()) {
 				case R.id.navigation_map:
-					mMapView.setVisibility(View.VISIBLE);
-					mFragmentContainer.setVisibility(View.GONE);
-					return true;
+					showMap();
+					break;
 				case R.id.navigation_post:
-					selectedFragment = mPostFragment;
+					showPost();
 					break;
 				case R.id.navigation_profile:
-					selectedFragment = mProfileFragment;
+					showProfile();
 					break;
 			}
-			mMapView.setVisibility(View.INVISIBLE);
-			mFragmentContainer.setVisibility(View.VISIBLE);
-			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
 			return true;
 		}
 	};
@@ -127,6 +147,8 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 	@Override
 	public void onPostCreated(Post post) {
-		mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(34.055569, -117.182541)).title("Home").snippet("Hope its ok"));
+		mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
+		navigation.setSelectedItemId(R.id.navigation_map);
+
 	}
 }

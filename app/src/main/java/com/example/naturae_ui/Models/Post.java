@@ -4,6 +4,6 @@ public class Post {
 	public String title;
 	public String species;
 	public String description;
-	public Double lat;
-	public Double lng;
+	public float lat;
+	public float lng;
 }
