@@ -3,54 +3,60 @@
 
 	<string name="dropped_pin">Dropped Pin</string>
 
-	<!--Shared Strings-->
-	<string name="google_map_key">Google Map Key</string>
-	<string name="app_name">Naturae</string>
-	<string name="API_Key">AIzaSyAoLYtlxsSkFQNJ53Dn-x9VoZsrcwSFmjk</string>
-	<string name="first_name">First name</string>
-	<string name="last_name">Last name</string>
-	<string name="email">Email</string>
-	<string name="password">Password</string>
+    <!--Shared Strings-->
+    <string name="google_map_key">Google Map Key</string>
+    <string name="app_name">Naturae</string>
+    <string name="API_Key">AIzaSyAoLYtlxsSkFQNJ53Dn-x9VoZsrcwSFmjk</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
 
-	<!--Map-->
-	<string name="title_map">Map</string>
-	<string name="title_post">Post</string>
-	<string name="title_profile">Profile</string>
-	<string name="title_activity_maps">Map</string>
-	<string name="normal_map">Normal Map</string>
-	<string name="hybrid_map">Hybrid Map</string>
-	<string name="satellite_map">Satellite Map</string>
-	<string name="terrain_map">Terrain Map</string>
+    <!--Map-->
+    <string name="title_map">Map</string>
+    <string name="title_post">Post</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="normal_map">Normal Map</string>
+    <string name="hybrid_map">Hybrid Map</string>
+    <string name="satellite_map">Satellite Map</string>
+    <string name="terrain_map">Terrain Map</string>
 
-	<!--Create Account-->
-	<string name="invalid_email">Invalid email</string>
-	<string name="invalid_password">Invalid password</string>
-	<string name="password_short">Password must be at least 8 characters long</string>
-	<string name="weak_password">Password must contain at least one of (a-z, A-Z, 0-9, Special Character)</string>
-	<string name="invalid_last_name">Invalid last name</string>
-	<string name="invalid_first_name">Invalid first name</string>
-	<string name="password_mismatch">Password does not match</string>
-	<string name="confirm_password">Confirm password</string>
-	<string name="create">Create</string>
+    <!--Friends-->
+    <string name = "title_chat">Chat</string>
+    <string name = "header_friends">Your Friends</string>
+    <string name = "place_holder_text">Write your Message</string>
+    <string name = "content_description_send">Send Button</string>
+
+    <!--Create Account-->
+    <string name="invalid_email">Invalid email</string>
+    <string name="invalid_password">Invalid password</string>
+    <string name="password_short">Password must be at least 8 characters long</string>
+    <string name="weak_password">Password must contain at least one of (a-z, A-Z, 0-9, Special Character)</string>
+    <string name="invalid_last_name">Invalid last name</string>
+    <string name="invalid_first_name">Invalid first name</string>
+    <string name="password_mismatch">Password does not match</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="create">Create</string>
 
 
-	<!--Login-->
-	<string name="forget_password">Forget Password?</string>
-	<string name="login">Login</string>
-	<string name="create_account">Create Account</string>
-	<string name="invalid_email_password">Invalid username or password</string>
+    <!--Login-->
+    <string name="forget_password">Forget Password?</string>
+    <string name="login">Login</string>
+    <string name="create_account">Create Account</string>
+    <string name="invalid_email_password">Invalid username or password</string>
 
-	<!--Authentication-->
-	<string name="authentication_message">An email message with a 6-digit authentication code was just
+    <!--Authentication-->
+    <string name="authentication_message">An email message with a 6-digit authentication code was just
     sent to</string>
-	<string name="verify">Verify</string>
-	<string name="no_authen_code">Don\'t have your code?</string>
+    <string name="verify">Verify</string>
+    <string name="no_authen_code">Don\'t have your code?</string>
 
-	<!-- TODO: Remove or change this placeholder text -->
-	<string name="hello_blank_fragment">Hello blank fragment</string>
-	<string name="code">Code</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="code">Code</string>
 
-	<!--Create Account-->
+    <!--Create Account-->
 
 
 </resources>
