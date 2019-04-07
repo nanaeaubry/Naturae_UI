@@ -1,7 +1,7 @@
 syntax = "proto3";
-option java_package = "com.examples.naturaeproto";
-option go_package = "proto";
 
+option java_package = "com.examples.naturaeproto";
+option go_package = "naturaeproto";
 
 package naturaeproto;
 
@@ -31,8 +31,14 @@ message CreateAccountRequest{
 message CreateAccountReply{
     string accessToken = 1;
     string refreshToken = 2;
-    repeated string errorList = 3;
+    Status status = 3;
 }
+
+message Status{
+    int32 Code = 1;
+    string Message = 2;
+}
+
 //
 //message LoginRequest{
 //    string appKey = 1;

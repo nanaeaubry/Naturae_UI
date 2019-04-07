@@ -2,6 +2,7 @@ package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;

@@ -14,6 +14,7 @@ public class UserUtilities {
     private static final String REFRESH_TOKEN = "refreshToken";
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
+    private static final String IS_LOGGED_IN = "isLoggedIn";
 
 
     /**
@@ -37,6 +38,8 @@ public class UserUtilities {
         editor.putString(FIRST_NAME, user.getFirstName());
         // Cache the User's last name
         editor.putString(LAST_NAME, user.getLastName());
+        //Cache if the ser is logged in
+        editor.putBoolean(IS_LOGGED_IN, false);
         // Apply the changes
         editor.apply();
     }
@@ -46,9 +49,9 @@ public class UserUtilities {
      * otherwise, return null
      * @return The current logged in User's username, and null otherwise
      */
-    public static String isLoggedIn(Context context){
+    public static boolean isLoggedIn(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
-        return userPreferences.getString(EMAIL, null);
+        return userPreferences.getBoolean(IS_LOGGED_IN, false);
     }
     /**
      *
@@ -81,7 +84,7 @@ public class UserUtilities {
      * Update the user's first name cache
      * @param name user's new first name
      */
-    private static void upDateFirstName(String name){
+    private static void setFirstName(String name){
         userPreferences.edit().putString(FIRST_NAME, name).apply();
     }
 
@@ -89,7 +92,7 @@ public class UserUtilities {
      * Update the user's last name cache
      * @param name user's new last name
      */
-    private static void upDateLastName(String name){
+    private static void setLastName(String name){
         userPreferences.edit().putString(LAST_NAME, name).apply();
     }
 
@@ -97,7 +100,7 @@ public class UserUtilities {
      * Update the user's email cache
      * @param emailAddress user's new email
      */
-    private static void upDateEmail(String emailAddress){
+    private static void setEmail(String emailAddress){
         userPreferences.edit().putString(EMAIL, emailAddress).apply();
     }
 
@@ -105,7 +108,7 @@ public class UserUtilities {
      * Update user's access token id cache
      * @param tokenID user's new access token id
      */
-    private static void upDateAccessToken(String tokenID){
+    private static void setAccessToken(String tokenID){
         userPreferences.edit().putString(ACCESS_TOKEN, tokenID).apply();
     }
 

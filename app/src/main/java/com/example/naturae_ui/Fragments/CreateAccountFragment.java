@@ -5,10 +5,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +15,22 @@ import android.widget.TextView;
 
 import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.Server.NaturaeUser;
+import com.example.naturae_ui.Util.Constants;
 import com.example.naturae_ui.Util.Helper;
+import com.example.naturae_ui.Util.UserUtilities;
+import com.examples.naturaeproto.Naturae;
+import com.examples.naturaeproto.ServerRequestsGrpc;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.okhttp.internal.Util;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -138,41 +147,45 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        TextInputEditText checkEditText = Objects.requireNonNull(getView()).findViewById(v.getId());
-        String inputString = Objects.requireNonNull(checkEditText.getText()).toString();
-        switch (v.getId()){
-            case R.id.first_name_edit_text:
-                checkEditTextFieldValidity(EditTextFieldType.FIRST_NAME, inputString);
-                break;
-            case R.id.last_name_edit_text:
-                checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, inputString);
-                break;
-            case R.id.email_edit_text:
-                checkEditTextFieldValidity(EditTextFieldType.EMAIL, inputString);
-                break;
-            case R.id.password_edit_text:
-                checkEditTextFieldValidity(EditTextFieldType.PASSWORD, inputString);
-                break;
-            case R.id.confirm_password_edit_text:
-                if (inputString.isEmpty()) {
-                    confirmPasswordErrorTextView.setVisibility(GONE);
-                }else{
-                    checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, inputString);
-                }
-                break;
+        if (!hasFocus) {
+            switch (v.getId()){
+                case R.id.first_name_edit_text:
+                    checkEditTextFieldValidity(EditTextFieldType.FIRST_NAME, Objects.requireNonNull(firstNameEditText.getText()).toString());
+                    break;
+                case R.id.last_name_edit_text:
+                    checkEditTextFieldValidity(EditTextFieldType.LAST_NAME, Objects.requireNonNull(lastNameEditText.getText()).toString());
+                    break;
+                case R.id.email_edit_text:
+                    checkEditTextFieldValidity(EditTextFieldType.EMAIL, Objects.requireNonNull(emailEditText.getText()).toString());
+                    break;
+                case R.id.password_edit_text:
+                    checkEditTextFieldValidity(EditTextFieldType.PASSWORD, Objects.requireNonNull(passwordEditText.getText()).toString());
+                    break;
+                case R.id.confirm_password_edit_text:
+                    if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().isEmpty()) {
+                        confirmPasswordErrorTextView.setVisibility(GONE);
+                    }else{
+                        checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, confirmPasswordEditText.getText().toString());
+                    }
+                    break;
+            }
         }
+
     }
 
     /**
-     * Check if the data input is valid
+     * Check is the information provide by the user is in a valid format
+     * @param type the format to check
+     * @param inputString the information entered and to check
      */
     private void checkEditTextFieldValidity(EditTextFieldType type, String inputString){
         switch (type){
+            //Check if first name is valid
             case FIRST_NAME:
                 if (inputString.isEmpty()){
                     isFirstNameValid = false;
                 }
-                else if (Helper.isNameValid(inputString)) {
+                else if (Helper.isNameValid(inputString)){
                     isFirstNameValid = true;
                     firstNameErrorTextView.setVisibility(GONE);
                 }else{
@@ -181,13 +194,13 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                     firstNameErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
+            //Check if last name is valid
             case LAST_NAME:
                 if (inputString.isEmpty()){
                     isLastNameValid = false;
                 }
                 else if (Helper.isNameValid(inputString)){
                     isLastNameValid = true;
-
                     lastNameErrorTextView.setVisibility(GONE);
                 }else{
                     isLastNameValid = false;
@@ -195,6 +208,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                     lastNameErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
+            //Check if email is valid
             case EMAIL:
                 if (inputString.isEmpty()){
                     isEmailValid = false;
@@ -209,12 +223,13 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                     emailErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
+            //Check if password is valid
             case PASSWORD:
                 if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().isEmpty()){
                     isConfirmPasswordValid = false;
                     confirmPasswordErrorTextView.setVisibility(GONE);
                 }
-                else if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().compareTo(inputString) > 0){
+                else if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().compareTo(inputString) < 1){
                     isConfirmPasswordValid = true;
                     confirmPasswordErrorTextView.setVisibility(GONE);
                 }else{
@@ -234,6 +249,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                     passwordErrorTextView.setVisibility(VISIBLE);
                 }
                 break;
+            //Check if confirm password is valid
             case CONFIRM_PASSWORD:
                 if (Objects.requireNonNull(confirmPasswordEditText.getText()).toString().isEmpty()){
                     isConfirmPasswordValid = false;
@@ -253,10 +269,18 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
      * Try to create user account
      */
     private void createAccount(){
+         //Check if first name, last name, email, password, and confirm password is valid
+         //If any of the information is invalid then an error message will appear below the edit text field
+         //If all of the information are valid then it will create an request to the server to create the user
 
-        if(!isAllInformationValid()){
+        if(isAllInformationValid()){
             mListener.showProgressBar();
-            new GrpcCreateAccount(mListener).execute();
+            new GrpcCreateAccount(mListener, getActivity()).execute(
+                    Objects.requireNonNull(firstNameEditText.getText()).toString(),
+                    Objects.requireNonNull(lastNameEditText.getText()).toString(),
+                    Objects.requireNonNull(emailEditText.getText()).toString(),
+                    Objects.requireNonNull(passwordEditText.getText()).toString()
+            );
         }
 
     }
@@ -308,32 +332,92 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
             checkEditTextFieldValidity(EditTextFieldType.CONFIRM_PASSWORD, Objects.requireNonNull(confirmPasswordEditText.getText()).toString());
         }
 
-        if(isFirstNameValid && isLastNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid){
-            return true;
-        }
+        return isFirstNameValid && isLastNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid;
 
-        return false;
     }
 
-
-    private static class GrpcCreateAccount extends AsyncTask<String, Void, String[]>{
+    /**
+     * Create an Async task to handle server request form the client
+     */
+    private static class GrpcCreateAccount extends AsyncTask<String, Void, Naturae.CreateAccountReply>{
         private final OnFragmentInteractionListener mListener;
+        private final WeakReference<Activity> activity;
+        private ManagedChannel channel;
+        private String firstName, lastName, email;
 
-        private GrpcCreateAccount(OnFragmentInteractionListener mListener){
+        private GrpcCreateAccount(OnFragmentInteractionListener mListener, Activity activity){
             this.mListener = mListener;
+            this.activity = new WeakReference<>(activity);
         }
 
         @Override
-        protected String[] doInBackground(String... strings) {
-
-            return new String[0];
-        }
-
-        @Override
-        protected void onPostExecute(String[] strings) {
+        protected void onCancelled(Naturae.CreateAccountReply reply) {
+            super.onCancelled(reply);
+            //Remove the progress bar
             mListener.hideProgressBar();
-            super.onPostExecute(strings);
+        }
 
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            //Remove the progress bar
+            mListener.hideProgressBar();
+        }
+
+        @Override
+        protected Naturae.CreateAccountReply doInBackground(String... params) {
+            Naturae.CreateAccountReply reply;
+            try{
+                //Create a channel to connect to the server
+                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+                //Create a stub for with the channel
+                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+                firstName = params[0];
+                lastName = params[1];
+                email = params[2];
+                //Create an gRPC create account request
+                Naturae.CreateAccountRequest request = Naturae.CreateAccountRequest.newBuilder().setAppKey(Constants.APP_KEY)
+                        .setFirstName(firstName).setLastName(lastName).setEmail(email).setPassword(params[3]).build();
+                //Send the request to the server and set reply to equal the response back from the server
+                reply = stub.createAccount(request);
+
+            }catch (Exception e){
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+                return null;
+            }
+            return reply;
+
+        }
+
+        @Override
+        protected void onPostExecute(Naturae.CreateAccountReply reply) {
+            super.onPostExecute(reply);
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            //Remove the progress bar from the screen
+            mListener.hideProgressBar();
+
+            //Check the status of the request
+            //If the status code is 201, then the account was able to created successfully
+            //If the status code is 150, then there already an account with that email address
+            //Any thing else then the an server error
+            if (reply.getStatus().getCode() == Constants.ACCOUNT_CREATED){
+                //Cache the user
+                UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
+                        reply.getAccessToken(), reply.getRefreshToken(), ""));
+                mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, false, false);
+            }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
+
+            }else{
+
+            }
         }
     }
 }

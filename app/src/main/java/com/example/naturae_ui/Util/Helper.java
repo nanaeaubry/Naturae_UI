@@ -34,7 +34,7 @@ public class Helper {
         if(password.isEmpty()){
             return false;
         }
-        return Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$").matcher(password).matches();
+        return Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+])(?=\\S+$).{8,}$").matcher(password).matches();
 
     }
 
