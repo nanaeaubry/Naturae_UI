@@ -51,20 +51,4 @@ public class Helper {
 
     }
 
-
-    public static boolean isConfirmPasswordValid(String password, String confirmPassword){
-        if(password.contentEquals(confirmPassword)){
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean doesStringMatch(String firstString, String secondString){
-        if(firstString.compareTo(secondString) > 0){
-            return false;
-        }
-        return true;
-    }
-
-
 }

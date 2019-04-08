@@ -13,10 +13,11 @@ import com.example.naturae_ui.R;
 
 public class AccountAuthenFragment extends Fragment {
 
-
     private OnFragmentInteractionListener mListener;
+    private String userEmail;
 
     public AccountAuthenFragment() {
+        userEmail = "*****";
         // Required empty public constructor
     }
 
@@ -58,4 +59,7 @@ public class AccountAuthenFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction();
     }
+
+    public void setSendEmail(String email){
+        userEmail = email.substring(email.indexOf("@");
 }

@@ -1,7 +1,9 @@
 package com.example.naturae_ui.Fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -143,6 +145,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
         void beginFragment(StartUpContainer.AuthFragmentType fragmentType, boolean setTransition,
                            boolean addToBackStack);
         Button getRightSideButton();
+        void setSendAuthenEmail(String email);
     }
 
     @Override
@@ -378,6 +381,10 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 //Create an gRPC create account request
                 Naturae.CreateAccountRequest request = Naturae.CreateAccountRequest.newBuilder().setAppKey(Constants.APP_KEY)
                         .setFirstName(firstName).setLastName(lastName).setEmail(email).setPassword(params[3]).build();
+
+                new Thread(()->{
+                    mListener.setSendAuthenEmail(email);
+                }).start();
                 //Send the request to the server and set reply to equal the response back from the server
                 reply = stub.createAccount(request);
 
@@ -412,12 +419,26 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 //Cache the user
                 UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
                         reply.getAccessToken(), reply.getRefreshToken(), ""));
-                mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, false, false);
+                mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, false, true);
             }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
-
+                //Display an error message that an account with the email already exist
+                displayError((String) activity.get().getText(R.string.email_exist));
             }else{
-
+                //Display an create account error
+                displayError((String) activity.get().getText(R.string.create_account_error));
             }
+        }
+
+        /**
+         * Create an dialog box that display the error
+         * @param message the error message to be display
+         */
+        private void displayError(String message){
+            //Create an instance of Alert Dialog
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity.get());
+            alertDialogBuilder.setTitle("Error").setMessage(message).setPositiveButton(R.string.ok, (dialog, which) -> {
+                dialog.cancel();
+            }).show();
         }
     }
 }

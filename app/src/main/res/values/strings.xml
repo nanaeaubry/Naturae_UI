@@ -31,11 +31,13 @@
     <string name="password_mismatch">Password did not match. Try again.</string>
     <string name="confirm_password">Confirm password</string>
     <string name="create">Create</string>
-    <string name="create_account_error">There an error while trying to create your account, please try again</string>
+    <string name="create_account_error">There an error while trying to create your account. Please try again</string>
     <string name="empty_first_name">Enter first name</string>
     <string name="empty_last_name">Enter last name</string>
     <string name="empty_email">Enter email address</string>
     <string name="empty_password">Enter password</string>
+    <string name="email_exist">There already an account with this email. Please try again with
+    another email.</string>
 
 
     <!--Login-->

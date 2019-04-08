@@ -1,9 +1,9 @@
 package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -96,6 +96,8 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
 //                fragmentTransaction.replace(R.id.main_display_container, forgetPasswordFragment);
 //                break;
             case ACCOUNT_AUTHENTICATION:
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fragmentTransaction.replace(R.id.main_display_container, accountAuthenFragment);
                 break;
         }
         if(addToBackStack) {
@@ -112,8 +114,8 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     public void onBackPressed() {
         //If the current page is the login page then will will go to the
         //main apps page
-        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        if(getFragmentManager().getBackStackEntryCount() == 0){
+        getSupportFragmentManager().popBackStack();
+        if(getSupportFragmentManager().getBackStackEntryCount() == 0){
             //To allow default back button to go to home page
             //goHomeEnable = true;
             startUpTopNav.setVisibility(View.GONE);
@@ -153,4 +155,8 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         return rightSideButton;
     }
 
+    @Override
+    public  void setSendAuthenEmail(String email){
+        accountAuthenFragment.setSendEmail(email);
+    }
 }
