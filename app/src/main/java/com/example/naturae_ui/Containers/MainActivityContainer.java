@@ -131,6 +131,10 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	};
 
 
+	/**
+	 * Create map
+	 * @param googleMap map to be created
+	 */
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
 		MapsInitializer.initialize(this);
@@ -152,6 +156,12 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 	}
 
+	/**
+	 * Request permission for location
+	 * @param requestCode code that indicates permission being requested
+	 * @param permissions permission needed
+	 * @param grantResults give access to use location
+	 */
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		// Check if location permissions are granted and if so enable the
@@ -165,6 +175,10 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 	}
 
+	/**
+	 * Create marker when post is created
+	 * @param post post that is created
+	 */
 	@Override
 	public void onPostCreated(Post post) {
 		mMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
@@ -173,6 +187,11 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	}
 
 
+	/**
+	 * When a marker is clicked the preview fragment will be shown for the specific marker
+	 * @param marker marker chosen
+	 * @return true if marker is clickable.
+	 */
 	@Override
 	public boolean onMarkerClick(Marker marker) {
 		showPreview();

@@ -133,8 +133,10 @@ public class PostFragment extends Fragment {
 					return;
 				}
 
+				//New post to hold information input by user
 				Post post = new Post();
 
+				//User input will be put in post
 				post.title = titlePost.getText().toString();
 				post.species = speciesPost.getText().toString();
 				post.description = descriptionPost.getText().toString();
@@ -156,6 +158,13 @@ public class PostFragment extends Fragment {
 		return mView;
 	}
 
+	/**
+	 * Get image data and process accordingly based on whether photo is taken with camera
+	 * or uploaded from user gallery
+	 * @param requestCode specifies how picture was gotten
+	 * @param resultCode what will happen with image
+	 * @param data data about the image
+	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (data == null) {
@@ -214,6 +223,10 @@ public class PostFragment extends Fragment {
 		return file;
 	}
 
+	/**
+	 * Read data from image
+	 * @param uri image uri
+	 */
 	void readExif(Uri uri) {
 
 		try {
@@ -244,6 +257,10 @@ public class PostFragment extends Fragment {
 	}
 
 
+	/**
+	 * Attach post to listener
+	 * @param context context of the app
+	 */
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
