@@ -7,7 +7,7 @@ package naturaeproto;
 
 service ServerRequests{
     rpc CreateAccount (CreateAccountRequest) returns(CreateAccountReply){}
-    //    rpc Login (LoginRequest) returns(LoginReply){}
+    rpc Login (LoginRequest) returns(LoginReply){}
     rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
     rpc SayHello (HelloRequest) returns (HelloReply){};
 }
@@ -34,25 +34,18 @@ message CreateAccountReply{
     Status status = 3;
 }
 
-message Status{
-    int32 Code = 1;
-    string Message = 2;
+message LoginRequest{
+    string appKey = 1;
+    string email = 2;
+    string password = 3;
 }
 
-//
-//message LoginRequest{
-//    string appKey = 1;
-//    string email = 2;
-//    string password = 3;
-//}
-//
-//message LoginReply{
-//    bool success = 1;
-//    string accessToken = 2;
-//    string refreshToken = 3;
-//    AppError error = 4;
-//}
-//
+message LoginReply{
+    string accessToken = 1;
+    string refreshToken = 2;
+    Status status = 3;
+}
+
 message AccountAuthenRequest{
     string appKey = 1;
     string email = 2;
@@ -61,4 +54,11 @@ message AccountAuthenRequest{
 
 message AccountAuthenReply{
     bool result = 1;
+    Status status = 2;
+
+}
+
+message Status{
+    int32 Code = 1;
+    string Message = 2;
 }

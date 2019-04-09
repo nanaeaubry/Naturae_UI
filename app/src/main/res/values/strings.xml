@@ -44,8 +44,9 @@
     <string name="forget_password">Forget Password?</string>
     <string name="login">Login</string>
     <string name="create_account">Create Account</string>
-    <string name="invalid_email_password">Invalid username or password</string>
+    <string name="invalid_email_password">Invalid email or password</string>
     <string name="app_name_image_description">App name image</string>
+    <string name="empty_email_password_error">Email or Password can\'t be empty</string>
 
     <!--Authentication-->
     <string name="authentication_message">An email message with a 6-digit authentication code was just

@@ -1,6 +1,8 @@
 package com.example.naturae_ui.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
@@ -14,8 +16,17 @@ import android.widget.TextView;
 import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.Server.Test;
+import com.example.naturae_ui.Util.Constants;
+import com.examples.naturaeproto.Naturae;
+import com.examples.naturaeproto.ServerRequestsGrpc;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.ref.WeakReference;
 import java.util.Objects;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 public class LoginFragment extends Fragment implements View.OnClickListener{
 
@@ -23,7 +34,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     private OnFragmentInteractionListener mListener;
     private TextInputEditText emailEditText;
     private TextInputEditText passwordEditText;
-    private TextView wrongCredentialTextView;
+    private TextView errorMessageTextView;
     private ImageView appNameImage;
 
     private View view;
@@ -51,7 +62,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         //Assign all of the variable in the fragment
         emailEditText = view.findViewById(R.id.email_edit_text);
         passwordEditText =  view.findViewById(R.id.password_edit_text);
-        wrongCredentialTextView = view.findViewById(R.id.wrong_credential_text_view);
+        errorMessageTextView = view.findViewById(R.id.error_message_text_view);
         Button forgetPasswordTextView =  view.findViewById(R.id.forget_password_text_view);
         Button loginButton = view.findViewById(R.id.login_button);
         Button createAccountButton = view.findViewById(R.id.create_account_button);
@@ -90,12 +101,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction();
         void hideKeyboard();
         void showProgressBar();
         void hideProgressBar();
         void beginFragment(StartUpContainer.AuthFragmentType fragmentType, boolean setTransition,
                            boolean addToBackStack);
+        void startMainActivity();
     }
 
     //Create on click listener
@@ -104,10 +115,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         switch (v.getId()){
             //Login button selected
             case R.id.login_button:
+                mListener.hideKeyboard();
                 String email = Objects.requireNonNull(emailEditText.getText()).toString();
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
-                mListener.hideKeyboard();
-                login();
+                //Check if email or password edit text box is empty. If it's empty then an error message
+                //will pop-up
+                if (email.isEmpty() || password.isEmpty()){
+                    errorMessageTextView.setText(R.string.empty_email_password_error);
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+                else{
+                    new GrpcLogin(mListener, getActivity()).execute(
+                            email,
+                            password
+                    );
+                }
                 break;
             //Create account selected
             case R.id.create_account_button:
@@ -123,12 +145,77 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         appNameImage.requestFocus();
     }
 
-    /**
-     * Preform login process
-     */
-    public void login(){
-        Test newTest = new Test();
-        newTest.printName();
+    private static class GrpcLogin extends AsyncTask<String, Void, Naturae.LoginReply>{
+        private final LoginFragment.OnFragmentInteractionListener mListener;
+        private final WeakReference<Activity> activity;
+        private ManagedChannel channel;
+
+        public GrpcLogin(LoginFragment.OnFragmentInteractionListener mListener, Activity activity) {
+            super();
+            this.mListener = mListener;
+            this.activity = new WeakReference<>(activity);
+
+        }
+
+        @Override
+        protected Naturae.LoginReply doInBackground(String... params) {
+            Naturae.LoginReply reply;
+
+            try{
+                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+                //Create a stub for with the channel
+                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+                //Create an gRPC login request
+                Naturae.LoginRequest request = Naturae.LoginRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
+                        .setEmail(params[0]).setPassword(params[1]).build();
+                //Send the request to the server and set reply to be the response back from the server
+                reply = stub.login(request);
+            }
+            catch (Exception e){
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+                return null;
+            }
+            return reply;
+        }
+
+        @Override
+        protected void onPostExecute(Naturae.LoginReply loginReply) {
+            //Check if login replay is equal to null. If it's equal to null then there an error
+            //when communicating with the server
+            if (loginReply != null){
+                TextView errorMessageTextView = activity.get().findViewById(R.id.error_message_text_view);
+                //If the status code is equal to 200 then the information the user's entered is correct
+                if (loginReply.getStatus().getCode() == Constants.OK){
+                    mListener.startMainActivity();
+                }
+                //If the status code is equal to 205 then the information the user's entered is incorrect
+                else if (loginReply.getStatus().getCode() == Constants.DENIED){
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                    errorMessageTextView.setText(R.string.invalid_email_password);
+                }
+                //If the information entered is correct but the account has not been verify.
+                //The program will send the user's to the authentication page so the user could
+                //use the authentication code to verify their account
+                else if (loginReply.getStatus().getCode() == Constants.ACCOUNT_NOT_VERIFY){
+                    //Open the account authentication page
+                    mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true,
+                            true);
+                }
+                else{
+
+                }
+
+            }
+            else{
+
+            }
+
+        }
+
+
     }
 
 

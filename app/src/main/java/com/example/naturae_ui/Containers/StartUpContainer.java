@@ -2,6 +2,7 @@ package com.example.naturae_ui.Containers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -99,7 +100,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
                 //Remove the right side button
                 rightSideButton.setVisibility(View.GONE);
                 //Remove the create account fragment from fragment back stack
-                getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                removeFragmentFromBackStack();
                 fragmentTransaction.remove(createAccountFragment);
                 fragmentTransaction.replace(R.id.main_display_container, accountAuthenFragment);
                 break;
@@ -113,13 +114,21 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     }
 
     /**
+     * Pop the fragment from the stack if there are more than one fragment
+     */
+    private void removeFragmentFromBackStack(){
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+    }
+
+    /**
      * Handle default back button
      */
     @Override
     public void onBackPressed() {
         //If the current page is the login page then will will go to the
         //main apps page
-        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         if(getFragmentManager().getBackStackEntryCount() == 0){
             //To allow default back button to go to home page
             //goHomeEnable = true;
@@ -129,11 +138,6 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         else{
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void onFragmentInteraction() {
-
     }
 
     @Override
@@ -163,5 +167,15 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     @Override
     public  void setSendAuthenEmail(String email){
         accountAuthenFragment.setSendEmail(email);
+    }
+
+    /**
+     * Start the main activity
+     */
+    @Override
+    public void startMainActivity(){
+        removeFragmentFromBackStack();
+        Intent intent = new Intent(this, MainActivityContainer.class);
+        startActivity(intent);
     }
 }

@@ -90,7 +90,7 @@
                 android:textColor="@android:color/white"/>
 
             <TextView
-                android:id="@+id/wrong_credential_text_view"
+                android:id="@+id/error_message_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

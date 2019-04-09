@@ -410,22 +410,30 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
             }
             //Hide the progress bar
             mListener.hideProgressBar();
-            //Check the status of the request
-            //If the status code is 201, then the account was able to created successfully
-            //If the status code is 150, then there already an account with that email address
-            //Any thing else then the an server error
-            if (reply.getStatus().getCode() == Constants.ACCOUNT_CREATED){
-                //Start a new thread and cache the user
-                new Thread(()->UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
-                        reply.getAccessToken(), reply.getRefreshToken(), "")));
-                mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true, true);
-            }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
-                //Display an error message that an account with the email already exist
-                displayError((String) activity.get().getText(R.string.email_exist));
-            }else{
-                //Display an create account error
-                displayError((String) activity.get().getText(R.string.create_account_error));
+            //Check if reply is equal to null. If it's equal to null then there was an error with the server or phone
+            //while communicating with the server.
+            if (reply != null){
+                //Check the status of the request
+                //If the status code is 201, then the account was able to created successfully
+                //If the status code is 150, then there already an account with that email address
+                //Any thing else then the an server error
+                if (reply.getStatus().getCode() == Constants.ACCOUNT_CREATED){
+                    //Start a new thread and cache the user
+                    new Thread(()->UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
+                            reply.getAccessToken(), reply.getRefreshToken(), "")));
+                    mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true, true);
+                }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
+                    //Display an error message that an account with the email already exist
+                    displayError((String) activity.get().getText(R.string.email_exist));
+                }else{
+                    //Display an create account error
+                    displayError((String) activity.get().getText(R.string.create_account_error));
+                }
             }
+            else{
+
+            }
+
         }
 
         /**

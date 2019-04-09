@@ -7,6 +7,11 @@ class Constants{
         const val PORT = 443
         const val ACCOUNT_CREATED = 201
         const val EMAIL_EXIST = 150
+        const val INVALID_AUTHEN_CODE = 105
+        const val EXPIRED_AUTHEN_CODE = 151
+        const val OK = 200
+        const val DENIED = 205
+        const val ACCOUNT_NOT_VERIFY = 106
     }
 }
 
