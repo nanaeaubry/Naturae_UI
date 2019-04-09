@@ -3,9 +3,8 @@ package com.example.naturae_ui.Containers;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -13,16 +12,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
-import com.example.naturae_ui.Fragments.CreateAccountFragment;
-import com.example.naturae_ui.Fragments.LoginFragment;
-import com.example.naturae_ui.Fragments.MapFragment;
 import com.example.naturae_ui.Fragments.PostFragment;
 import com.example.naturae_ui.Fragments.ProfileFragment;
 import com.example.naturae_ui.Models.Post;
@@ -37,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
+@SuppressLint("Registered")
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener {
 
 	public static final int REQUEST_LOCATION_PERMISSION = 99;
@@ -100,26 +93,22 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 * Enable navigation on bottom bar.
 	 */
 	private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
-			= new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-		@Override
-		public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-			Fragment selectedFragment = null;
-			switch (item.getItemId()) {
-				case R.id.navigation_map:
-					showMap();
-					break;
-				case R.id.navigation_post:
-					showPost();
-					break;
-				case R.id.navigation_profile:
-					showProfile();
-					break;
-			}
-			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
-			return true;
-		}
-	};
+			= item -> {
+                Fragment selectedFragment = null;
+                switch (item.getItemId()) {
+                    case R.id.navigation_map:
+                        showMap();
+                        break;
+                    case R.id.navigation_post:
+                        showPost();
+                        break;
+                    case R.id.navigation_profile:
+                        showProfile();
+                        break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                return true;
+            };
 
 
 	@Override
