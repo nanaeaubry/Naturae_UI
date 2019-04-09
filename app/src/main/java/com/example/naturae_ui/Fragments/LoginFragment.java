@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 
 import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.Server.Test;
 import com.example.naturae_ui.Util.Constants;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
@@ -37,15 +37,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     private TextView errorMessageTextView;
     private ImageView appNameImage;
 
-    private View view;
+    protected View view;
 
     public LoginFragment() {
         // Required empty public constructor
     }
 
     public static LoginFragment newInstance() {
-        LoginFragment fragment = new LoginFragment();
-        return fragment;
+        return new LoginFragment();
     }
 
     @Override
@@ -55,7 +54,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_login, container, false);
@@ -150,8 +149,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         private final WeakReference<Activity> activity;
         private ManagedChannel channel;
 
-        public GrpcLogin(LoginFragment.OnFragmentInteractionListener mListener, Activity activity) {
-            super();
+        private GrpcLogin(OnFragmentInteractionListener mListener, Activity activity) {
             this.mListener = mListener;
             this.activity = new WeakReference<>(activity);
 
