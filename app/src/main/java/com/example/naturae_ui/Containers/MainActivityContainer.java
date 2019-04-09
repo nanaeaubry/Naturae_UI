@@ -4,6 +4,8 @@ package com.example.naturae_ui.Containers;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -15,7 +17,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
+import com.example.naturae_ui.Fragments.CreateAccountFragment;
+import com.example.naturae_ui.Fragments.LoginFragment;
+import com.example.naturae_ui.Fragments.MapFragment;
 import com.example.naturae_ui.Fragments.PostFragment;
 import com.example.naturae_ui.Fragments.ProfileFragment;
 import com.example.naturae_ui.Models.Post;
@@ -109,6 +116,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 					showProfile();
 					break;
 			}
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
 			return true;
 		}
 	};

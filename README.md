@@ -1,6 +1,6 @@
 # Naturae
 
-Senior Group Project for California State Univerity Long Beach
+Senior Group Project for California State University Long Beach
 
 Class: CECS 491 - Spring 2019
 

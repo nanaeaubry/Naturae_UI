@@ -11,16 +11,30 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+
         <TextView
             android:id="@+id/authentication_message_text_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="@string/authentication_message"
+            android:textSize="16sp"/>
 
         <EditText
             android:id="@+id/authentication_code_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/code"/>
+            android:layout_marginTop="5dp"
+            android:hint="@string/code"
+            android:textColor="@color/black"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/authen_error_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorInvalid"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/no_authen_code_text_view"
