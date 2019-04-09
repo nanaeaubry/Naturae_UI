@@ -92,7 +92,7 @@ public class UserUtilities {
      * Update the user's last name cache
      * @param name user's new last name
      */
-    private static void setLastName(String name){
+    public static void setLastName(String name){
         userPreferences.edit().putString(LAST_NAME, name).apply();
     }
 
@@ -100,7 +100,7 @@ public class UserUtilities {
      * Update the user's email cache
      * @param emailAddress user's new email
      */
-    private static void setEmail(String emailAddress){
+    public static void setEmail(String emailAddress){
         userPreferences.edit().putString(EMAIL, emailAddress).apply();
     }
 
@@ -108,7 +108,7 @@ public class UserUtilities {
      * Update user's access token id cache
      * @param tokenID user's new access token id
      */
-    private static void setAccessToken(String tokenID){
+    public static void setAccessToken(String tokenID){
         userPreferences.edit().putString(ACCESS_TOKEN, tokenID).apply();
     }
 
@@ -116,8 +116,15 @@ public class UserUtilities {
      * Update user's refresh token id cache
      * @param tokenID user's new refresh token id
      */
-    private static void upDateRefreshToken(String tokenID){
+    public static void setRefreshToken(String tokenID){
         userPreferences.edit().putString(REFRESH_TOKEN, tokenID).apply();
+    }
+
+    /**
+     * Update user's logged in status
+     */
+    public static void setIsLoggedIn(boolean currStatus){
+        userPreferences.edit().putBoolean(IS_LOGGED_IN, currStatus).apply();
     }
 
     /**
@@ -158,5 +165,13 @@ public class UserUtilities {
      */
     public static String getRefreshToken(){
         return userPreferences.getString(REFRESH_TOKEN, "");
+    }
+
+    /**
+     * Retrieves the user's logged in status
+     * @return the user logged in status
+     */
+    public static boolean getIsLoggedIn(){
+        return userPreferences.getBoolean(IS_LOGGED_IN, false);
     }
 }

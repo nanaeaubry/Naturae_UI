@@ -8,7 +8,7 @@ package naturaeproto;
 service ServerRequests{
     rpc CreateAccount (CreateAccountRequest) returns(CreateAccountReply){}
     //    rpc Login (LoginRequest) returns(LoginReply){}
-    //    rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
+    rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
     rpc SayHello (HelloRequest) returns (HelloReply){};
 }
 
@@ -53,12 +53,12 @@ message Status{
 //    AppError error = 4;
 //}
 //
-//message AccountAuthenRequest{
-//    string appKey = 1;
-//    string email = 2;
-//    string AuthenCode = 3;
-//}
-//
-//message AccountAuthenReply{
-//    bool success = 1;
-//}
+message AccountAuthenRequest{
+    string appKey = 1;
+    string email = 2;
+    string AuthenCode = 3;
+}
+
+message AccountAuthenReply{
+    bool result = 1;
+}

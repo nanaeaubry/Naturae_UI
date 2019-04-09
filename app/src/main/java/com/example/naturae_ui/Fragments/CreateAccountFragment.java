@@ -47,6 +47,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
     private TextInputEditText confirmPasswordEditText;
     private TextView firstNameErrorTextView, lastNameErrorTextView, emailErrorTextView,
         passwordErrorTextView, confirmPasswordErrorTextView;
+    private Button createAccountButton;
 
     private boolean isFirstNameValid, isLastNameValid, isEmailValid, isPasswordValid, isConfirmPasswordValid;
 
@@ -98,7 +99,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
         passwordEditText.setOnFocusChangeListener(this);
         confirmPasswordEditText.setOnFocusChangeListener(this);
 
-        Button createAccountButton = mListener.getRightSideButton();
+        createAccountButton= mListener.getRightSideButton();
         createAccountButton.setOnClickListener(v -> createAccount());
 
 
@@ -134,6 +135,8 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        createAccountButton = null;
+
     }
 
     /**
@@ -379,12 +382,9 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 lastName = params[1];
                 email = params[2];
                 //Create an gRPC create account request
-                Naturae.CreateAccountRequest request = Naturae.CreateAccountRequest.newBuilder().setAppKey(Constants.APP_KEY)
+                Naturae.CreateAccountRequest request = Naturae.CreateAccountRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
                         .setFirstName(firstName).setLastName(lastName).setEmail(email).setPassword(params[3]).build();
 
-                new Thread(()->{
-                    mListener.setSendAuthenEmail(email);
-                }).start();
                 //Send the request to the server and set reply to equal the response back from the server
                 reply = stub.createAccount(request);
 
@@ -408,18 +408,17 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            //Remove the progress bar from the screen
+            //Hide the progress bar
             mListener.hideProgressBar();
-
             //Check the status of the request
             //If the status code is 201, then the account was able to created successfully
             //If the status code is 150, then there already an account with that email address
             //Any thing else then the an server error
             if (reply.getStatus().getCode() == Constants.ACCOUNT_CREATED){
-                //Cache the user
-                UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
-                        reply.getAccessToken(), reply.getRefreshToken(), ""));
-                mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, false, true);
+                //Start a new thread and cache the user
+                new Thread(()->UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
+                        reply.getAccessToken(), reply.getRefreshToken(), "")));
+                mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true, true);
             }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
                 //Display an error message that an account with the email already exist
                 displayError((String) activity.get().getText(R.string.email_exist));

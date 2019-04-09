@@ -19,7 +19,7 @@ import com.example.naturae_ui.Fragments.LoginFragment;
 import com.example.naturae_ui.R;
 
 public class StartUpContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
-        CreateAccountFragment.OnFragmentInteractionListener {
+        CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
 
     private FrameLayout mainLayout;
     private LoginFragment loginFragment;
@@ -96,10 +96,15 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
 //                fragmentTransaction.replace(R.id.main_display_container, forgetPasswordFragment);
 //                break;
             case ACCOUNT_AUTHENTICATION:
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                //Remove the right side button
+                rightSideButton.setVisibility(View.GONE);
+                //Remove the create account fragment from fragment back stack
+                getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fragmentTransaction.remove(createAccountFragment);
                 fragmentTransaction.replace(R.id.main_display_container, accountAuthenFragment);
                 break;
         }
+        //Check weather or not to add the fragment to the back stack
         if(addToBackStack) {
             fragmentTransaction.addToBackStack(null);
         }
@@ -114,8 +119,8 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     public void onBackPressed() {
         //If the current page is the login page then will will go to the
         //main apps page
-        getSupportFragmentManager().popBackStack();
-        if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        if(getFragmentManager().getBackStackEntryCount() == 0){
             //To allow default back button to go to home page
             //goHomeEnable = true;
             startUpTopNav.setVisibility(View.GONE);
