@@ -32,7 +32,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
 
     private Button backButton, rightSideButton;
     private ProgressBar progressBar;
-    //Test
+
     public StartUpContainer() {
     }
 
