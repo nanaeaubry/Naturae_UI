@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+
 import com.example.naturae_ui.Models.Post;
 import com.example.naturae_ui.R;
 
@@ -156,7 +157,6 @@ public class PostFragment extends Fragment {
 		});
 		return mView;
 	}
-
 
 	/**
 	 * Get image data and process accordingly based on whether photo is taken with camera
