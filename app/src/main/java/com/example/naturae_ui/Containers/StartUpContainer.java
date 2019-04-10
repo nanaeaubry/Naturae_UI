@@ -22,7 +22,7 @@ import com.example.naturae_ui.R;
 public class StartUpContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
         CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
 
-    //Testing
+
     private FrameLayout mainLayout;
     private LoginFragment loginFragment;
     private CreateAccountFragment createAccountFragment;
