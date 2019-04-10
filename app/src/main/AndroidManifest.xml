@@ -48,7 +48,7 @@
 			android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".Containers.StartUpContainer"
+            android:name=".Containers.MainActivityContainer"
             android:label="@string/app_name"
             android:theme="@style/Theme.Design.Light.NoActionBar"
             android:screenOrientation="portrait">
