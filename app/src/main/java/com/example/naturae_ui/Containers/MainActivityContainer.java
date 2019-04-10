@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -109,7 +110,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 		@Override
 		public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-			Fragment selectedFragment = null;
 			switch (item.getItemId()) {
 				case R.id.navigation_map:
 					showMap();
@@ -192,7 +192,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public boolean onMarkerClick(Marker marker) {
-		showPreview();
+
 		return true;
 	}
 }

@@ -18,7 +18,8 @@
 	<item
 		android:id="@+id/navigation_chat"
 		android:icon="@drawable/ic_chat_black_24dp"
-		android:title="@string/title_chat"/>
+		android:title="@string/title_chat"
+		android:iconTint="@color/colorPrimary"/>
 
 
 	<item
