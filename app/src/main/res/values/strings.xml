@@ -1,5 +1,5 @@
 <resources>
-	<string name="dropped_pin">Dropped Pin</string>
+    <string name="dropped_pin">Dropped Pin</string>
 
     <!--Shared Strings-->
     <string name="google_map_key">Google Map Key</string>
@@ -11,6 +11,7 @@
     <string name="password">Password</string>
     <string name="back_button"><![CDATA[<]]></string>
     <string name="ok">Ok</string>
+    <string name="server_error">"An error has occurred while communicating with the server. Please try again"</string>
 
     <!--Map-->
     <string name="title_map">Map</string>
@@ -23,10 +24,10 @@
     <string name="terrain_map">Terrain Map</string>
 
     <!--Friends-->
-    <string name = "title_chat">Chat</string>
-    <string name = "header_friends">Your Friends</string>
-    <string name = "place_holder_text">Write your Message</string>
-    <string name = "content_description_send">Send Button</string>
+    <string name="title_chat">Chat</string>
+    <string name="header_friends">Your Friends</string>
+    <string name="place_holder_text">Write your Message</string>
+    <string name="content_description_send">Send Button</string>
 
     <!--Create Account-->
     <string name="invalid_email">Invalid email address</string>
@@ -60,7 +61,8 @@
     <string name="verify">Verify</string>
     <string name="no_authen_code">Don\'t have your code?</string>
     <string name="invalid_authen_code">The code you entered is invalid. Please try again</string>
-    <string name="expired_authen_code">The code you entered has expired. A new code will be send to your email</string>
+    <string name="expired_authen_code">The code you entered had expired. Check your email for the new code</string>
+    <string name="empty_authen_code_field">Enter your authentication code</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
