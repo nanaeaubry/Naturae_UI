@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +21,10 @@ import android.widget.ImageView;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
+import com.example.naturae_ui.Containers.MainActivityContainer;
+import com.example.naturae_ui.Containers.StartUpContainer;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.Util.UserUtilities;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +34,8 @@ import java.util.Objects;
 public class ProfileFragment extends Fragment {
     public final static int PICK_PHOTO = 1046;
     View mView;
-    EditText firstNameEditText;
-    EditText lastNameEditText;
+    EditText firstName;
+    EditText lastName;
     TextView profileName;
     Button bLogout;
     Button bChangePass;
@@ -41,11 +46,21 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_profile, container, false);
-        super.onCreate(savedInstanceState);
 
-        profileName = mView.findViewById(R.id.first_name_edit_text + R.id.last_name_edit_text);
+        firstName = mView.findViewById(R.id.first_name_edit_text);
+        lastName = mView.findViewById(R.id.last_name_edit_text);
 
-        ibProfileImage = mView.findViewById(R.id.open_photos);
+        //profileName.setText(UserUtilities.getFirstName() + UserUtilities.getLastName());
+
+//        bChangePass.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+
+        ibProfileImage = mView.findViewById(R.id.ibProfileImage);
         ibProfileImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,36 +75,15 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-        return mView;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+        Button bLogout = (Button) mView.findViewById(R.id.bLogout);
         bLogout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Objects.requireNonNull(getActivity()).finish();
+                Intent in = new Intent(getActivity(), StartUpContainer.class);
+                startActivity(in);
             }
         });
-
-        ibProfileImage.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        bChangePass.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-
-
+        return mView;
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -97,9 +91,9 @@ public class ProfileFragment extends Fragment {
             return;
         }
         Uri photoUri = data.getData();
-
         ibProfileImage.setImageURI(photoUri);
 
     }
- 
+
+
 }

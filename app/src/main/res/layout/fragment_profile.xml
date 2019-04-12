@@ -14,8 +14,10 @@
 
         <ImageButton
             android:id="@+id/ibProfileImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:maxHeight="120dp"
+            android:maxWidth="120dp"
             tools:srcCompat="@tools:sample/avatars[0]" />
 
         <TextView
