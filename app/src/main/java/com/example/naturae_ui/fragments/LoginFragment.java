@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Fragments;
+package com.example.naturae_ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,9 +14,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.naturae_ui.Containers.StartUpActivityContainer;
+import com.example.naturae_ui.containers.StartUpActivityContainer;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.Util.Constants;
+import com.example.naturae_ui.util.Constants;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 

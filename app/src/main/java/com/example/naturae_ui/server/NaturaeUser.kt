@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Server
+package com.example.naturae_ui.server
 
 import java.io.Serializable
 

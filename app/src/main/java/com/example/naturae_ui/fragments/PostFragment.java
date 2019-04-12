@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Fragments;
+package com.example.naturae_ui.fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -26,7 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 
-import com.example.naturae_ui.Models.Post;
+import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
 
 import java.io.File;

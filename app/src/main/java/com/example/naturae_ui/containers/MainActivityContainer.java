@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Containers;
+package com.example.naturae_ui.containers;
 
 
 
@@ -11,16 +11,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.example.naturae_ui.Fragments.FriendFragment;
-import com.example.naturae_ui.Fragments.PostFragment;
-import com.example.naturae_ui.Fragments.PreviewFragment;
-import com.example.naturae_ui.Fragments.ProfileFragment;
-import com.example.naturae_ui.Models.Post;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.fragments.FriendFragment;
+import com.example.naturae_ui.fragments.PostFragment;
+import com.example.naturae_ui.fragments.PreviewFragment;
+import com.example.naturae_ui.fragments.ProfileFragment;
+import com.example.naturae_ui.models.Post;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -106,27 +105,23 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 * Enable navigation on bottom bar.
 	 */
 	private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
-			= new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-		@Override
-		public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-			switch (item.getItemId()) {
-				case R.id.navigation_map:
-					showMap();
-					break;
-				case R.id.navigation_post:
-					showPost();
-					break;
-				case R.id.navigation_chat:
-					showChat();
-					break;
-				case R.id.navigation_profile:
-					showProfile();
-					break;
-			}
-			return true;
-		}
-	};
+			= item -> {
+				switch (item.getItemId()) {
+					case R.id.navigation_map:
+						showMap();
+						break;
+					case R.id.navigation_post:
+						showPost();
+						break;
+					case R.id.navigation_chat:
+						showChat();
+						break;
+					case R.id.navigation_profile:
+						showProfile();
+						break;
+				}
+				return true;
+			};
 
 
 	/**
@@ -173,7 +168,12 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 	}
 
-	/**
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    /**
 	 * Create marker when post is created
 	 * @param post post that is created
 	 */

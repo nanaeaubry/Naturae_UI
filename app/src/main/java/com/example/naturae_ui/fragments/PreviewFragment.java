@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Fragments;
+package com.example.naturae_ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

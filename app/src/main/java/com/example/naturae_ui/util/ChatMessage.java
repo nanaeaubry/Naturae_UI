@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Util;
+package com.example.naturae_ui.util;
 
 /**
  * Represents a single message sent by a user or friend
