@@ -184,7 +184,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 	}
 
-
 	/**
 	 * When a marker is clicked the preview fragment will be shown for the specific marker
 	 * @param marker marker chosen
