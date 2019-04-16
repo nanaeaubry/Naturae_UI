@@ -86,6 +86,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 	private void showPreview(){
 		mMapView.setVisibility(View.INVISIBLE);
+		mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
 
@@ -144,6 +145,10 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 		CameraPosition Home = CameraPosition.builder().target(new LatLng(34.055569, -117.182541)).zoom(14).bearing(0).tilt(45).build();
 		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Home));
+
+		//TODO Nanae
+		//Start GRPC task to fetch all posts
+		//GRPCtask(map)-> fetch posts and push on map
 	}
 
 	private void enableMyLocation() {
@@ -191,7 +196,9 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public boolean onMarkerClick(Marker marker) {
-
+		if(marker == mMarker) {
+			showPreview();
+		}
 		return true;
 	}
 }

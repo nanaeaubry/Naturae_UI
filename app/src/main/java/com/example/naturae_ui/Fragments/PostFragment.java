@@ -1,5 +1,6 @@
 package com.example.naturae_ui.Fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -16,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,15 +27,27 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 
+import com.example.naturae_ui.Containers.StartUpActivityContainer;
 import com.example.naturae_ui.Models.Post;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.Util.Constants;
+import com.examples.naturaeproto.Naturae;
+import com.examples.naturaeproto.ServerRequestsGrpc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.ref.WeakReference;
 
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 import static android.view.View.GONE;
 
@@ -56,7 +71,6 @@ public class PostFragment extends Fragment {
 	Bitmap selectedImage = null;
 	ImageView imagePreview;
 	float[] latLong = new float[2];
-
 
 	@Nullable
 	@Override
@@ -143,15 +157,9 @@ public class PostFragment extends Fragment {
 				post.lat = latLong[0];
 				post.lng = latLong[1];
 				post.image = selectedImage;
-				listener.onPostCreated(post);
 
-				// Cleanup
-				selectedImage = null;
-				imagePreview.setVisibility(GONE);
-				imagePreview.setImageBitmap(null);
-				titlePost.setText("");
-				speciesPost.setText("");
-				descriptionPost.setText("");
+				new GrpcCreatePost(listener, post).execute();
+
 			}
 
 		});
@@ -161,9 +169,10 @@ public class PostFragment extends Fragment {
 	/**
 	 * Get image data and process accordingly based on whether photo is taken with camera
 	 * or uploaded from user gallery
+	 *
 	 * @param requestCode specifies how picture was gotten
-	 * @param resultCode what will happen with image
-	 * @param data data about the image
+	 * @param resultCode  what will happen with image
+	 * @param data        data about the image
 	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -213,7 +222,7 @@ public class PostFragment extends Fragment {
 		File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG);
 
 		// Create the storage directory if it does not exist
-		if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+		if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
 			Log.d(APP_TAG, "failed to create directory");
 		}
 
@@ -225,6 +234,7 @@ public class PostFragment extends Fragment {
 
 	/**
 	 * Read data from image
+	 *
 	 * @param uri image uri
 	 */
 	void readExif(Uri uri) {
@@ -259,6 +269,7 @@ public class PostFragment extends Fragment {
 
 	/**
 	 * Attach post to listener
+	 *
 	 * @param context context of the app
 	 */
 	@Override
@@ -266,7 +277,6 @@ public class PostFragment extends Fragment {
 		super.onAttach(context);
 		try {
 			listener = (OnPostListener) context;
-
 
 		} catch (ClassCastException c) {
 			throw new ClassCastException(context.toString() + " must implement OnPostListener");
@@ -276,4 +286,69 @@ public class PostFragment extends Fragment {
 	public interface OnPostListener {
 		void onPostCreated(Post post);
 	}
+
+	private static class GrpcCreatePost extends AsyncTask<Void, Void, Naturae.CreatePostReply> {
+
+		private final PostFragment.OnPostListener mListener;
+		private final Post mPost;
+
+		private ManagedChannel channel;
+
+
+		private GrpcCreatePost(PostFragment.OnPostListener mListener, Post post) {
+			this.mListener = mListener;
+			this.mPost = post;
+
+		}
+
+		@Override
+		protected Naturae.CreatePostReply doInBackground(Void... voids) {
+
+			//Make image a byte array to store in server
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			mPost.image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+			byte[] byteArray = byteArrayOutputStream.toByteArray();
+			String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+			Naturae.CreatePostReply reply;
+			try {
+				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+				//Create a stub for with the channel
+				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+				//Create an gRPC login request
+				Naturae.CreatePostRequest request = Naturae.CreatePostRequest.newBuilder()
+						.setAppKey(Constants.NATURAE_APP_KEY)
+						.setTitle(mPost.title).setSpecies(mPost.species)
+						.setDescription(mPost.description)
+						.setLat(mPost.lat)
+						.setLng(mPost.lng)
+						.setEncodedImage(encodedImage)
+						.build();
+				reply = stub.createPost(request);
+
+			} catch (Exception e) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				pw.flush();
+				return null;
+			}
+			return reply;
+		}
+
+		@Override
+		protected void onPostExecute(Naturae.CreatePostReply createPostReply) {
+			//Check if reply is equal to null. If it's equal to null then there is an error
+			//when communicating with the server
+			if (createPostReply != null) {
+				if(createPostReply.getStatus().getCode() == Constants.OK ){
+					mListener.onPostCreated(mPost);
+				}
+			}
+
+		}
+
+	}
+
 }
+

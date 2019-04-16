@@ -58,6 +58,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_login, container, false);
+
         //Assign all of the variable in the fragment
         emailEditText = view.findViewById(R.id.email_edit_text);
         passwordEditText =  view.findViewById(R.id.password_edit_text);

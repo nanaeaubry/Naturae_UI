@@ -12,6 +12,7 @@ service ServerRequests{
     rpc Login (LoginRequest) returns(LoginReply){}
     rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
     rpc SayHello (HelloRequest) returns (HelloReply){};
+    rpc CreatePost (CreatePostRequest) returns (CreatePostReply){};
 }
 
 message HelloRequest{
@@ -30,38 +31,56 @@ message CreateAccountRequest{
     string lastName = 5;
 }
 
-message CreateAccountReply{
+message CreateAccountReply {
     string accessToken = 1;
     string refreshToken = 2;
     Status status = 3;
 }
 
-message LoginRequest{
+message LoginRequest {
     string appKey = 1;
     string email = 2;
     string password = 3;
 }
 
-message LoginReply{
+message LoginReply {
     string accessToken = 1;
     string refreshToken = 2;
     Status status = 3;
 }
 
-message AccountAuthenRequest{
+message AccountAuthenRequest {
     string appKey = 1;
     string firstName = 2;
     string email = 3;
     string authenCode = 4;
 }
 
-message AccountAuthenReply{
+message AccountAuthenReply {
     bool result = 1;
     Status status = 2;
-
 }
 
-message Status{
+message CreatePostRequest {
+    string appKey = 1;
+    string accessToken = 2;
+    string title = 3;
+    string species = 4;
+    string description = 5;
+    float lat = 6;
+    float lng = 7;
+    string encodedImage = 8;
+}
+
+message CreatePostReply {
+    Status status = 1;
+}
+
+message getPostsRequest {
+    //array of posts
+}
+
+message Status {
     int32 Code = 1;
     string Message = 2;
 }
