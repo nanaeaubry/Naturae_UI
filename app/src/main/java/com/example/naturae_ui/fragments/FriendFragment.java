@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.util.Friend;
+import com.example.naturae_ui.models.Friend;
 import com.example.naturae_ui.util.FriendAdapter;
 
 import java.util.ArrayList;

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.content.Context;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.models.ChatMessage;
 
 import java.util.List;
 

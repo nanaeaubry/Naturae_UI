@@ -12,6 +12,14 @@ service ServerRequests{
     rpc Login (LoginRequest) returns(LoginReply){}
     rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
     rpc SayHello (HelloRequest) returns (HelloReply){};
+
+    /**** Friendslist GRPC Functions ****/
+    // Query is sent to the server and a list of matching users is returned
+    rpc SearchUsers(UserSearchRequest) returns (UserListReply){}
+    // Unary client request to add a new friend for the user
+    rpc AddFriend(FriendRequest) returns (FriendReply){}
+    // Unary client request to remove an existing friend for the user
+    rpc RemoveFriend(FriendRequest) returns(FriendReply){}
 }
 
 message HelloRequest{
@@ -65,3 +73,29 @@ message Status{
     int32 Code = 1;
     string Message = 2;
 }
+
+/** MESSAGES FOR FRIEND'S LIST **/
+//Both values can be processed by the server to search for a list of users, their usage is mutually exclusive
+//If the identifier for the user is used, their friendslist is returned, if a query is sent, all matching registered users are returned
+message UserSearchRequest{
+    // string appKey = 1;
+     string user = 1;
+     string query = 2;
+ }
+ //A list of users that matched the parameters provided by the UserSearchRequest
+ message UserListReply{
+     repeated string users = 1;
+     Status status = 2;
+ }
+ // The request message containing the users's to perform an action on
+ message FriendRequest {
+     //string appKey = 1;
+     string sender = 1;
+     string receiver = 2; 
+ }
+ //The reply message from the server
+ message FriendReply{
+     Status status = 1;
+    // string accessToken = 1;
+    //string refreshToken = 2;
+ }
