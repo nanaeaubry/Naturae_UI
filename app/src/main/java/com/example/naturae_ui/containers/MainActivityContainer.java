@@ -110,7 +110,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 		@Override
 		public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-			Fragment selectedFragment = null;
 			switch (item.getItemId()) {
 				case R.id.navigation_map:
 					showMap();
@@ -193,7 +192,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public boolean onMarkerClick(Marker marker) {
-		showPreview();
+
 		return true;
 	}
 }

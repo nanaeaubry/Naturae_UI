@@ -89,20 +89,20 @@ public class PostFragment extends Fragment {
 
 		//Button to open media gallery on user phone
 		openPhotos = mView.findViewById(R.id.open_photos);
-        openPhotos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Create intent for picking a photo from the gallery
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		openPhotos.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Create intent for picking a photo from the gallery
+				Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-                // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-                // So as long as the result is not null, it's safe to use the intent.
-                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    // Bring up gallery to select a photo
-                    startActivityForResult(intent, PICK_PHOTO);
-                }
-            }
-        });
+				// If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+				// So as long as the result is not null, it's safe to use the intent.
+				if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+					// Bring up gallery to select a photo
+					startActivityForResult(intent, PICK_PHOTO);
+				}
+			}
+		});
 
 		//User enters title of post
 		titlePost = mView.findViewById(R.id.post_title);

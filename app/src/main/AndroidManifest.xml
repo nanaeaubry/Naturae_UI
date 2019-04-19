@@ -51,18 +51,22 @@
 		<meta-data
 			android:name="com.google.android.geo.API_KEY"
 			android:value="@string/API_Key" />
-
         <activity
-            android:name=".Containers.MainActivityContainer"
+            android:name=".containers.StartUpContainer"
             android:label="@string/app_name"
             android:theme="@style/Theme.Design.Light.NoActionBar"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".containers.MainActivityContainer"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Design.Light.NoActionBar"
+            android:screenOrientation="portrait">
 		</activity>
 
 		<meta-data

@@ -5,7 +5,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".Containers.MainActivityContainer">
+	tools:context=".containers.MainActivityContainer">
 
 	<com.google.android.gms.maps.MapView
 		android:id="@+id/map"
@@ -28,6 +28,7 @@
 		android:layout_marginEnd="0dp"
 		android:background="?android:attr/windowBackground"
 		android:layout_alignParentBottom="true"
-		app:menu="@menu/navigation" />
+		app:menu="@menu/navigation"
+		app:itemIconTint="@color/colorPrimary"/>
 
 </RelativeLayout>

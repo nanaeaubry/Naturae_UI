@@ -1,7 +1,6 @@
-package com.example.naturae_ui.Containers;
+package com.example.naturae_ui.containers;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
@@ -14,9 +13,9 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import com.example.naturae_ui.Fragments.AccountAuthenFragment;
-import com.example.naturae_ui.Fragments.CreateAccountFragment;
-import com.example.naturae_ui.Fragments.LoginFragment;
+import com.example.naturae_ui.fragments.AccountAuthenFragment;
+import com.example.naturae_ui.fragments.CreateAccountFragment;
+import com.example.naturae_ui.fragments.LoginFragment;
 import com.example.naturae_ui.R;
 
 public class StartUpContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,

@@ -9,7 +9,8 @@ service ServerRequests{
     rpc CreateAccount (CreateAccountRequest) returns(CreateAccountReply){}
     rpc Login (LoginRequest) returns(LoginReply){}
     rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
-    rpc SayHello (HelloRequest) returns (HelloReply){};
+    rpc SayHello (HelloRequest) returns (HelloReply){}
+    rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply){};
 }
 
 message HelloRequest{
@@ -61,4 +62,15 @@ message AccountAuthenReply{
 message Status{
     int32 Code = 1;
     string Message = 2;
+}
+
+message ChangePasswordRequest{
+    string appKey = 1;
+    string accessToken = 2;
+    string currentPassword = 3;
+    string newPassword = 4;
+}
+
+message ChangePasswordReply{
+    Status status = 1;
 }

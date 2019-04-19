@@ -1,5 +1,5 @@
 <resources>
-	<string name="dropped_pin">Dropped Pin</string>
+    <string name="dropped_pin">Dropped Pin</string>
 
     <!--Shared Strings-->
     <string name="google_map_key">Google Map Key</string>
@@ -23,10 +23,10 @@
     <string name="terrain_map">Terrain Map</string>
 
     <!--Friends-->
-    <string name = "title_chat">Chat</string>
-    <string name = "header_friends">Your Friends</string>
-    <string name = "place_holder_text">Write your Message</string>
-    <string name = "content_description_send">Send Button</string>
+    <string name="title_chat">Chat</string>
+    <string name="header_friends">Your Friends</string>
+    <string name="place_holder_text">Write your Message</string>
+    <string name="content_description_send">Send Button</string>
 
     <!--Create Account-->
     <string name="invalid_email">Invalid email address</string>

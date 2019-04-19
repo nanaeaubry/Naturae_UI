@@ -1,9 +1,9 @@
-package com.example.naturae_ui.Util;
+package com.example.naturae_ui.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.naturae_ui.Server.NaturaeUser;
+import com.example.naturae_ui.server.NaturaeUser;
 
 public class UserUtilities {
     private static SharedPreferences userPreferences;
