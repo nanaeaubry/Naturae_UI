@@ -11,7 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.naturae_ui.Models.Post;
+import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
 import com.google.android.gms.maps.model.Marker;
 

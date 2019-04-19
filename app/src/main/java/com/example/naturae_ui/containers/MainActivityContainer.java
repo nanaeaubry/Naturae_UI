@@ -3,8 +3,8 @@ package com.example.naturae_ui.containers;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -40,13 +40,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
-
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -224,7 +217,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	}
 
 	//If the current access token expired then this will request the server to generate a new access token
-	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply>{
+	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply> {
 
 		private final WeakReference<Activity> activity;
 		private ManagedChannel channel;

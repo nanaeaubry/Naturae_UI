@@ -50,7 +50,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".Containers.SplashScreenActivityContainer"
+            android:name=".containers.SplashScreenActivityContainer"
             android:label="@string/app_name"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -62,13 +62,13 @@
 
 
         <activity
-            android:name=".Containers.StartUpActivityContainer"
+            android:name=".containers.StartUpActivityContainer"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light.NoActionBar"/>
 
         <activity
-            android:name=".Containers.MainActivityContainer"
+            android:name=".containers.MainActivityContainer"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light.NoActionBar" />
