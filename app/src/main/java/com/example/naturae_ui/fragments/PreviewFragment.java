@@ -8,12 +8,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
+import com.google.android.gms.maps.model.Marker;
 
 public class PreviewFragment extends Fragment {
 	View mView;
-	ImageButton goBack;
+	ImageView imageView;
+	TextView mTitle;
+	TextView mSpecies;
+	TextView mDescription;
+	Post post = new Post();
+	Marker marker;
+
 
 	@Nullable
 	@Override
@@ -21,14 +31,16 @@ public class PreviewFragment extends Fragment {
 		mView = inflater.inflate(R.layout.fragment_preview, container, false);
 		super.onCreate(savedInstanceState);
 
-		//Button to go back to map
-		goBack = mView.findViewById(R.id.go_back);
-		goBack.setOnClickListener(new View.OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				getActivity().onBackPressed();
-			}
-		});
+		imageView = mView.findViewById(R.id.image_view);
+
+
+
+		mTitle = mView.findViewById(R.id.preview_title);
+
+		mSpecies = mView.findViewById(R.id.preview_species);
+
+		mDescription = mView.findViewById(R.id.preview_description);
+
 
 
 

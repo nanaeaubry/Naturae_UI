@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.example.naturae_ui.containers.StartUpActivityContainer;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 
@@ -58,6 +59,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_login, container, false);
+
         //Assign all of the variable in the fragment
         emailEditText = view.findViewById(R.id.email_edit_text);
         passwordEditText =  view.findViewById(R.id.password_edit_text);
@@ -180,6 +182,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 //If the status code is equal to 200 then the information the user's entered is correct
                 if (loginReply.getStatus().getCode() == Constants.OK){
                     mListener.startMainActivity();
+	                UserUtilities.setIsLoggedIn(activity.get(), true);
+
                 }
                 //If the status code is equal to 103 then the information the user's entered is incorrect
                 else if (loginReply.getStatus().getCode() == Constants.INVALID_LOGIN_CREDENTIAL){
