@@ -1,7 +1,6 @@
-package com.example.naturae_ui.Fragments;
+package com.example.naturae_ui.fragments;
 
 import android.content.Intent;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -9,26 +8,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
-import com.example.naturae_ui.Containers.MainActivityContainer;
-import com.example.naturae_ui.Containers.StartUpContainer;
+import com.example.naturae_ui.containers.StartUpContainer;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.Util.UserUtilities;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Objects;
 
 
 public class ProfileFragment extends Fragment {
@@ -41,7 +33,6 @@ public class ProfileFragment extends Fragment {
     Button bChangePass;
     ImageButton ibProfileImage;
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,12 +43,18 @@ public class ProfileFragment extends Fragment {
 
         //profileName.setText(UserUtilities.getFirstName() + UserUtilities.getLastName());
 
-//        bChangePass.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
+        bChangePass.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                ChangePasswordFragment cp = new ChangePasswordFragment();
+                fragmentTransaction.replace(R.id.fragment_container, cp);
+                fragmentTransaction.commit();
+
+
+            }
+        });
 
 
         ibProfileImage = mView.findViewById(R.id.ibProfileImage);
@@ -75,7 +72,7 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-        Button bLogout = (Button) mView.findViewById(R.id.bLogout);
+        bLogout =  mView.findViewById(R.id.bLogout);
         bLogout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

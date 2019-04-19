@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Containers;
+package com.example.naturae_ui.containers;
 
 
 
@@ -15,11 +15,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.example.naturae_ui.Fragments.FriendFragment;
-import com.example.naturae_ui.Fragments.PostFragment;
-import com.example.naturae_ui.Fragments.PreviewFragment;
-import com.example.naturae_ui.Fragments.ProfileFragment;
-import com.example.naturae_ui.Models.Post;
+import com.example.naturae_ui.fragments.FriendFragment;
+import com.example.naturae_ui.fragments.PostFragment;
+import com.example.naturae_ui.fragments.PreviewFragment;
+import com.example.naturae_ui.fragments.ProfileFragment;
+import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
