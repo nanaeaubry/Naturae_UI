@@ -3,7 +3,6 @@ package com.example.naturae_ui.containers;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -99,7 +97,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 	private void showPreview(){
 		mMapView.setVisibility(View.INVISIBLE);
-		mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
 
@@ -154,10 +151,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 		CameraPosition Home = CameraPosition.builder().target(new LatLng(34.055569, -117.182541)).zoom(14).bearing(0).tilt(45).build();
 		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Home));
-
-		//TODO Nanae
-		//Start GRPC task to fetch all posts
-		//GRPCtask(map)-> fetch posts and push on map
 	}
 
 	private void enableMyLocation() {
@@ -169,7 +162,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	}
 
 	/**
-	 * Request posts to load on map
+	 * Request permission for location
 	 * @param requestCode code that indicates permission being requested
 	 * @param permissions permission needed
 	 * @param grantResults give access to use location
@@ -211,14 +204,12 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public boolean onMarkerClick(Marker marker) {
-		if(marker == mMarker) {
-			showPreview();
-		}
+
 		return true;
 	}
 
 	//If the current access token expired then this will request the server to generate a new access token
-	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply> {
+	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply>{
 
 		private final WeakReference<Activity> activity;
 		private ManagedChannel channel;
