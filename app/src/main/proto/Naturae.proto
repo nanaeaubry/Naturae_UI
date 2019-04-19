@@ -11,6 +11,7 @@ service ServerRequests{
     rpc CreateAccount (CreateAccountRequest) returns(CreateAccountReply){}
     rpc Login (LoginRequest) returns(LoginReply){}
     rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
+    rpc GetNewAccessToken(GetAccessTokenRequest) returns (GetAccessTokenReply){}
     rpc SayHello (HelloRequest) returns (HelloReply){};
 }
 
@@ -64,4 +65,14 @@ message AccountAuthenReply{
 message Status{
     int32 Code = 1;
     string Message = 2;
+}
+
+message GetAccessTokenRequest{
+    string appKey = 1;
+    string refreshToken = 2;
+}
+
+message GetAccessTokenReply{
+    string accessToken = 1;
+    Status status = 2;
 }

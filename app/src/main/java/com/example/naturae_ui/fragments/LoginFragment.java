@@ -143,7 +143,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         private GrpcLogin(OnFragmentInteractionListener mListener, Activity activity) {
             this.mListener = mListener;
             this.activity = new WeakReference<>(activity);
-
         }
 
         @Override

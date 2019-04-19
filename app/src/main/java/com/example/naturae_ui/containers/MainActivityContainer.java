@@ -1,9 +1,9 @@
 package com.example.naturae_ui.containers;
 
-
-
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -20,6 +21,10 @@ import com.example.naturae_ui.fragments.PostFragment;
 import com.example.naturae_ui.fragments.PreviewFragment;
 import com.example.naturae_ui.fragments.ProfileFragment;
 import com.example.naturae_ui.models.Post;
+import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.UserUtilities;
+import com.examples.naturaeproto.Naturae;
+import com.examples.naturaeproto.ServerRequestsGrpc;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -29,6 +34,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.ref.WeakReference;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener, GoogleMap.OnMarkerClickListener {
@@ -193,5 +205,48 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	public boolean onMarkerClick(Marker marker) {
 
 		return true;
+	}
+
+	//If the current access token expired then this will request the server to generate a new access token
+	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply>{
+
+		private final WeakReference<Activity> activity;
+		private ManagedChannel channel;
+
+		public GrpcGetNewAccessToken(Activity activity){
+			this.activity = new WeakReference<>(activity);
+		}
+		@Override
+		protected Naturae.GetAccessTokenReply doInBackground(Void... voids) {
+			Naturae.GetAccessTokenReply reply;
+			try {
+				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+				//Create a stub for with the channel
+				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+				Naturae.GetAccessTokenRequest request = Naturae.GetAccessTokenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
+						.setRefreshToken(UserUtilities.getRefreshToken(activity.get())).build();
+				reply = stub.getNewAccessToken(request);
+			}catch (Exception e){
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				pw.flush();
+				return null;
+			}
+
+			return reply;
+		}
+
+		@Override
+		protected void onPostExecute(Naturae.GetAccessTokenReply getAccessTokenReply) {
+			super.onPostExecute(getAccessTokenReply);
+			if (getAccessTokenReply == null){
+				Log.e("Access Token", "Unable to get new access token from the server");
+			}
+			else{
+				//Cache new the access token to the phone
+				UserUtilities.setAccessToken(activity.get(), getAccessTokenReply.getAccessToken());
+			}
+		}
 	}
 }

@@ -38,7 +38,7 @@ public class UserUtilities {
         // Cache the User's last name
         editor.putString(LAST_NAME, user.getLastName());
         //Cache if the ser is logged in
-        editor.putBoolean(IS_LOGGED_IN, false);
+        editor.putBoolean(IS_LOGGED_IN, true);
         // Apply the changes
         editor.apply();
     }
@@ -50,7 +50,7 @@ public class UserUtilities {
      */
     public static boolean isLoggedIn(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
-        return userPreferences.getBoolean(IS_LOGGED_IN, false);
+        return userPreferences.getBoolean(IS_LOGGED_IN, true);
     }
     /**
      *

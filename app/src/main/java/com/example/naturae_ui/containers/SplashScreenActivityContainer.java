@@ -12,6 +12,7 @@ public class SplashScreenActivityContainer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //If the user's had already login into the app. If the user had already logged in then it wil takes
         //the users to the main activity page and clear the top activity from the stack
+        System.out.println(UserUtilities.isLoggedIn(this));
         if (UserUtilities.isLoggedIn(this)){
             startActivity(new Intent(SplashScreenActivityContainer.this, MainActivityContainer.class));
         }
