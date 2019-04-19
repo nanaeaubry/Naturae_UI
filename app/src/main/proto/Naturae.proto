@@ -15,6 +15,7 @@ service ServerRequests{
     rpc SayHello (HelloRequest) returns (HelloReply){};
     rpc CreatePost (CreatePostRequest) returns (CreatePostReply){};
     rpc GetPosts (GetPostRequest) returns (GetPostReply){};
+    rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply){};
 }
 
 message HelloRequest{
@@ -113,4 +114,14 @@ message GetAccessTokenRequest{
 message GetAccessTokenReply{
     string accessToken = 1;
     Status status = 2;
+}
+
+message ChangePasswordRequest{
+    string appKey = 1;
+    string currentPassword = 2;
+    string newPassword = 3;
+}
+
+message ChangePasswordReply{
+    Status status = 1;
 }
