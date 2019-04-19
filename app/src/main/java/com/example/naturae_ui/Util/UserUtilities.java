@@ -38,7 +38,7 @@ public class UserUtilities {
         // Cache the User's last name
         editor.putString(LAST_NAME, user.getLastName());
         //Cache if the ser is logged in
-        editor.putBoolean(IS_LOGGED_IN, false);
+        editor.putBoolean(IS_LOGGED_IN, true);
         // Apply the changes
         editor.apply();
     }

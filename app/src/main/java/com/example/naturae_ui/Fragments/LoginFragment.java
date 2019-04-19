@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.example.naturae_ui.Containers.StartUpActivityContainer;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.Util.Constants;
+import com.example.naturae_ui.Util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 
@@ -182,6 +183,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 //If the status code is equal to 200 then the information the user's entered is correct
                 if (loginReply.getStatus().getCode() == Constants.OK){
                     mListener.startMainActivity();
+                    UserUtilities.setIsLoggedIn(activity.get(), true);
                 }
                 //If the status code is equal to 103 then the information the user's entered is incorrect
                 else if (loginReply.getStatus().getCode() == Constants.INVALID_LOGIN_CREDENTIAL){

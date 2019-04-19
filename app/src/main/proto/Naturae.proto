@@ -13,6 +13,7 @@ service ServerRequests{
     rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
     rpc SayHello (HelloRequest) returns (HelloReply){};
     rpc CreatePost (CreatePostRequest) returns (CreatePostReply){};
+    rpc GetPosts (GetPostRequest) returns (GetPostReply){};
 }
 
 message HelloRequest{
@@ -76,8 +77,26 @@ message CreatePostReply {
     Status status = 1;
 }
 
-message getPostsRequest {
-    //array of posts
+message GetPostRequest {
+    string appKey = 1;
+    float lat = 2;
+    float lng = 3;
+    int32 radius = 4;
+}
+
+message GetPostReply{
+    Status status = 1;
+    repeated GetPostReplyStruct reply = 2;
+
+}
+
+message GetPostReplyStruct{
+    string title = 3;
+    string species = 4;
+    string description = 5;
+    float lat = 6;
+    float lng = 7;
+    string encodedImage = 8;
 }
 
 message Status {

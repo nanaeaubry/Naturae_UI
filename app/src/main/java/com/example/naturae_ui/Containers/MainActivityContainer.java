@@ -4,6 +4,8 @@ package com.example.naturae_ui.Containers;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -11,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -21,6 +24,9 @@ import com.example.naturae_ui.Fragments.PreviewFragment;
 import com.example.naturae_ui.Fragments.ProfileFragment;
 import com.example.naturae_ui.Models.Post;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.Util.Constants;
+import com.examples.naturaeproto.Naturae;
+import com.examples.naturaeproto.ServerRequestsGrpc;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -30,6 +36,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener, GoogleMap.OnMarkerClickListener {
@@ -160,7 +173,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	}
 
 	/**
-	 * Request permission for location
+	 * Request posts to load on map
 	 * @param requestCode code that indicates permission being requested
 	 * @param permissions permission needed
 	 * @param grantResults give access to use location
@@ -201,4 +214,59 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 		return true;
 	}
+
+	private static class GrpcGetPosts extends AsyncTask<Void, Void, Naturae.GetPostReply> {
+
+
+		private ManagedChannel channel;
+
+
+		private GrpcGetPosts() {
+
+		}
+
+		@Override
+		protected Naturae.GetPostReply doInBackground(Void... voids) {
+
+			//Make image a byte array to store in server
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+			Naturae.GetPostReply reply;
+			try {
+				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+				//Create a stub for with the channel
+				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+				//Create an gRPC login request
+				Naturae.GetPostRequest request = Naturae.GetPostRequest.newBuilder()
+						.setAppKey(Constants.NATURAE_APP_KEY)
+						.setLat()
+						.setLng()
+						.setRadius(20)
+						.build();
+				reply = stub.createPost(request);
+
+			} catch (Exception e) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				pw.flush();
+				return null;
+			}
+			return reply;
+		}
+
+		@Override
+		protected void onPostExecute(Naturae.CreatePostReply createPostReply) {
+			//Check if reply is equal to null. If it's equal to null then there is an error
+			//when communicating with the server
+			if (createPostReply != null) {
+				if(createPostReply.getStatus().getCode() == Constants.OK ){
+
+				}
+			}
+
+		}
+
+	}
+
 }
