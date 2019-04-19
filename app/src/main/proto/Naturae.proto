@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+//protoc --go_out=plugins=grpc:. naturaeproto/Naturae.proto
+
 option java_package = "com.examples.naturaeproto";
 option go_package = "naturaeproto";
 
@@ -9,8 +11,8 @@ service ServerRequests{
     rpc CreateAccount (CreateAccountRequest) returns(CreateAccountReply){}
     rpc Login (LoginRequest) returns(LoginReply){}
     rpc AccountAuthentication(AccountAuthenRequest) returns(AccountAuthenReply){}
-    rpc SayHello (HelloRequest) returns (HelloReply){}
-    rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply){};
+    rpc GetNewAccessToken(GetAccessTokenRequest) returns (GetAccessTokenReply){}
+    rpc SayHello (HelloRequest) returns (HelloReply){};
 }
 
 message HelloRequest{
@@ -49,8 +51,9 @@ message LoginReply{
 
 message AccountAuthenRequest{
     string appKey = 1;
-    string email = 2;
-    string AuthenCode = 3;
+    string firstName = 2;
+    string email = 3;
+    string authenCode = 4;
 }
 
 message AccountAuthenReply{
@@ -64,13 +67,12 @@ message Status{
     string Message = 2;
 }
 
-message ChangePasswordRequest{
+message GetAccessTokenRequest{
     string appKey = 1;
-    string accessToken = 2;
-    string currentPassword = 3;
-    string newPassword = 4;
+    string refreshToken = 2;
 }
 
-message ChangePasswordReply{
-    Status status = 1;
+message GetAccessTokenReply{
+    string accessToken = 1;
+    Status status = 2;
 }

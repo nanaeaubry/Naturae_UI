@@ -1,7 +1,6 @@
 package com.example.naturae_ui.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,7 +13,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.naturae_ui.containers.StartUpContainer;
+
+import com.example.naturae_ui.containers.StartUpActivityContainer;
+
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.server.NaturaeUser;
 import com.example.naturae_ui.util.Constants;
@@ -123,13 +124,6 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mListener.hideProgressBar();
-
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -143,10 +137,9 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
     public interface OnFragmentInteractionListener {
         void showProgressBar();
         void hideProgressBar();
-        void beginFragment(StartUpContainer.AuthFragmentType fragmentType, boolean setTransition,
+        void beginFragment(StartUpActivityContainer.AuthFragmentType fragmentType, boolean setTransition,
                            boolean addToBackStack);
         Button getRightSideButton();
-        void setSendAuthenEmail(String email);
     }
 
     @Override
@@ -382,7 +375,6 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 //Create an gRPC create account request
                 Naturae.CreateAccountRequest request = Naturae.CreateAccountRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
                         .setFirstName(firstName).setLastName(lastName).setEmail(email).setPassword(params[3]).build();
-
                 //Send the request to the server and set reply to equal the response back from the server
                 reply = stub.createAccount(request);
 
@@ -417,33 +409,21 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 //Any thing else then the an server error
                 if (reply.getStatus().getCode() == Constants.ACCOUNT_CREATED){
                     //Start a new thread and cache the user
-                    new Thread(()->UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
-                            reply.getAccessToken(), reply.getRefreshToken(), "")));
-                    mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true, true);
+                    UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
+                            reply.getAccessToken(), reply.getRefreshToken(), ""));
+                    mListener.beginFragment(StartUpActivityContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true, true);
                 }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
                     //Display an error message that an account with the email already exist
-                    displayError((String) activity.get().getText(R.string.email_exist));
+                    Helper.alertDialogErrorMessage(activity.get(),(String) activity.get().getText(R.string.email_exist));
                 }else{
                     //Display an create account error
-                    displayError((String) activity.get().getText(R.string.create_account_error));
+                    Helper.alertDialogErrorMessage(activity.get(),(String) activity.get().getText(R.string.create_account_error));
                 }
             }
             else{
-
+                Helper.alertDialogErrorMessage(activity.get(), "An error has occurred while communicating with the server. Please try again");
             }
 
-        }
-
-        /**
-         * Create an dialog box that display the error
-         * @param message the error message to be display
-         */
-        private void displayError(String message){
-            //Create an instance of Alert Dialog
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity.get());
-            alertDialogBuilder.setTitle("Error").setMessage(message).setPositiveButton(R.string.ok, (dialog, which) -> {
-                dialog.cancel();
-            }).show();
         }
     }
 }

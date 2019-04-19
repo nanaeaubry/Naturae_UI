@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.naturae_ui.containers.StartUpContainer;
+import com.example.naturae_ui.containers.StartUpActivityContainer;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.util.Constants;
 import com.examples.naturaeproto.Naturae;
@@ -71,7 +71,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         loginButton.setOnClickListener(this);
         createAccountButton.setOnClickListener(this);
         forgetPasswordTextView.setOnClickListener(this);
-
         return view;
     }
 
@@ -87,12 +86,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mListener.hideProgressBar();
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -101,9 +94,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
     public interface OnFragmentInteractionListener {
         void hideKeyboard();
-        void showProgressBar();
-        void hideProgressBar();
-        void beginFragment(StartUpContainer.AuthFragmentType fragmentType, boolean setTransition,
+        void beginFragment(StartUpActivityContainer.AuthFragmentType fragmentType, boolean setTransition,
                            boolean addToBackStack);
         void startMainActivity();
     }
@@ -132,12 +123,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 break;
             //Create account selected
             case R.id.create_account_button:
-                mListener.beginFragment(StartUpContainer.AuthFragmentType.CREATE_ACCOUNT, true,
+                mListener.beginFragment(StartUpActivityContainer.AuthFragmentType.CREATE_ACCOUNT, true,
                         true);
                 break;
             //Forget password selected
             case R.id.forget_password_text_view:
-                mListener.beginFragment(StartUpContainer.AuthFragmentType.FORGOT_PASSWORD, true,
+                mListener.beginFragment(StartUpActivityContainer.AuthFragmentType.FORGOT_PASSWORD, true,
                         true);
                 break;
         }
@@ -152,7 +143,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         private GrpcLogin(OnFragmentInteractionListener mListener, Activity activity) {
             this.mListener = mListener;
             this.activity = new WeakReference<>(activity);
-
         }
 
         @Override
@@ -185,12 +175,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
             //when communicating with the server
             if (loginReply != null){
                 TextView errorMessageTextView = activity.get().findViewById(R.id.error_message_text_view);
+                System.out.println(loginReply.getStatus().getMessage());
+                System.out.println(loginReply.getStatus().getCode());
                 //If the status code is equal to 200 then the information the user's entered is correct
                 if (loginReply.getStatus().getCode() == Constants.OK){
                     mListener.startMainActivity();
                 }
-                //If the status code is equal to 205 then the information the user's entered is incorrect
-                else if (loginReply.getStatus().getCode() == Constants.DENIED){
+                //If the status code is equal to 103 then the information the user's entered is incorrect
+                else if (loginReply.getStatus().getCode() == Constants.INVALID_LOGIN_CREDENTIAL){
                     errorMessageTextView.setVisibility(View.VISIBLE);
                     errorMessageTextView.setText(R.string.invalid_email_password);
                 }
@@ -199,7 +191,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 //use the authentication code to verify their account
                 else if (loginReply.getStatus().getCode() == Constants.ACCOUNT_NOT_VERIFY){
                     //Open the account authentication page
-                    mListener.beginFragment(StartUpContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true,
+                    mListener.beginFragment(StartUpActivityContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true,
                             true);
                 }
                 else{

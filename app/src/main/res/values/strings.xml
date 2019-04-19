@@ -11,6 +11,7 @@
     <string name="password">Password</string>
     <string name="back_button"><![CDATA[<]]></string>
     <string name="ok">Ok</string>
+    <string name="server_error">"An error has occurred while communicating with the server. Please try again"</string>
 
     <!--Map-->
     <string name="title_map">Map</string>
@@ -60,7 +61,8 @@
     <string name="verify">Verify</string>
     <string name="no_authen_code">Don\'t have your code?</string>
     <string name="invalid_authen_code">The code you entered is invalid. Please try again</string>
-    <string name="expired_authen_code">The code you entered has expired. A new code will be send to your email</string>
+    <string name="expired_authen_code">The code you entered had expired. Check your email for the new code</string>
+    <string name="empty_authen_code_field">Enter your authentication code</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
