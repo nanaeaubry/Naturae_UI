@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Models;
+package com.example.naturae_ui.models;
 
 import android.graphics.Bitmap;
 

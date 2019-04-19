@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Fragments;
+package com.example.naturae_ui.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.support.v4.app.Fragment;
-import com.example.naturae_ui.Util.*;
+import com.example.naturae_ui.util.*;
 import com.example.naturae_ui.R;
 import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;

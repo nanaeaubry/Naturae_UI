@@ -1,6 +1,6 @@
-package com.example.naturae_ui.Fragments;
+package com.example.naturae_ui.fragments;
 
-import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.net.Uri;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,13 +29,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 
-import com.example.naturae_ui.Containers.StartUpActivityContainer;
-import com.example.naturae_ui.Models.Post;
+
+import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.Util.Constants;
+import com.example.naturae_ui.util.Constants;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 
@@ -43,7 +44,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.ref.WeakReference;
 
 
 import io.grpc.ManagedChannel;

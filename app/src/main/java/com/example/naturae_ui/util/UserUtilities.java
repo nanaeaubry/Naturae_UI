@@ -1,9 +1,9 @@
-package com.example.naturae_ui.Util;
+package com.example.naturae_ui.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.naturae_ui.Server.NaturaeUser;
+import com.example.naturae_ui.server.NaturaeUser;
 
 public class UserUtilities {
     private static final String SHARED_PREF_USER_DATA = "UserData";
@@ -50,7 +50,7 @@ public class UserUtilities {
      */
     public static boolean isLoggedIn(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
-        return userPreferences.getBoolean(IS_LOGGED_IN, false);
+        return userPreferences.getBoolean(IS_LOGGED_IN, true);
     }
     /**
      *

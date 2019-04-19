@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Containers;
+package com.example.naturae_ui.containers;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,9 +11,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
-import com.example.naturae_ui.Fragments.AccountAuthenFragment;
-import com.example.naturae_ui.Fragments.CreateAccountFragment;
-import com.example.naturae_ui.Fragments.LoginFragment;
+import com.example.naturae_ui.fragments.AccountAuthenFragment;
+import com.example.naturae_ui.fragments.CreateAccountFragment;
+import com.example.naturae_ui.fragments.LoginFragment;
 import com.example.naturae_ui.R;
 
 public class StartUpActivityContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,

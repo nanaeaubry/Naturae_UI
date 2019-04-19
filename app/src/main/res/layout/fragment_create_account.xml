@@ -5,7 +5,7 @@
     android:id="@+id/create_account_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.CreateAccountFragment">
+    tools:context=".fragments.CreateAccountFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

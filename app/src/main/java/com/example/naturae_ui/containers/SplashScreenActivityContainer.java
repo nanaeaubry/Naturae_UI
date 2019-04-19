@@ -1,11 +1,9 @@
-package com.example.naturae_ui.Containers;
+package com.example.naturae_ui.containers;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import com.example.naturae_ui.R;
-import com.example.naturae_ui.Util.UserUtilities;
+import com.example.naturae_ui.util.UserUtilities;
 
 public class SplashScreenActivityContainer extends AppCompatActivity {
 
@@ -13,7 +11,8 @@ public class SplashScreenActivityContainer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //If the user's had already login into the app. If the user had already logged in then it wil takes
-        //the users to the main activity page
+        //the users to the main activity page and clear the top activity from the stack
+        System.out.println(UserUtilities.isLoggedIn(this));
         if (UserUtilities.isLoggedIn(this)){
             startActivity(new Intent(SplashScreenActivityContainer.this, MainActivityContainer.class));
         }
@@ -22,6 +21,14 @@ public class SplashScreenActivityContainer extends AppCompatActivity {
         else{
             startActivity(new Intent(SplashScreenActivityContainer.this, StartUpActivityContainer.class));
         }
-        setContentView(R.layout.activity_splash_screen_container);
+    }
+
+    /**
+     * stops the application
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 }

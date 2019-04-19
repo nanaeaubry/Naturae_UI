@@ -1,14 +1,13 @@
-package com.example.naturae_ui.Util;
+package com.example.naturae_ui.util;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.content.Context;
 import com.example.naturae_ui.R;
-import java.util.ArrayList;
+
 import java.util.List;
 
 

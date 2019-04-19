@@ -1,11 +1,10 @@
-package com.example.naturae_ui.Containers;
-
-
+package com.example.naturae_ui.containers;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -13,18 +12,19 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
-import android.view.MenuItem;
+import android.util.Log;
+
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.example.naturae_ui.Fragments.FriendFragment;
-import com.example.naturae_ui.Fragments.PostFragment;
-import com.example.naturae_ui.Fragments.PreviewFragment;
-import com.example.naturae_ui.Fragments.ProfileFragment;
-import com.example.naturae_ui.Models.Post;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.Util.Constants;
+import com.example.naturae_ui.fragments.FriendFragment;
+import com.example.naturae_ui.fragments.PostFragment;
+import com.example.naturae_ui.fragments.PreviewFragment;
+import com.example.naturae_ui.fragments.ProfileFragment;
+import com.example.naturae_ui.models.Post;
+import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,6 +36,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.ref.WeakReference;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -120,27 +127,23 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 * Enable navigation on bottom bar.
 	 */
 	private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
-			= new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-		@Override
-		public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-			switch (item.getItemId()) {
-				case R.id.navigation_map:
-					showMap();
-					break;
-				case R.id.navigation_post:
-					showPost();
-					break;
-				case R.id.navigation_chat:
-					showChat();
-					break;
-				case R.id.navigation_profile:
-					showProfile();
-					break;
-			}
-			return true;
-		}
-	};
+			= item -> {
+				switch (item.getItemId()) {
+					case R.id.navigation_map:
+						showMap();
+						break;
+					case R.id.navigation_post:
+						showPost();
+						break;
+					case R.id.navigation_chat:
+						showChat();
+						break;
+					case R.id.navigation_profile:
+						showProfile();
+						break;
+				}
+				return true;
+			};
 
 
 	/**
@@ -191,7 +194,12 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 	}
 
-	/**
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    /**
 	 * Create marker when post is created
 	 * @param post post that is created
 	 */
@@ -215,58 +223,46 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		return true;
 	}
 
-	private static class GrpcGetPosts extends AsyncTask<Void, Void, Naturae.GetPostReply> {
+	//If the current access token expired then this will request the server to generate a new access token
+	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply>{
 
-
+		private final WeakReference<Activity> activity;
 		private ManagedChannel channel;
 
-
-		private GrpcGetPosts() {
-
+		public GrpcGetNewAccessToken(Activity activity){
+			this.activity = new WeakReference<>(activity);
 		}
-
 		@Override
-		protected Naturae.GetPostReply doInBackground(Void... voids) {
-
-			//Make image a byte array to store in server
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-			Naturae.GetPostReply reply;
+		protected Naturae.GetAccessTokenReply doInBackground(Void... voids) {
+			Naturae.GetAccessTokenReply reply;
 			try {
 				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
 				//Create a stub for with the channel
 				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-				//Create an gRPC login request
-				Naturae.GetPostRequest request = Naturae.GetPostRequest.newBuilder()
-						.setAppKey(Constants.NATURAE_APP_KEY)
-						.setLat()
-						.setLng()
-						.setRadius(20)
-						.build();
-				reply = stub.createPost(request);
-
-			} catch (Exception e) {
+				Naturae.GetAccessTokenRequest request = Naturae.GetAccessTokenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
+						.setRefreshToken(UserUtilities.getRefreshToken(activity.get())).build();
+				reply = stub.getNewAccessToken(request);
+			}catch (Exception e){
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
 				pw.flush();
 				return null;
 			}
+
 			return reply;
 		}
 
 		@Override
-		protected void onPostExecute(Naturae.CreatePostReply createPostReply) {
-			//Check if reply is equal to null. If it's equal to null then there is an error
-			//when communicating with the server
-			if (createPostReply != null) {
-				if(createPostReply.getStatus().getCode() == Constants.OK ){
-
-				}
+		protected void onPostExecute(Naturae.GetAccessTokenReply getAccessTokenReply) {
+			super.onPostExecute(getAccessTokenReply);
+			if (getAccessTokenReply == null){
+				Log.e("Access Token", "Unable to get new access token from the server");
 			}
-
+			else{
+				//Cache new the access token to the phone
+				UserUtilities.setAccessToken(activity.get(), getAccessTokenReply.getAccessToken());
+			}
 		}
-
 	}
-
 }

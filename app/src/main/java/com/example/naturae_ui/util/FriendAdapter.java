@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Util;
+package com.example.naturae_ui.util;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
