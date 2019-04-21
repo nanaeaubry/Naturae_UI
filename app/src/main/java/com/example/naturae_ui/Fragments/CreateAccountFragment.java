@@ -3,7 +3,6 @@ package com.example.naturae_ui.Fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.okhttp.internal.Util;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
