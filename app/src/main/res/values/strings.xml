@@ -64,6 +64,14 @@
     <string name="expired_authen_code">The code you entered had expired. Check your email for the new code</string>
     <string name="empty_authen_code_field">Enter your authentication code</string>
 
+    <!--Reset password-->
+    <string name="reset_message">Enter email address and instructions will be send on how to reset
+    your password</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="reset_password_code_message">Enter your reset password code</string>
+    <string name="submit">Submit</string>
+    <string name="new_password">New Password</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="code">Code</string>
