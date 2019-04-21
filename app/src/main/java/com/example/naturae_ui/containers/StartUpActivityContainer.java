@@ -1,28 +1,24 @@
-package com.example.naturae_ui.Containers;
+package com.example.naturae_ui.containers;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import com.example.naturae_ui.Fragments.AccountAuthenFragment;
-import com.example.naturae_ui.Fragments.CreateAccountFragment;
-import com.example.naturae_ui.Fragments.LoginFragment;
+import com.example.naturae_ui.fragments.AccountAuthenFragment;
+import com.example.naturae_ui.fragments.CreateAccountFragment;
+import com.example.naturae_ui.fragments.LoginFragment;
 import com.example.naturae_ui.R;
 
-public class StartUpContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
+public class StartUpActivityContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
         CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
 
-    private FrameLayout mainLayout;
     private LoginFragment loginFragment;
     private CreateAccountFragment createAccountFragment;
     private AccountAuthenFragment accountAuthenFragment;
@@ -31,8 +27,9 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
 
     private Button backButton, rightSideButton;
     private ProgressBar progressBar;
+    private boolean isHomeEnable;
 
-    public StartUpContainer() {
+    public StartUpActivityContainer() {
     }
 
     //Enumerator
@@ -49,7 +46,6 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_up_container);
 
-        mainLayout = findViewById(R.id.main_display_container);
         startUpTopNav =  findViewById(R.id.start_up_top_nav_bar);
 
         //Initialize Login Fragment
@@ -62,6 +58,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         progressBar = findViewById(R.id.progressBar);
 
         beginFragment(AuthFragmentType.LOGIN, true, false);
+        isHomeEnable = true;
 
         backButton.setOnClickListener(v -> onBackPressed());
 
@@ -107,9 +104,9 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         }
         //Check weather or not to add the fragment to the back stack
         if(addToBackStack) {
+            isHomeEnable = false;
             fragmentTransaction.addToBackStack(null);
         }
-        showProgressBar();
         fragmentTransaction.commit();
     }
 
@@ -118,7 +115,7 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
      */
     private void removeFragmentFromBackStack(){
         if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            getFragmentManager().popBackStackImmediate();
         }
     }
 
@@ -129,14 +126,17 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
     public void onBackPressed() {
         //If the current page is the login page then will will go to the
         //main apps page
-        if(getFragmentManager().getBackStackEntryCount() == 0){
-            //To allow default back button to go to home page
-            //goHomeEnable = true;
-            startUpTopNav.setVisibility(View.GONE);
-            beginFragment(AuthFragmentType.LOGIN, true, false);
-        }
-        else{
-            super.onBackPressed();
+        removeFragmentFromBackStack();
+        super.onBackPressed();
+        if (!isHomeEnable) {
+            if (getFragmentManager().getBackStackEntryCount() == 0){
+                //To allow default back button to go to home page
+                startUpTopNav.setVisibility(View.GONE);
+                isHomeEnable = true;
+            }
+            else {
+                isHomeEnable = false;
+            }
         }
     }
 
@@ -164,18 +164,12 @@ public class StartUpContainer extends AppCompatActivity implements LoginFragment
         return rightSideButton;
     }
 
-    @Override
-    public  void setSendAuthenEmail(String email){
-        accountAuthenFragment.setSendEmail(email);
-    }
-
     /**
      * Start the main activity
      */
     @Override
     public void startMainActivity(){
-        removeFragmentFromBackStack();
-        Intent intent = new Intent(this, MainActivityContainer.class);
+        Intent intent = new Intent(StartUpActivityContainer.this, MainActivityContainer.class);
         startActivity(intent);
     }
 }

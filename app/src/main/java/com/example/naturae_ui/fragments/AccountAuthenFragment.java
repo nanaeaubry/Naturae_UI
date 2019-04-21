@@ -1,8 +1,7 @@
-package com.example.naturae_ui.Fragments;
+package com.example.naturae_ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,10 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.naturae_ui.Containers.MainActivityContainer;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.Util.Constants;
-import com.example.naturae_ui.Util.UserUtilities;
+import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.Helper;
+import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 
@@ -33,15 +32,14 @@ import io.grpc.ManagedChannelBuilder;
 public class AccountAuthenFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private String userEmail;
+    private String displayEmail;
+
 
     private TextView authenMessageTextView;
-    private TextView autehnErrorMessageTextView;
     private EditText authenCodeEditText;
-    private Button verifyButton;
 
     public AccountAuthenFragment() {
-        userEmail = "****";
+        displayEmail = "****";
         // Required empty public constructor
     }
 
@@ -66,15 +64,15 @@ public class AccountAuthenFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_account_authen, container, false);
         authenMessageTextView = view.findViewById(R.id.authentication_message_text_view);
-        verifyButton = view.findViewById(R.id.verify_button);
-        autehnErrorMessageTextView = view.findViewById(R.id.authen_error_text_view);
+        Button verifyButton = view.findViewById(R.id.verify_button);
+        TextView authenErrorMessageTextView = view.findViewById(R.id.authen_error_text_view);
         authenCodeEditText = view.findViewById(R.id.authentication_code_edit_text);
 
         verifyButton.setOnClickListener(v -> {
             //Check if the authen code edit text is empty. If it's empty then an error message will
             //pop-up to ask the user to enter the authentication code
             if (authenCodeEditText.getText().toString().isEmpty()){
-
+                authenErrorMessageTextView.setText(R.string.empty_authen_code_field);
             }
             else{
                 new GrpcAccountAuthen(mListener, getActivity()).execute(
@@ -88,7 +86,8 @@ public class AccountAuthenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        authenMessageTextView.setText(String.format("%s %s", getString(R.string.authentication_message), userEmail));
+        authenMessageTextView.setText(String.format("%s %s", getString(R.string.authentication_message),
+                hideUserEmail(UserUtilities.getEmail(getContext()))));
     }
 
     @Override
@@ -109,20 +108,26 @@ public class AccountAuthenFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void showProgressBar();
         void hideProgressBar();
         void startMainActivity();
     }
 
-    public void setSendEmail(String email) {
-        userEmail = email.substring(0, 3) + userEmail + email.substring(email.indexOf("@"));
+    /**
+     * Hide the user's full email from displaying
+     * @param email user email
+     * @return a modify version of user's email
+     */
+    public String hideUserEmail(String email) {
+        return email.substring(0, 3) + displayEmail + email.substring(email.indexOf("@"));
     }
 
+    //Create an async task for account authentication
     private static class GrpcAccountAuthen extends AsyncTask<String, Void, Naturae.AccountAuthenReply>{
         private final AccountAuthenFragment.OnFragmentInteractionListener mListener;
         private final WeakReference<Activity> activity;
         private ManagedChannel channel;
 
+        //Create an constructor for the async task
         private GrpcAccountAuthen(AccountAuthenFragment.OnFragmentInteractionListener mListener, Activity activity){
             this.mListener = mListener;
             this.activity = new WeakReference<>(activity);
@@ -137,8 +142,8 @@ public class AccountAuthenFragment extends Fragment {
                 //Create a stub for with the channel
                 ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
                 //Create a GRPC request to the server for account authentication
-                Naturae.AccountAuthenRequest request = Naturae.AccountAuthenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
-                        .setEmail(UserUtilities.getEmail()).build();
+                Naturae.AccountAuthenRequest request = Naturae.AccountAuthenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY).setFirstName(UserUtilities.getFirstName(activity.get()))
+                        .setEmail(UserUtilities.getEmail(activity.get())).build();
                 //Request the send and set reply equal to the response back from the server
                 reply = stub.accountAuthentication(request);
 
@@ -162,7 +167,7 @@ public class AccountAuthenFragment extends Fragment {
             if (result.getResult()){
                 //Cache that the user is able to logged in successfully
                 //Next time the user's open the app the user's don't have to log in again
-                UserUtilities.setIsLoggedIn(true);
+                UserUtilities.setIsLoggedIn(activity.get(), true);
                 //Start the main activity
                 mListener.startMainActivity();
             }
@@ -189,7 +194,7 @@ public class AccountAuthenFragment extends Fragment {
                 }
                 //Any other error
                 else{
-
+                    Helper.alertDialogErrorMessage(activity.get(), activity.get().getText(R.string.server_error).toString());
                 }
 
             }

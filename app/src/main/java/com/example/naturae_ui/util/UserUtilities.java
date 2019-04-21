@@ -1,12 +1,11 @@
-package com.example.naturae_ui.Util;
+package com.example.naturae_ui.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.naturae_ui.Server.NaturaeUser;
+import com.example.naturae_ui.server.NaturaeUser;
 
 public class UserUtilities {
-    private static SharedPreferences userPreferences;
     private static final String SHARED_PREF_USER_DATA = "UserData";
     private static final String USER_INFO = "userJson";
     private static final String EMAIL = "username";
@@ -19,12 +18,12 @@ public class UserUtilities {
 
     /**
      *  Caches the user's information
-     * @param context
-     * @param user - DotifyUser object containing the user's information
+     * @param context current context
+     * @param user - Naturae user's object containing the user's information
      */
     public static void cacheUser(Context context, NaturaeUser user){
         // Retrieve the user's shared preferences folder
-        userPreferences = getUserSharedPreferences(context);
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
         // Grab the editor to change the information currently stored in the User's shared preferences
         // folder
         SharedPreferences.Editor editor = userPreferences.edit();
@@ -39,7 +38,7 @@ public class UserUtilities {
         // Cache the User's last name
         editor.putString(LAST_NAME, user.getLastName());
         //Cache if the ser is logged in
-        editor.putBoolean(IS_LOGGED_IN, false);
+        editor.putBoolean(IS_LOGGED_IN, true);
         // Apply the changes
         editor.apply();
     }
@@ -51,7 +50,7 @@ public class UserUtilities {
      */
     public static boolean isLoggedIn(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
-        return userPreferences.getBoolean(IS_LOGGED_IN, false);
+        return userPreferences.getBoolean(IS_LOGGED_IN, true);
     }
     /**
      *
@@ -84,7 +83,8 @@ public class UserUtilities {
      * Update the user's first name cache
      * @param name user's new first name
      */
-    private static void setFirstName(String name){
+    private static void setFirstName(Context context, String name){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
         userPreferences.edit().putString(FIRST_NAME, name).apply();
     }
 
@@ -92,23 +92,17 @@ public class UserUtilities {
      * Update the user's last name cache
      * @param name user's new last name
      */
-    public static void setLastName(String name){
+    public static void setLastName(Context context, String name){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
         userPreferences.edit().putString(LAST_NAME, name).apply();
-    }
-
-    /**
-     * Update the user's email cache
-     * @param emailAddress user's new email
-     */
-    public static void setEmail(String emailAddress){
-        userPreferences.edit().putString(EMAIL, emailAddress).apply();
     }
 
     /**
      * Update user's access token id cache
      * @param tokenID user's new access token id
      */
-    public static void setAccessToken(String tokenID){
+    public static void setAccessToken(Context context, String tokenID){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
         userPreferences.edit().putString(ACCESS_TOKEN, tokenID).apply();
     }
 
@@ -116,14 +110,16 @@ public class UserUtilities {
      * Update user's refresh token id cache
      * @param tokenID user's new refresh token id
      */
-    public static void setRefreshToken(String tokenID){
+    public static void setRefreshToken(Context context, String tokenID){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
         userPreferences.edit().putString(REFRESH_TOKEN, tokenID).apply();
     }
 
     /**
      * Update user's logged in status
      */
-    public static void setIsLoggedIn(boolean currStatus){
+    public static void setIsLoggedIn(Context context, boolean currStatus){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
         userPreferences.edit().putBoolean(IS_LOGGED_IN, currStatus).apply();
     }
 
@@ -131,47 +127,45 @@ public class UserUtilities {
      * Retrieves the user's first name
      * @return the user's first name
      */
-    public static String getFirstName(){
-        return userPreferences.getString(FIRST_NAME, "");
+    public static String getFirstName(Context context){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        return userPreferences.getString(FIRST_NAME, null);
     }
 
     /**
      * Retrieves the user's last name
      * @return the user's last name
      */
-    public static String getLastName(){
-        return userPreferences.getString(LAST_NAME, "");
+    public static String getLastName(Context context){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        return userPreferences.getString(LAST_NAME, null);
     }
 
     /**
      * Retrieves the user's email
      * @return the user's email
      */
-    public static String getEmail(){
-        return userPreferences.getString(EMAIL,"");
+    public static String getEmail(Context context){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        return userPreferences.getString(EMAIL,null);
     }
 
     /**
      * Retrieves the user's access token
      * @return the user's access token
      */
-    public static String getAccessToken(){
-        return userPreferences.getString(ACCESS_TOKEN, "");
+    public static String getAccessToken(Context context){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        return userPreferences.getString(ACCESS_TOKEN, null);
     }
 
     /**
      * Retrieves the user's refresh token
      * @return the user's refresh token
      */
-    public static String getRefreshToken(){
-        return userPreferences.getString(REFRESH_TOKEN, "");
+    public static String getRefreshToken(Context context){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        return userPreferences.getString(REFRESH_TOKEN, null);
     }
 
-    /**
-     * Retrieves the user's logged in status
-     * @return the user logged in status
-     */
-    public static boolean getIsLoggedIn(){
-        return userPreferences.getBoolean(IS_LOGGED_IN, false);
-    }
 }

@@ -1,4 +1,4 @@
-package com.example.naturae_ui.Server
+package com.example.naturae_ui.server
 
 import com.examples.naturaeproto.Naturae
 import com.examples.naturaeproto.ServerRequestsGrpc
