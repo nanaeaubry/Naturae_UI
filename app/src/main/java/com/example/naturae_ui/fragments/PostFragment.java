@@ -312,10 +312,10 @@ public class PostFragment extends Fragment {
 
 			//Make image a byte array to store in server
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			mPost.image.compress(Bitmap.CompressFormat.PNG, 60, byteArrayOutputStream);
+			mPost.image.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
 			byte[] byteArray = byteArrayOutputStream.toByteArray();
 			String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
+			System.out.println(UserUtilities.getEmail(cReference.get()));
 			Naturae.CreatePostReply reply;
 			try {
 				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
