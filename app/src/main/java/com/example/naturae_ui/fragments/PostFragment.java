@@ -1,6 +1,7 @@
 package com.example.naturae_ui.fragments;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,6 +36,7 @@ import android.widget.ImageView;
 import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 
@@ -44,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.ref.WeakReference;
 
 //Test Comment by Nanae
 import io.grpc.ManagedChannel;
@@ -59,6 +62,7 @@ public class PostFragment extends Fragment {
 	public String photoFileName = "photo.jpg";
 	File photoFile;
 	Uri photoFileUri;
+	private static Context context;
 
 	View mView;
 	ImageButton openCamera;
@@ -77,7 +81,6 @@ public class PostFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		mView = inflater.inflate(R.layout.fragment_post, container, false);
 		super.onCreate(savedInstanceState);
-
 		imagePreview = mView.findViewById(R.id.image_preview);
 
 		// Create a File reference for photo capture
@@ -158,7 +161,7 @@ public class PostFragment extends Fragment {
 				post.lng = latLong[1];
 				post.image = selectedImage;
 
-				new GrpcCreatePost(listener, post).execute();
+				new GrpcCreatePost(listener, post, getActivity()).execute();
 
 			}
 
@@ -291,13 +294,16 @@ public class PostFragment extends Fragment {
 
 		private final PostFragment.OnPostListener mListener;
 		private final Post mPost;
+		private final WeakReference<Context> cReference ;
 
 		private ManagedChannel channel;
 
 
-		private GrpcCreatePost(PostFragment.OnPostListener mListener, Post post) {
+		private GrpcCreatePost(OnPostListener mListener, Post post, Activity activity) {
 			this.mListener = mListener;
 			this.mPost = post;
+			this.cReference = new WeakReference<>(activity.getApplicationContext());
+
 
 		}
 
@@ -306,7 +312,7 @@ public class PostFragment extends Fragment {
 
 			//Make image a byte array to store in server
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			mPost.image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+			mPost.image.compress(Bitmap.CompressFormat.PNG, 60, byteArrayOutputStream);
 			byte[] byteArray = byteArrayOutputStream.toByteArray();
 			String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
@@ -318,6 +324,7 @@ public class PostFragment extends Fragment {
 				//Create an gRPC login request
 				Naturae.CreatePostRequest request = Naturae.CreatePostRequest.newBuilder()
 						.setAppKey(Constants.NATURAE_APP_KEY)
+						.setAccessToken(UserUtilities.getAccessToken(cReference.get()))
 						.setTitle(mPost.title).setSpecies(mPost.species)
 						.setDescription(mPost.description)
 						.setLat(mPost.lat)
