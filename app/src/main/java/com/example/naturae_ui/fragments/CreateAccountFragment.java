@@ -361,7 +361,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
 
         @Override
         protected Naturae.CreateAccountReply doInBackground(String... params) {
-            Naturae.CreateAccountReply reply;
+            Naturae.CreateAccountReply reply = null;
             try{
                 //Create a channel to connect to the server
                 channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
@@ -381,7 +381,6 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 pw.flush();
-                return null;
             }
             return reply;
 

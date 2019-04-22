@@ -1,13 +1,13 @@
 package com.example.naturae_ui.fragments;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 
 import android.os.AsyncTask;
@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 
@@ -44,12 +45,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 //Test Comment by Nanae
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-
-import static android.view.View.GONE;
 
 public class PostFragment extends Fragment {
 	// PICK_PHOTO_CODE is a constant integer
@@ -84,37 +85,31 @@ public class PostFragment extends Fragment {
 		photoFile = getPhotoFile(photoFileName);
 
 		// wrap File object into a content provider
-		photoFileUri = FileProvider.getUriForFile(getContext(), "com.example.naturae_ui", photoFile);
+		photoFileUri = FileProvider.getUriForFile(Objects.requireNonNull(getContext()), "com.example.naturae_ui", photoFile);
 
 		//Button to open camera on user phone
 		openCamera = mView.findViewById(R.id.open_camera);
-		openCamera.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		openCamera.setOnClickListener(v -> {
+			Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
+			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
 
-				if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-					startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-				}
+			if (takePictureIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
+				startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 			}
 		});
 
 		//Button to open media gallery on user phone
 		openPhotos = mView.findViewById(R.id.open_photos);
-		openPhotos.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// Create intent for picking a photo from the gallery
-				Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		openPhotos.setOnClickListener(v -> {
+			// Create intent for picking a photo from the gallery
+			Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-				// If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-				// So as long as the result is not null, it's safe to use the intent.
-				if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-					// Bring up gallery to select a photo
-					startActivityForResult(intent, PICK_PHOTO);
-				}
+			// If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+			// So as long as the result is not null, it's safe to use the intent.
+			if (intent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
+				// Bring up gallery to select a photo
+				startActivityForResult(intent, PICK_PHOTO);
 			}
 		});
 
@@ -129,38 +124,32 @@ public class PostFragment extends Fragment {
 
 		//Button to submit post
 		submitPost = mView.findViewById(R.id.post_submit);
-		submitPost.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				boolean missingData = TextUtils.isEmpty(titlePost.getText()) ||
-						TextUtils.isEmpty(speciesPost.getText()) ||
-						TextUtils.isEmpty(descriptionPost.getText()) ||
-						selectedImage == null;
-				if (missingData) {
-					new AlertDialog.Builder(getContext())
-							.setTitle("One or more fields are empty").setMessage("Please make sure all fields are correct ")
-							.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
+		submitPost.setOnClickListener(v -> {
+			boolean missingData = TextUtils.isEmpty(titlePost.getText()) ||
+					TextUtils.isEmpty(speciesPost.getText()) ||
+					TextUtils.isEmpty(descriptionPost.getText()) ||
+					selectedImage == null;
+			if (missingData) {
+				new AlertDialog.Builder(getContext())
+						.setTitle("One or more fields are empty").setMessage("Please make sure all fields are correct ")
+						.setPositiveButton("Ok", (dialog, which) -> {
 
-								}
-							}).show();
-					return;
-				}
-
-				//New post to hold information input by user
-				Post post = new Post();
-
-				//User input will be put in post
-				post.title = titlePost.getText().toString();
-				post.species = speciesPost.getText().toString();
-				post.description = descriptionPost.getText().toString();
-				post.lat = latLong[0];
-				post.lng = latLong[1];
-				post.image = selectedImage;
-
-				new GrpcCreatePost(listener, post).execute();
-
+						}).show();
+				return;
 			}
+
+			//New post to hold information input by user
+			Post post = new Post();
+
+			//User input will be put in post
+			post.title = titlePost.getText().toString();
+			post.species = speciesPost.getText().toString();
+			post.description = descriptionPost.getText().toString();
+			post.lat = latLong[0];
+			post.lng = latLong[1];
+			post.image = selectedImage;
+
+			new GrpcCreatePost(listener, post, getActivity()).execute();
 
 		});
 		return mView;
@@ -186,7 +175,7 @@ public class PostFragment extends Fragment {
 				try {
 
 					Uri photoUri = data.getData();
-					selectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+					selectedImage = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getContext()).getContentResolver(), photoUri);
 
 					// Load the selected image into a preview
 					imagePreview.setVisibility(View.VISIBLE);
@@ -219,7 +208,7 @@ public class PostFragment extends Fragment {
 		// Get safe storage directory for photos
 		// Use `getExternalFilesDir` on Context to access package-specific directories.
 		// This way, we don't need to request external read/write runtime permissions.
-		File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG);
+		File mediaStorageDir = new File(Objects.requireNonNull(getContext()).getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG);
 
 		// Create the storage directory if it does not exist
 		if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
@@ -227,9 +216,7 @@ public class PostFragment extends Fragment {
 		}
 
 		// Return the file target for the photo based on filename
-		File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
-
-		return file;
+		return  new File(mediaStorageDir.getPath() + File.separator + fileName);
 	}
 
 	/**
@@ -240,7 +227,7 @@ public class PostFragment extends Fragment {
 	void readExif(Uri uri) {
 
 		try {
-			InputStream is = getContext().getContentResolver().openInputStream(uri);
+			InputStream is = Objects.requireNonNull(getContext()).getContentResolver().openInputStream(uri);
 			ExifInterface exifInterface = new ExifInterface(is);
 
 			int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
@@ -291,13 +278,15 @@ public class PostFragment extends Fragment {
 
 		private final PostFragment.OnPostListener mListener;
 		private final Post mPost;
+		private final WeakReference<Activity> activity;
 
 		private ManagedChannel channel;
 
 
-		private GrpcCreatePost(PostFragment.OnPostListener mListener, Post post) {
+		private GrpcCreatePost(PostFragment.OnPostListener mListener, Post post, Activity activity) {
 			this.mListener = mListener;
 			this.mPost = post;
+			this.activity = new WeakReference<>(activity);
 
 		}
 
@@ -318,7 +307,9 @@ public class PostFragment extends Fragment {
 				//Create an gRPC login request
 				Naturae.CreatePostRequest request = Naturae.CreatePostRequest.newBuilder()
 						.setAppKey(Constants.NATURAE_APP_KEY)
-						.setTitle(mPost.title).setSpecies(mPost.species)
+						.setAccessToken(UserUtilities.getAccessToken(activity.get()))
+						.setTitle(mPost.title)
+						.setSpecies(mPost.species)
 						.setDescription(mPost.description)
 						.setLat(mPost.lat)
 						.setLng(mPost.lng)

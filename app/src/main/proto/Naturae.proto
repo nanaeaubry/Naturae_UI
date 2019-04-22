@@ -15,6 +15,9 @@ service ServerRequests{
     rpc SayHello (HelloRequest) returns (HelloReply){};
     rpc CreatePost (CreatePostRequest) returns (CreatePostReply){};
     rpc GetPosts (GetPostRequest) returns (GetPostReply){};
+    rpc ForgetPassword (ForgetPasswordRequest) returns (ForgetPasswordReply){};
+    rpc ForgetPasswordAuthenCode (ForgetPasswordAuthenRequest) returns (ForgetPasswordAuthenReply){};
+    rpc ForgetPasswordResetPassword (ForgetPasswordNewPasswordRequest) returns (ForgetPasswordNewPasswordReply){};
 }
 
 message HelloRequest{
@@ -48,7 +51,10 @@ message LoginRequest {
 message LoginReply {
     string accessToken = 1;
     string refreshToken = 2;
-    Status status = 3;
+    string firstName = 3;
+    string lastName = 4;
+    string email = 5;
+    Status status = 6;
 }
 
 message AccountAuthenRequest {
@@ -88,7 +94,6 @@ message GetPostRequest {
 message GetPostReply{
     Status status = 1;
     repeated GetPostReplyStruct reply = 2;
-
 }
 
 message GetPostReplyStruct{
@@ -113,4 +118,31 @@ message GetAccessTokenRequest{
 message GetAccessTokenReply{
     string accessToken = 1;
     Status status = 2;
+}
+
+message ForgetPasswordRequest{
+    string AppKey = 1;
+    string email = 2;
+}
+
+message ForgetPasswordReply{
+    Status status = 1;
+}
+
+message ForgetPasswordAuthenRequest{
+    string AppKey = 1;
+    int32 AuthenCode = 2;
+}
+
+message ForgetPasswordAuthenReply{
+    Status status = 1;
+}
+
+message ForgetPasswordNewPasswordRequest{
+    string AppKey = 1;
+    string Password = 2;
+}
+
+message ForgetPasswordNewPasswordReply{
+    Status status = 1;
 }

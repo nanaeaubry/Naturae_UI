@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.example.naturae_ui.containers.StartUpActivityContainer;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.server.NaturaeUser;
 import com.example.naturae_ui.util.Constants;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
@@ -177,13 +178,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
             //when communicating with the server
             if (loginReply != null){
                 TextView errorMessageTextView = activity.get().findViewById(R.id.error_message_text_view);
-                System.out.println(loginReply.getStatus().getMessage());
-                System.out.println(loginReply.getStatus().getCode());
                 //If the status code is equal to 200 then the information the user's entered is correct
                 if (loginReply.getStatus().getCode() == Constants.OK){
+                    //Cache the user information
+                    new Thread(()->{
+                        UserUtilities.setIsLoggedIn(activity.get(), true);
+                        UserUtilities.cacheUser(activity.get(), new NaturaeUser(loginReply.getFirstName(), loginReply.getLastName(),
+                                loginReply.getEmail(), loginReply.getAccessToken(), loginReply.getRefreshToken(), ""));
+                    }).run();
                     mListener.startMainActivity();
-	                UserUtilities.setIsLoggedIn(activity.get(), true);
-
                 }
                 //If the status code is equal to 103 then the information the user's entered is incorrect
                 else if (loginReply.getStatus().getCode() == Constants.INVALID_LOGIN_CREDENTIAL){

@@ -15,6 +15,7 @@ import com.example.naturae_ui.fragments.AccountAuthenFragment;
 import com.example.naturae_ui.fragments.CreateAccountFragment;
 import com.example.naturae_ui.fragments.LoginFragment;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.fragments.ResetPasswordFragment;
 
 public class StartUpActivityContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
         CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
@@ -22,6 +23,7 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
     private LoginFragment loginFragment;
     private CreateAccountFragment createAccountFragment;
     private AccountAuthenFragment accountAuthenFragment;
+    private ResetPasswordFragment resetPasswordFragment;
 
     private ConstraintLayout startUpTopNav;
 
@@ -52,6 +54,8 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
         loginFragment = LoginFragment.newInstance();
         createAccountFragment = CreateAccountFragment.newInstance();
         accountAuthenFragment = AccountAuthenFragment.newInstance();
+        resetPasswordFragment = ResetPasswordFragment.newInstance();
+
 
         backButton = findViewById(R.id.back_button);
         rightSideButton = findViewById(R.id.right_side_button);
@@ -87,12 +91,9 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
                 startUpTopNav.setVisibility(View.VISIBLE);
                 fragmentTransaction.replace(R.id.main_display_container, createAccountFragment);
                 break;
-//            case FORGOT_PASSWORD:
-//                toolbar.setVisibility(View.VISIBLE);
-//                createAccountButton.setVisibility(View.GONE);
-//                titleTextView.setText(R.string.forget_password_title);
-//                fragmentTransaction.replace(R.id.main_display_container, forgetPasswordFragment);
-//                break;
+            case FORGOT_PASSWORD:
+                fragmentTransaction.replace(R.id.main_display_container, resetPasswordFragment);
+                break;
             case ACCOUNT_AUTHENTICATION:
                 //Remove the right side button
                 rightSideButton.setVisibility(View.GONE);
