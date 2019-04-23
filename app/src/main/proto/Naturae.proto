@@ -37,8 +37,6 @@ message CreateAccountRequest{
 }
 
 message CreateAccountReply {
-    string accessToken = 1;
-    string refreshToken = 2;
     Status status = 3;
 }
 
@@ -59,14 +57,17 @@ message LoginReply {
 
 message AccountAuthenRequest {
     string appKey = 1;
-    string firstName = 2;
-    string email = 3;
-    string authenCode = 4;
+    string email = 4;
+    string authenCode = 5;
 }
 
 message AccountAuthenReply {
-    bool result = 1;
-    Status status = 2;
+    string accessToken = 1;
+    string refreshToken = 2;
+    string firstName = 3;
+    string lastName = 4;
+    string email = 5;
+    Status status = 6;
 }
 
 message CreatePostRequest {
