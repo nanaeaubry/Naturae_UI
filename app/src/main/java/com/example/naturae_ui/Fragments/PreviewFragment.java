@@ -4,16 +4,27 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.naturae_ui.Models.Post;
 import com.example.naturae_ui.R;
+import com.google.android.gms.maps.model.Marker;
 
 public class PreviewFragment extends Fragment {
 	View mView;
-	ImageButton goBack;
+	ImageView imageView;
+	TextView mTitle;
+	TextView mSpecies;
+	TextView mDescription;
+	Post mPost;
+	//Marker marker;
+
 
 	@Nullable
 	@Override
@@ -21,20 +32,31 @@ public class PreviewFragment extends Fragment {
 		mView = inflater.inflate(R.layout.fragment_preview, container, false);
 		super.onCreate(savedInstanceState);
 
-		//Button to go back to map
-		goBack = mView.findViewById(R.id.go_back);
-		goBack.setOnClickListener(new View.OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				getActivity().onBackPressed();
-			}
-		});
+		imageView = mView.findViewById(R.id.image_view);
+		Log.d("text", new Boolean(imageView == null).toString());
+
+
+
+		mTitle = mView.findViewById(R.id.preview_title);
+
+		mSpecies = mView.findViewById(R.id.preview_species);
+
+		mDescription = mView.findViewById(R.id.preview_description);
+
 
 
 
 
 
 		return mView;
+	}
+
+	public void determinePost(Post post){
+		mPost = post;
+		imageView.setImageBitmap(mPost.image);
+		mTitle.setText(mPost.title);
+		mSpecies.setText(mPost.species);
+		mDescription.setText(mPost.description);
 	}
 
 }

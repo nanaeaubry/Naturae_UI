@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+//protoc --go_out=plugins=grpc:. naturaeproto/Naturae.proto
+
 option java_package = "com.examples.naturaeproto";
 option go_package = "naturaeproto";
 
@@ -48,8 +50,9 @@ message LoginReply{
 
 message AccountAuthenRequest{
     string appKey = 1;
-    string email = 2;
-    string AuthenCode = 3;
+    string firstName = 2;
+    string email = 3;
+    string authenCode = 4;
 }
 
 message AccountAuthenReply{

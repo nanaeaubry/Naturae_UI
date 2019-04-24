@@ -1,4 +1,75 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="dropped_pin">Dropped Pin</string>
+
+    <!--Shared Strings-->
+    <string name="google_map_key">Google Map Key</string>
+    <string name="app_name">Naturae</string>
+    <string name="API_Key">AIzaSyAoLYtlxsSkFQNJ53Dn-x9VoZsrcwSFmjk</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="back_button"><![CDATA[<]]></string>
+    <string name="ok">Ok</string>
+    <string name="server_error">"An error has occurred while communicating with the server. Please try again"</string>
+
+    <!--Map-->
+    <string name="title_map">Map</string>
+    <string name="title_post">Post</string>
+    <string name="title_profile">Profile</string>
     <string name="title_activity_maps">Map</string>
+    <string name="normal_map">Normal Map</string>
+    <string name="hybrid_map">Hybrid Map</string>
+    <string name="satellite_map">Satellite Map</string>
+    <string name="terrain_map">Terrain Map</string>
+
+    <!--Friends-->
+    <string name="title_chat">Chat</string>
+    <string name="header_friends">Your Friends</string>
+    <string name="place_holder_text">Write your Message</string>
+    <string name="content_description_send">Send Button</string>
+
+    <!--Create Account-->
+    <string name="invalid_email">Invalid email address</string>
+    <string name="invalid_password">Invalid password</string>
+    <string name="weak_password">Minimum 8 characters, a<![CDATA[-]]>z, A<![CDATA[-]]>Z, 0<![CDATA[-]]>9, @#$%^<![CDATA[&]]>=</string>
+    <string name="invalid_last_name">Invalid last name</string>
+    <string name="invalid_first_name">Invalid first name</string>
+    <string name="password_mismatch">Password did not match. Try again.</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="create">Create</string>
+    <string name="create_account_error">There an error while trying to create your account. Please try again</string>
+    <string name="empty_first_name">Enter first name</string>
+    <string name="empty_last_name">Enter last name</string>
+    <string name="empty_email">Enter email address</string>
+    <string name="empty_password">Enter password</string>
+    <string name="email_exist">There already an account with this email. Please try again with
+    another email.</string>
+
+
+    <!--Login-->
+    <string name="forget_password">Forget Password?</string>
+    <string name="login">Login</string>
+    <string name="create_account">Create Account</string>
+    <string name="invalid_email_password">Invalid email or password</string>
+    <string name="app_name_image_description">App name image</string>
+    <string name="empty_email_password_error">Email or Password can\'t be empty</string>
+
+    <!--Authentication-->
+    <string name="authentication_message">An email message with a 6-digit authentication code was just
+    sent to</string>
+    <string name="verify">Verify</string>
+    <string name="no_authen_code">Don\'t have your code?</string>
+    <string name="invalid_authen_code">The code you entered is invalid. Please try again</string>
+    <string name="expired_authen_code">The code you entered had expired. Check your email for the new code</string>
+    <string name="empty_authen_code_field">Enter your authentication code</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="code">Code</string>
+
+
+    <!--Create Account-->
+
+
 </resources>
