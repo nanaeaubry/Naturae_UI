@@ -33,7 +33,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/bChangePass"
+                android:id="@+id/btChangePass"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -41,7 +41,7 @@
                 android:text="Change Password" />
 
             <Button
-                android:id="@+id/bLogout"
+                android:id="@+id/btLogout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

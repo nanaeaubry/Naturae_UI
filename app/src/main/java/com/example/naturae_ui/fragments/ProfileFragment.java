@@ -2,6 +2,8 @@ package com.example.naturae_ui.fragments;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,8 +19,12 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.containers.StartUpActivityContainer;
+import com.example.naturae_ui.util.UserUtilities;
 
-public class ProfileFragment extends Fragment {
+import java.util.Objects;
+
+public class ProfileFragment extends Fragment implements LoginFragment.OnFragmentInteractionListener {
     public final static int PICK_PHOTO = 1046;
     View mView;
     EditText firstName;
@@ -33,42 +39,42 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_profile, container, false);
+        super.onCreate(savedInstanceState);
 
         firstName = mView.findViewById(R.id.first_name_edit_text);
         lastName = mView.findViewById(R.id.last_name_edit_text);
 
-        //profileName.setText(UserUtilities.getFirstName() + UserUtilities.getLastName());
+        //profileName.setText(UserUtilities.getFirstName(getContext()) + UserUtilities.getLastName(getContext()));
 
-    bChangePass.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-        }
-    });
+        bChangePass = mView.findViewById(R.id.btChangePass);
+        bChangePass.setOnClickListener(v -> {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            ChangePasswordFragment changePasswordFragment = new ChangePasswordFragment();
+            fragmentTransaction.replace(R.id.fragment_container, changePasswordFragment);
+            fragmentTransaction.commit();
+        });
 
 
         ibProfileImage = mView.findViewById(R.id.ibProfileImage);
-        ibProfileImage.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Create intent for picking a photo from the gallery
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        ibProfileImage.setOnClickListener(v -> {
+            // Create intent for picking a photo from the gallery
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-                // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-                // So as long as the result is not null, it's safe to use the intent.
-                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    // Bring up gallery to select a photo
-                    startActivityForResult(intent, PICK_PHOTO);
-                }
+            // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+            // So as long as the result is not null, it's safe to use the intent.
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                // Bring up gallery to select a photo
+                startActivityForResult(intent, PICK_PHOTO);
             }
         });
-        /*Button bLogout = (Button) mView.findViewById(R.id.bLogout);
-        bLogout.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent in = new Intent(getActivity(), StartUpContainer.class);
-                startActivity(in);
-            }
+        /*bLogout =  mView.findViewById(R.id.btLogout);
+        bLogout.setOnClickListener(v -> {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            LoginFragment loginFragment = new LoginFragment();
+            fragmentTransaction.replace(R.id.fragment_container, loginFragment);
+            fragmentTransaction.commit();
         });*/
         return mView;
     }
@@ -83,5 +89,22 @@ public class ProfileFragment extends Fragment {
     }
 
 
+    @Override
+    public void hideKeyboard() {
+
+    }
+
+    @Override
+    public void beginFragment(StartUpActivityContainer.AuthFragmentType fragmentType, boolean setTransition, boolean addToBackStack) {
+
+    }
+
+    @Override
+    public void startMainActivity() {
+
+    }
 }
+
+
+
 

@@ -4,12 +4,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.util.UserUtilities;
@@ -21,49 +24,38 @@ public class ChangePasswordFragment extends Fragment{
     EditText currentPass;
     EditText newPass;
     EditText confirmPass;
-    Button btChangePassword;
+    EditText currPass;
+    Button bSubmit;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_profile, container, false);
+        super.onCreate(savedInstanceState);
 
         currentPass = view.findViewById(R.id.etCurrentPass);
         newPass = view.findViewById(R.id.etNewPass);
         confirmPass = view.findViewById(R.id.etConfirmNewPass);
-        btChangePassword = view.findViewById(R.id.btSubmit);
+        bSubmit = view.findViewById(R.id.btSubmit);
+        currPass = view.findViewById(R.id.password_edit_text);
 
-
-        btChangePassword.setOnClickListener(new View.OnClickListener() {
-        @Override
-            public void onClick(View v) {
-                boolean checkPass = true;
-                while(checkPass)
+        bSubmit.setOnClickListener(v -> {
+                if(currPass == currentPass && newPass == confirmPass)
                 {
-                    if(currentPass == view.findViewById(R.id.password_edit_text))
-                    {
-
-                        if(newPass == confirmPass){
-                            currentPass = newPass;
-                            //UserUtilities.getAccessToken();
-                            Log.d(TAG, "onClick: It works!");
-                        }
-                        else{
-                            checkPass = false;
-                        }
-                    }
-                    else{
-                        checkPass = false;
-                    }
+                    currentPass = newPass;
+                    //UserUtilities.getAccessToken();
+                    Log.d(TAG, "onClick: It works!");
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    ProfileFragment profileFragment = new ProfileFragment();
+                    fragmentTransaction.replace(R.id.fragment_container, profileFragment);
+                    fragmentTransaction.commit();
+                }
+                else
+                {
 
                 }
-
-
-
-            }
         });
-
-
 
         return view;
     }
