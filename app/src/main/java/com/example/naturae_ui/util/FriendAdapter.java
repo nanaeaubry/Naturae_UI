@@ -8,6 +8,7 @@ import android.widget.TextView;
 import java.util.List;
 import android.content.Context;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.models.Friend;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder>{
     private static final String TAG = "FriendAdapter";

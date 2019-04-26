@@ -26,23 +26,60 @@
         android:gravity="center"
         android:text="@string/header_friends"
         android:textAlignment="center"
-        android:textColor="@color/colorPrimaryText"
+        android:textColor="@color/lightGray"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/search_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/title_friend">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/search_field_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/friend_search_hint"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:textAlignment="viewStart" />
+    </android.support.design.widget.TextInputLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/friend_recycler"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/removeFriend"
+        android:layout_width="411dp"
+        android:layout_height="481dp"
+        app:layout_constraintBottom_toTopOf="@+id/addFriend"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title_friend"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/search_field" />
+
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="@string/no_friend_data_available"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/addFriend"
@@ -50,14 +87,14 @@
         android:layout_height="41dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_add_black_24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/removeFriend"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        android:foreground= "?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <View
         android:id="@+id/removeFriend"
@@ -65,14 +102,14 @@
         android:layout_height="40dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_remove_black_24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/sortFriend"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/addFriend"
-        android:foreground= "?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"/>
+        app:layout_constraintStart_toEndOf="@+id/addFriend" />
 
     <View
         android:id="@+id/sortFriend"
@@ -80,12 +117,13 @@
         android:layout_height="40dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_sort_by_alpha_black_24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/removeFriend"
-        android:foreground= "?android:attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"/>
+        app:layout_constraintStart_toEndOf="@+id/removeFriend" />
+
 </android.support.constraint.ConstraintLayout>
