@@ -16,8 +16,10 @@ import android.util.Log;
 
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.fragments.MapFragment;
 import com.example.naturae_ui.fragments.FriendFragment;
 import com.example.naturae_ui.fragments.PostFragment;
 import com.example.naturae_ui.fragments.PreviewFragment;
@@ -52,6 +54,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	GoogleMap mGoogleMap;
 	MapView mMapView;
 	FrameLayout mFragmentContainer;
+	Fragment mMapFragment;
 	Fragment mPostFragment;
 	Fragment mPreviewFragment;
 	Fragment mChatFragment;
@@ -64,53 +67,55 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-
 		// Load bottom navigation bar
 		navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
-
+		mMapFragment = new MapFragment();
 		mPostFragment = new PostFragment();
 		mProfileFragment = new ProfileFragment();
 		mChatFragment = new FriendFragment();
 		mPreviewFragment = new PreviewFragment();
 
 		mFragmentContainer = findViewById(R.id.fragment_container);
-
 		mMapView = findViewById(R.id.map);
 		if (mMapView != null) {
 			mMapView.onCreate(null);
 			mMapView.onResume();
 			mMapView.getMapAsync(this);
 		}
+
+		mFragmentContainer.setVisibility(View.VISIBLE);
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
 	}
 
 	private void showMap() {
 		mMapView.setVisibility(View.VISIBLE);
-		mFragmentContainer.setVisibility(View.GONE);
+		//mFragmentContainer.setVisibility(View.VISIBLE);
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
 	}
 
 	private void showPost() {
 		mMapView.setVisibility(View.INVISIBLE);
-		mFragmentContainer.setVisibility(View.VISIBLE);
+		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPostFragment).commit();
 	}
 
 	private void showPreview() {
 		mMapView.setVisibility(View.INVISIBLE);
-		mFragmentContainer.setVisibility(View.VISIBLE);
+		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
 
 	private void showChat() {
 		mMapView.setVisibility(View.INVISIBLE);
-		mFragmentContainer.setVisibility(View.VISIBLE);
+		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mChatFragment).commit();
 	}
 
 	private void showProfile() {
 		mMapView.setVisibility(View.INVISIBLE);
-		mFragmentContainer.setVisibility(View.VISIBLE);
+		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mProfileFragment).commit();
 
 	}
