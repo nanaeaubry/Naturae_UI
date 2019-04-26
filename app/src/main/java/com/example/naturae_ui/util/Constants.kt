@@ -3,8 +3,8 @@ package com.example.naturae_ui.util
 class Constants{
     companion object {
         const val NATURAE_APP_KEY = "XjJzwDO6lBCQ5LbWlL1PCXIO&6jH@M&Mz8&BLq"
-        const val HOST = "naturae.host"
-        const val PORT = 443
+        const val HOST = "192.168.1.16"
+        const val PORT = 8080
         const val ACCOUNT_CREATED = 201
         const val EMAIL_EXIST = 150
         const val INVALID_AUTHEN_CODE = 105
@@ -15,4 +15,3 @@ class Constants{
 
     }
 }
-
