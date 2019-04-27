@@ -90,16 +90,16 @@ message GetPostRequest {
     string appKey = 1;
     float lat = 2;
     float lng = 3;
-    int32 radius = 4;
+    int32 radius = 4; //in miles
 }
 
 message GetPostReply{
     Status status = 1;
-    repeated GetPostReplyStruct reply = 2;
+    repeated PostStruct reply = 2;
 
 }
 
-message GetPostReplyStruct{
+message PostStruct{
     string title = 3;
     string species = 4;
     string description = 5;
