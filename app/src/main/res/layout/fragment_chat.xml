@@ -13,7 +13,7 @@
         android:gravity="center"
         android:text="ExampleName"
         android:textAlignment="center"
-        android:textColor="@color/colorPrimaryText"
+        android:textColor="@color/lightGray"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

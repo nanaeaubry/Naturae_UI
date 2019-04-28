@@ -7,7 +7,8 @@ import com.examples.naturaeproto.ServerRequestsGrpc;
  */
 public interface GrpcRunnable {
     String run(
-            ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub,
-            ServerRequestsGrpc.ServerRequestsStub asyncStub
+            ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub
     ) throws Exception;
 }
+
+// , ServerRequestsGrpc.ServerRequestsStub asyncStub

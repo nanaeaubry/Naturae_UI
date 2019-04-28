@@ -15,7 +15,18 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintGuide_end="90dp"
+        app:layout_constraintGuide_end="81dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="411dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.8"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -51,14 +62,20 @@
             android:hint="@string/friend_search_hint"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:textAlignment="viewStart" />
+            android:textAlignment="viewStart"
+            android:inputType="textEmailAddress"
+            android:imeOptions="actionDone"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/friend_recycler"
-        android:layout_width="411dp"
-        android:layout_height="481dp"
-        app:layout_constraintBottom_toTopOf="@+id/addFriend"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_field" />
@@ -85,6 +102,7 @@
         android:id="@+id/addFriend"
         android:layout_width="40dp"
         android:layout_height="41dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_add_black_24dp"
         android:clickable="true"
@@ -94,12 +112,14 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/removeFriend"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
     <View
         android:id="@+id/removeFriend"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_remove_black_24dp"
         android:clickable="true"
@@ -109,12 +129,14 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/sortFriend"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/addFriend" />
+        app:layout_constraintStart_toEndOf="@+id/addFriend"
+        app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
     <View
         android:id="@+id/sortFriend"
         android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_height="39dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_sort_by_alpha_black_24dp"
         android:clickable="true"
@@ -124,6 +146,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/removeFriend" />
+        app:layout_constraintStart_toEndOf="@+id/removeFriend"
+        app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
 </android.support.constraint.ConstraintLayout>
