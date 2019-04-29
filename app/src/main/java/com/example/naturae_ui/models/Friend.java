@@ -1,4 +1,4 @@
-package com.example.naturae_ui.util;
+package com.example.naturae_ui.models;
 
 import android.view.View;
 /**

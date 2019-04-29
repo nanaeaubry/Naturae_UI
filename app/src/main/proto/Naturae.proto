@@ -16,8 +16,17 @@ service ServerRequests{
     rpc CreatePost (CreatePostRequest) returns (CreatePostReply){};
     rpc GetPosts (GetPostRequest) returns (GetPostReply){};
     rpc ForgetPassword (ForgetPasswordRequest) returns (ForgetPasswordReply){};
-    rpc ForgetPasswordAuthenCode (ForgetPasswordAuthenRequest) returns (ForgetPasswordAuthenReply){};
+    rpc ForgetPasswordVerifyCode (ForgetPasswordVerifyCodeRequest) returns (ForgetPasswordVerifyCodeReply){};
     rpc ForgetPasswordResetPassword (ForgetPasswordNewPasswordRequest) returns (ForgetPasswordNewPasswordReply){};
+    rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply){};
+
+    /**** Friendslist GRPC Functions ****/
+    // Query is sent to the server and a list of matching users is returned
+    rpc SearchUsers(UserSearchRequest) returns (UserListReply){}
+    // Unary client request to add a new friend for the user
+    rpc AddFriend(FriendRequest) returns (FriendReply){}
+    // Unary client request to remove an existing friend for the user
+    rpc RemoveFriend(FriendRequest) returns(FriendReply){}
 }
 
 message HelloRequest{
@@ -57,8 +66,9 @@ message LoginReply {
 
 message AccountAuthenRequest {
     string appKey = 1;
-    string email = 4;
-    string authenCode = 5;
+    string firstName = 2;
+    string email = 3;
+    string authenCode = 4;
 }
 
 message AccountAuthenReply {
@@ -89,15 +99,16 @@ message GetPostRequest {
     string appKey = 1;
     float lat = 2;
     float lng = 3;
-    int32 radius = 4;
+    int32 radius = 4; //in miles
 }
 
 message GetPostReply{
     Status status = 1;
-    repeated GetPostReplyStruct reply = 2;
+    repeated PostStruct reply = 2;
+
 }
 
-message GetPostReplyStruct{
+message PostStruct{
     string title = 3;
     string species = 4;
     string description = 5;
@@ -109,6 +120,33 @@ message GetPostReplyStruct{
 message Status {
     int32 Code = 1;
     string Message = 2;
+}
+
+/** MESSAGES FOR FRIEND'S LIST **/
+//Both values can be processed by the server to search for a list of users, their usage is mutually exclusive
+//If the identifier for the user is used, their friendslist is returned, if a query is sent, all matching registered users are returned
+message UserSearchRequest{
+    // string appKey = 1;
+    string user = 1;
+    string query = 2;
+}
+//A list of users that matched the parameters provided by the UserSearchRequest
+message UserListReply{
+    repeated string users = 1;
+    Status status = 2;
+}
+// The request message containing the users's to perform an action on
+message FriendRequest {
+    //string appKey = 1;
+    string sender = 1;
+    string receiver = 2;
+}
+
+//The reply message from the server
+message FriendReply{
+    Status status = 1;
+    // string accessToken = 1;
+    //string refreshToken = 2;
 }
 
 message GetAccessTokenRequest{
@@ -130,20 +168,33 @@ message ForgetPasswordReply{
     Status status = 1;
 }
 
-message ForgetPasswordAuthenRequest{
+message ForgetPasswordVerifyCodeRequest{
     string AppKey = 1;
-    int32 AuthenCode = 2;
+    string Email = 2;
+    string VerificationCode = 3;
 }
 
-message ForgetPasswordAuthenReply{
+message ForgetPasswordVerifyCodeReply{
     Status status = 1;
 }
 
 message ForgetPasswordNewPasswordRequest{
     string AppKey = 1;
-    string Password = 2;
+    string Email = 2;
+    string Password = 3;
 }
 
 message ForgetPasswordNewPasswordReply{
+    Status status = 1;
+}
+
+message ChangePasswordRequest{
+    string AppKey = 1;
+    string AccessToken = 2;
+    string CurrentPassword = 3;
+    string NewPassword = 4;
+}
+
+message ChangePasswordReply{
     Status status = 1;
 }

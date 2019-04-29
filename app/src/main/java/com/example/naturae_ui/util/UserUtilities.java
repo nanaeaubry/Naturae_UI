@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import com.example.naturae_ui.server.NaturaeUser;
 
+import java.lang.ref.WeakReference;
+
 public class UserUtilities {
     private static final String SHARED_PREF_USER_DATA = "UserData";
     private static final String USER_INFO = "userJson";
@@ -153,6 +155,7 @@ public class UserUtilities {
     /**
      * Retrieves the user's access token
      * @return the user's access token
+     * @param context
      */
     public static String getAccessToken(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);

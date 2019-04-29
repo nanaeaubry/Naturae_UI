@@ -22,12 +22,15 @@
     <string name="hybrid_map">Hybrid Map</string>
     <string name="satellite_map">Satellite Map</string>
     <string name="terrain_map">Terrain Map</string>
+    <string name="search">Search</string>
 
     <!--Friends-->
     <string name="title_chat">Chat</string>
     <string name="header_friends">Your Friends</string>
     <string name="place_holder_text">Write your Message</string>
     <string name="content_description_send">Send Button</string>
+    <string name="no_friend_data_available">You are alone</string>
+    <string name="friend_search_hint">Find Friends</string>
 
     <!--Create Account-->
     <string name="invalid_email">Invalid email address</string>

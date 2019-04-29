@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.support.v4.app.Fragment;
+
+import com.example.naturae_ui.models.ChatMessage;
 import com.example.naturae_ui.util.*;
 import com.example.naturae_ui.R;
 import android.support.v7.widget.LinearLayoutManager;
