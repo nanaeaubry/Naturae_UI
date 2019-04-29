@@ -18,16 +18,13 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.containers.StartUpActivityContainer;
 import com.example.naturae_ui.models.Friend;
-import com.example.naturae_ui.server.NaturaeUser;
 import com.example.naturae_ui.util.Constants;
 import com.example.naturae_ui.util.FriendAdapter;
-import com.example.naturae_ui.util.GrpcRunnable;
 import com.example.naturae_ui.util.Helper;
-import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
+import com.google.android.gms.tasks.Task;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -36,20 +33,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 public class FriendFragment extends Fragment {
     private static final String TAG = "FriendFragment";
-    private static List<Friend> friendsList;
+    private FriendAdapter adapter;
+    private List<Friend> friendsList;
+    private static List<Friend> searchedFriendsList;
     private ManagedChannel channel;
     private String searchQuery;
     private TextInputEditText searchFieldInput;
     private TextView emptyView;
     private RecyclerView recyclerView;
-    private FriendAdapter adapter;
 
     /**
      * Called to do initial creation of a fragment. This is called after onAttach(Activity) and before onCreateView
@@ -86,8 +83,17 @@ public class FriendFragment extends Fragment {
 
                     Log.d(TAG, "Message Sent" + searchQuery);
 
-                    new GrpcTask(new GrpcTask.SearchUsersRunnable("", searchQuery), channel, getActivity()).execute();
+                    GrpcSearchUsersTask search = new GrpcSearchUsersTask(new GrpcSearchUsersTask.SearchUsersRunnable("", searchQuery), channel, getActivity());
+                    search.setListener(new GrpcSearchUsersTask.AsyncTaskListener() {
+                        @Override
+                        public void onSearchTaskFinished() {
+                            // update UI in Activity here
+                            Log.d(TAG, "onSearchTaskFinished: ");
+                        }
+                    });
 
+                    search.execute();
+                    //Do something with searched friend's list
                     searchFieldInput.getText().clear();
                     return true;
                 }
@@ -98,20 +104,8 @@ public class FriendFragment extends Fragment {
 
         //EXECUTE gRPC SEARCH USER TASK
         //new GrpcTask(new GrpcTask.SearchUsersRunnable(UserUtilities.getEmail(getContext()), "empty"), getActivity()).execute();
-        //todo
 
-        //new GrpcTask(new GrpcTask.SearchUsersRunnable("limstevenlbw@gmail.com", "empty"), channel, getActivity()).execute();
-
-        //PLACEHOLDER
-        friendsList = new ArrayList<Friend>();
-        friendsList.add(new Friend("Jimmy"));
-        friendsList.add(new Friend("Trung"));
-        friendsList.add(new Friend("Jacob"));
-        friendsList.add(new Friend("Simon"));
-        friendsList.add(new Friend("Henry"));
-        friendsList.add(new Friend("Catherine"));
-        friendsList.add(new Friend("Josh"));
-        friendsList.add(new Friend("Colin"));
+        new GrpcSearchFriendsTask(new GrpcSearchFriendsTask.SearchUsersRunnable("limstevenlbw@gmail.com", "empty"), channel, getActivity()).execute();
 
         if(friendsList != null){
             recyclerView.setVisibility(View.VISIBLE);
@@ -165,30 +159,165 @@ public class FriendFragment extends Fragment {
         super.onPause();
     }
 
+    @Override
+    public void onDestroy() {
+        //asyncTask.setListener(null); // PREVENT LEAK AFTER ACTIVITY DESTROYED
+        super.onDestroy();
+    }
+
     /**
-     * Class sets up Asynchronous Task handling for Friend GRPC service functions
+     * Class sets up Asynchronous Task handling for searching for a search query
      * "Async Generic Types"
      *  -Params, the type of the parameters sent to the task for execution
      *  -Progress, the type of progress units published during computation
      *  -Result, the type of the result of the background computation
      */
-    private static class GrpcTask extends AsyncTask<Void, Void, Boolean> {
-        private final GrpcRunnable grpcRunnable;
+    private static class GrpcSearchUsersTask extends AsyncTask<Void, Void, Naturae.UserListReply> {
+        private final SearchUsersRunnable grpcRunnable;
         //Activity created as weak reference and can be garbage collected at anytime
         private final WeakReference<Activity> activityReference;
         //A channel is high-level abstraction of a connection, encapsulating TCP, HTTP, Load-balancing behind the scenes
         //Required to a consume a service
         private ManagedChannel channel;
-        private Boolean isSuccess;
+        private AsyncTaskListener listener;
 
         /**
          * Constructor initializes utilities
          * @param grpcRunnable grpc service runner interface
          * @param activity main activity of Naturae
          */
-        private GrpcTask(GrpcRunnable grpcRunnable, ManagedChannel channel, Activity activity){
+        GrpcSearchUsersTask(SearchUsersRunnable grpcRunnable, ManagedChannel channel, Activity activity){
             this.grpcRunnable = grpcRunnable;
-            this.activityReference = new WeakReference<Activity>(activity);
+            this.activityReference = new WeakReference<>(activity);
+            this.channel = channel;
+        }
+
+        /**
+         * Executes everything inside of another thread, operations in this
+         * method should not touch the main thread fragments/activities
+         * The parameters of the asynchronous task are passed to this step. The result of the computation must be returned by this step and will be passed back to the last step. This step can also use publishProgress(Progress...) to publish one or more units of progress.
+         */
+        @Override
+        protected Naturae.UserListReply doInBackground(Void... nothing) {
+            try{
+                Naturae.UserListReply result = grpcRunnable.run(ServerRequestsGrpc.newBlockingStub(channel));
+                Log.d(TAG, "*Successfully created response*\n");
+                return result;
+            }
+            catch(Exception e){
+                StringWriter error = new StringWriter();
+                PrintWriter pw = new PrintWriter(error);
+                e.printStackTrace(pw);
+                pw.flush();
+                Log.d(TAG,"doInBackground: Error Exception caught while trying to build stubs\n" + error);
+                return null;
+            }
+        }
+
+        /**
+         * After the Heavy Lifting, you may update info on ui on results within here
+         * Close the connection
+         */
+        @Override
+        protected void onPostExecute(Naturae.UserListReply result) {
+            super.onPostExecute(result);
+            Log.d(TAG, "onPostExecute: Made it to onPostExecute");
+
+            if(result != null){
+                if(result.getUsersList().size() == 0){
+                    Helper.alertDialogErrorMessage(activityReference.get(), "We were not able to find a user with that name");
+                }
+                else{
+                    String foundUser = result.getUsersList().get(0);
+                    Helper.alertDialogErrorMessage(activityReference.get(), "Add User: " + foundUser + "?");
+                    //todo
+
+                    //If yes, update friend's list
+                    if (listener != null) {
+                        listener.onSearchTaskFinished();
+                    }
+
+                    //If no, close the dialog
+                }
+            }
+            else{
+                //If yes, update friend's list
+                if (listener != null) {
+                    listener.onSearchTaskFinished();
+                }
+
+                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to connect with the server, please check your connection");
+            }
+
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+/*
+            if(result != null){
+                Log.d(TAG, "onPostExecute: Successfully retrieved result");
+            }else{
+                Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
+                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to connect with the server, please check your connection");
+            }
+            */
+        }
+
+        public void setListener(AsyncTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface AsyncTaskListener {
+            void onSearchTaskFinished();
+        }
+
+        /**
+         *  GRPC Service
+         *  Query is sent to the server and a list of matching users is returned
+         */
+        private static class SearchUsersRunnable {
+            private String user, query;
+
+            /**
+             * Initialize Request Parameters
+             * @param user the username of the current user of the client
+             * @param query the search query inputted by the current user
+             */
+            public SearchUsersRunnable(String user, String query){
+                this.user = user;
+                this.query = query;
+            }
+            // gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply)
+            public Naturae.UserListReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+                Naturae.UserListReply reply;
+                //Generate Request as defined by proto definition
+                Naturae.UserSearchRequest request = Naturae.UserSearchRequest.newBuilder().setUser(user).setQuery(query).build();
+
+                //Send the request to the server and set reply to the server response
+                reply = blockingStub.searchUsers(request);
+                //withDeadlineAfter(15000, TimeUnit.MILLISECONDS)
+                return reply;
+            }
+        }
+    } //End of Async Task Class
+
+    /**
+     * Class sets up Asynchronous Task handling for searching for a search query
+     * "Async Generic Types"
+     *  -Params, the type of the parameters sent to the task for execution
+     *  -Progress, the type of progress units published during computation
+     *  -Result, the type of the result of the background computation
+     */
+    private static class GrpcSearchFriendsTask extends AsyncTask<Void, Void, Naturae.UserListReply> {
+        private final SearchUsersRunnable grpcRunnable;
+        private final WeakReference<Activity> activityReference;
+        private ManagedChannel channel;
+
+        GrpcSearchFriendsTask(SearchUsersRunnable grpcRunnable, ManagedChannel channel, Activity activity){
+            this.grpcRunnable = grpcRunnable;
+            this.activityReference = new WeakReference<>(activity);
             this.channel = channel;
         }
 
@@ -201,37 +330,72 @@ public class FriendFragment extends Fragment {
             super.onPreExecute();
         }
 
-        /**
-         * Executes everything inside of another thread, operations in this
-         * method should not touch the main thread fragments/activities
-         * The parameters of the asynchronous task are passed to this step. The result of the computation must be returned by this step and will be passed back to the last step. This step can also use publishProgress(Progress...) to publish one or more units of progress.
-         */
         @Override
-        protected Boolean doInBackground(Void... nothing) {
-           try{
-               String logs = grpcRunnable.run(ServerRequestsGrpc.newBlockingStub(channel));
-               Log.d(TAG, "Successfully created stubs:\n" + logs);
-               return true;
-           }
-           catch(Exception e){
-               StringWriter error = new StringWriter();
-               PrintWriter pw = new PrintWriter(error);
-               e.printStackTrace(pw);
-               pw.flush();
-               Log.d(TAG,"doInBackground: Error Exception caught while trying to build stubs\n" + error);
-               return false;
-           }
-
+        protected Naturae.UserListReply doInBackground(Void... nothing) {
+            try {
+                Naturae.UserListReply result = grpcRunnable.run(ServerRequestsGrpc.newBlockingStub(channel));
+                Log.d(TAG, "*Successfully created response*\n");
+                return result;
+            } catch (Exception e) {
+                StringWriter error = new StringWriter();
+                PrintWriter pw = new PrintWriter(error);
+                e.printStackTrace(pw);
+                pw.flush();
+                Log.d(TAG, "doInBackground: Error Exception caught while trying to build stubs\n" + error);
+                return null;
+            }
         }
 
-        /**
-         * After the Heavy Lifting, you may update info on ui on results within here
-         * Close the connection
-         */
         @Override
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(Naturae.UserListReply result) {
             super.onPostExecute(result);
+            List<Friend> friendsList = new ArrayList<Friend>();
             Log.d(TAG, "onPostExecute: Made it to onPostExecute");
+
+            if(result != null){
+                Log.d(TAG, "onPostExecute: Successfully retrieved result");
+                if(result.getUsersCount() > 0){
+                    for(int i=0; i< result.getUsersList().size(); i++) {
+                        friendsList.add(new Friend(result.getUsersList().get(i)));
+                        Log.d(TAG, "" + (friendsList.get(i)));
+                    }
+
+                }
+                else{
+
+                }
+
+            }else{
+                Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
+                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve your friend's list, please check your connection");
+            }
+            /*
+
+
+                    } //If this search was built from the query
+                    else{
+                    for(int i=0; i< reply.getUsersList().size(); i++){
+                    searchedFriendsList.add(new Friend(reply.getUsersList().get(i)));
+                    Log.d(TAG, "" + (searchedFriendsList.get(i)));
+                    }
+                    }
+                    }
+                    else{
+
+                        Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
+                        friendsList = new ArrayList<Friend>();
+                        friendsList.add(new Friend("Jimmy"));
+                        friendsList.add(new Friend("Trung"));
+                        friendsList.add(new Friend("Jacob"));
+                        friendsList.add(new Friend("Simon"));
+                        friendsList.add(new Friend("Henry"));
+                        friendsList.add(new Friend("Catherine"));
+                        friendsList.add(new Friend("Josh"));
+                        friendsList.add(new Friend("Colin"));
+                    }
+
+                }
+             */
 
             //Shut down the gRPC channel
             try {
@@ -239,23 +403,14 @@ public class FriendFragment extends Fragment {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-
-            if(result){
-                Log.d(TAG, "onPostExecute: Successfully retrieved result");
-            }else{
-                Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
-                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to connect with the server, please check your connection");
-            }
-
         }
 
         /**
          *  GRPC Service
          *  Query is sent to the server and a list of matching users is returned
          */
-        private static class SearchUsersRunnable implements GrpcRunnable {
-            private String user;
-            private String query;
+        private static class SearchUsersRunnable {
+            private String user, query;
 
             /**
              * Initialize Request Parameters
@@ -266,20 +421,8 @@ public class FriendFragment extends Fragment {
                 this.user = user;
                 this.query = query;
             }
-            @Override
-            public String run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) {
-                return SearchUsers(user, query, blockingStub);
-            }
-
-            /**
-             * gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply){}
-             * @param user
-             * @param query
-             * @param blockingStub
-             * @return a string describing the result of the rpc
-             * @throws StatusRuntimeException
-             */
-            private String SearchUsers(String user, String query, ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+           // gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply)
+            public Naturae.UserListReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
                 Naturae.UserListReply reply;
                 //Generate Request as defined by proto definition
                 Naturae.UserSearchRequest request = Naturae.UserSearchRequest.newBuilder().setUser(user).setQuery(query).build();
@@ -287,86 +430,60 @@ public class FriendFragment extends Fragment {
                 //Send the request to the server and set reply to the server response
                 reply = blockingStub.searchUsers(request);
                 //withDeadlineAfter(15000, TimeUnit.MILLISECONDS)
-
-                //Check value of the search reply
-                if (reply != null){
-                    //Fill FriendsList Placeholder
-                    for(int i=0; i< reply.getUsersList().size(); i++){
-                        friendsList.add(new Friend(reply.getUsersList().get(i)));
-                        Log.d(TAG, "" + (friendsList.get(i)));
-                    }
-                    return "Built friendslist with retrieved data";
-                }
-                else{
-                 /*
-                TODO
-                ERROR HANDLING OF NULL REPLY
-                 */
-                    Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
-                    friendsList = new ArrayList<Friend>();
-                    friendsList.add(new Friend("Jimmy"));
-                    friendsList.add(new Friend("Trung"));
-                    friendsList.add(new Friend("Jacob"));
-                    friendsList.add(new Friend("Simon"));
-                    friendsList.add(new Friend("Henry"));
-                    friendsList.add(new Friend("Catherine"));
-                    friendsList.add(new Friend("Josh"));
-                    friendsList.add(new Friend("Colin"));
-                }
-                return "Executed with placeholder data";
+                return reply;
             }
         }
-
-        /**
-         *  gRPC request to add a friend to the list
-         */
-        private static class AddFriendRunnable implements GrpcRunnable{
-            private String sender, receiver;
-            public AddFriendRunnable(String sender, String receiver){
-                this.sender = sender;
-                this.receiver = receiver;
-            }
-
-            @Override
-            public String run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) {
-                return AddFriend(sender, receiver, blockingStub);
-            }
-
-            private String AddFriend(String sender, String receiver, ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
-                Naturae.FriendReply reply;
-                //Generate Request as defined by proto definition
-                Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
-                //Send the request to the server and set reply to the server response
-                reply = blockingStub.withDeadlineAfter(5000, TimeUnit.MILLISECONDS).addFriend(request);
-                return "";
-            }
-        }
-
-        /**
-         *  gRPC request to remove a friend from the list
-         */
-        private static class RemoveFriendRunnable implements GrpcRunnable{
-            private String sender, receiver;
-            public RemoveFriendRunnable(String sender, String receiver){
-                this.sender = sender;
-                this.receiver = receiver;
-            }
-
-            @Override
-            public String run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) {
-                return RemoveFriend(sender, receiver, blockingStub);
-            }
-
-            private String RemoveFriend(String sender, String receiver, ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
-                Naturae.FriendReply reply;
-                //Generate Request as defined by proto definition
-                Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
-                //Send the request to the server and set reply to the server response
-                reply = blockingStub.withDeadlineAfter(5000, TimeUnit.MILLISECONDS).removeFriend(request);
-                return "";
-            }
-        }
-    }
+    } //End of Async Task Class
 
 
 }
+
+
+/*
+
+
+private static class AddFriendRunnable implements GrpcRunnable{
+    private String sender, receiver;
+    public AddFriendRunnable(String sender, String receiver){
+        this.sender = sender;
+        this.receiver = receiver;
+    }
+
+    @Override
+    public String run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) {
+        return AddFriend(sender, receiver, blockingStub);
+    }
+
+    private String AddFriend(String sender, String receiver, ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+        Naturae.FriendReply reply;
+        //Generate Request as defined by proto definition
+        Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
+        //Send the request to the server and set reply to the server response
+        reply = blockingStub.withDeadlineAfter(5000, TimeUnit.MILLISECONDS).addFriend(request);
+        return "";
+    }
+}
+
+
+private static class RemoveFriendRunnable implements GrpcRunnable{
+    private String sender, receiver;
+    public RemoveFriendRunnable(String sender, String receiver){
+        this.sender = sender;
+        this.receiver = receiver;
+    }
+
+    @Override
+    public String run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) {
+        return RemoveFriend(sender, receiver, blockingStub);
+    }
+
+    private String RemoveFriend(String sender, String receiver, ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+        Naturae.FriendReply reply;
+        //Generate Request as defined by proto definition
+        Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
+        //Send the request to the server and set reply to the server response
+        reply = blockingStub.withDeadlineAfter(5000, TimeUnit.MILLISECONDS).removeFriend(request);
+        return "";
+    }
+}
+ */
