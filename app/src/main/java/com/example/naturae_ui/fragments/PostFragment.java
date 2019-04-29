@@ -92,7 +92,7 @@ public class PostFragment extends Fragment {
 		mOpenCamera.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				Intent  takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
 				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
 

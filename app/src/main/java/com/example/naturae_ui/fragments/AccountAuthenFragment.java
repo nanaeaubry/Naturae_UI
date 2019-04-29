@@ -15,8 +15,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.server.NaturaeUser;
 import com.example.naturae_ui.util.Constants;
 import com.example.naturae_ui.util.Helper;
+import com.example.naturae_ui.util.UserUtilities;
+import com.example.naturae_ui.util.Constants;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
@@ -24,6 +27,7 @@ import com.examples.naturaeproto.ServerRequestsGrpc;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -142,7 +146,7 @@ public class AccountAuthenFragment extends Fragment {
                 //Create a stub for with the channel
                 ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
                 //Create a GRPC request to the server for account authentication
-                Naturae.AccountAuthenRequest request = Naturae.AccountAuthenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY).setFirstName(UserUtilities.getFirstName(activity.get()))
+                Naturae.AccountAuthenRequest request = Naturae.AccountAuthenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
                         .setEmail(UserUtilities.getEmail(activity.get())).build();
                 //Request the send and set reply equal to the response back from the server
                 reply = stub.accountAuthentication(request);
@@ -162,12 +166,23 @@ public class AccountAuthenFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Naturae.AccountAuthenReply result) {
+            super.onPostExecute(result);
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             //If result is true then authentication code is valid
             //The program will now bring the user to the main application page
-            if (result.getResult()){
-                //Cache that the user is able to logged in successfully
+            if (result.getStatus().getCode() == Constants.OK){
+                //Cache that the user is able to logged in successfully and user information
                 //Next time the user's open the app the user's don't have to log in again
-                UserUtilities.setIsLoggedIn(activity.get(), true);
+                new Thread(()->{
+                    UserUtilities.setIsLoggedIn(activity.get(), true);
+                    UserUtilities.cacheUser(activity.get(), new NaturaeUser(result.getFirstName(), result.getLastName(), result.getEmail(),
+                            result.getAccessToken(), result.getRefreshToken(), ""));
+                }).run();
                 //Start the main activity
                 mListener.startMainActivity();
             }

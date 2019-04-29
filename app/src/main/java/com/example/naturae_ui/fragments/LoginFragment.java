@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import com.example.naturae_ui.containers.StartUpActivityContainer;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.server.NaturaeUser;
 import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.Helper;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
@@ -25,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -173,17 +176,27 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
         @Override
         protected void onPostExecute(Naturae.LoginReply loginReply) {
+            super.onPostExecute(loginReply);
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
             //Check if login replay is equal to null. If it's equal to null then there an error
             //when communicating with the server
             if (loginReply != null){
                 TextView errorMessageTextView = activity.get().findViewById(R.id.error_message_text_view);
-                System.out.println(loginReply.getStatus().getMessage());
-                System.out.println(loginReply.getStatus().getCode());
                 //If the status code is equal to 200 then the information the user's entered is correct
                 if (loginReply.getStatus().getCode() == Constants.OK){
+                    //Cache the user information
+                    new Thread(()->{
+                        UserUtilities.setIsLoggedIn(activity.get(), true);
+                        UserUtilities.cacheUser(activity.get(), new NaturaeUser(loginReply.getFirstName(), loginReply.getLastName(),
+                                loginReply.getEmail(), loginReply.getAccessToken(), loginReply.getRefreshToken(), ""));
+                    }).run();
                     mListener.startMainActivity();
-	                UserUtilities.setIsLoggedIn(activity.get(), true);
-
                 }
                 //If the status code is equal to 103 then the information the user's entered is incorrect
                 else if (loginReply.getStatus().getCode() == Constants.INVALID_LOGIN_CREDENTIAL){
@@ -199,12 +212,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                             true);
                 }
                 else{
-
+                    Helper.alertDialogErrorMessage(activity.get(), activity.get().getText(R.string.server_error).toString());
                 }
 
             }
             else{
-
+                Helper.alertDialogErrorMessage(activity.get(), activity.get().getText(R.string.server_error).toString());
             }
 
         }
