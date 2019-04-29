@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
-
+//test
 import com.example.naturae_ui.fragments.AccountAuthenFragment;
 import com.example.naturae_ui.fragments.CreateAccountFragment;
 import com.example.naturae_ui.fragments.ForgetPasswordFragment;
@@ -20,7 +20,7 @@ import com.examples.naturaeproto.Naturae;
 
 public class StartUpActivityContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
         CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
-
+//Hello
     private LoginFragment loginFragment;
     private CreateAccountFragment createAccountFragment;
     private AccountAuthenFragment accountAuthenFragment;
@@ -44,6 +44,9 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
 
     }
 
+    public static void test(){
+        System.out.println(197);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
