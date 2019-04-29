@@ -52,7 +52,8 @@ interface GetPostsCompleted {
 	void onGetPostsCompleted(Naturae.GetPostReply reply);
 }
 
-public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted {
+public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener,
+		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted {
 
 	public static final int REQUEST_LOCATION_PERMISSION = 99;
 
