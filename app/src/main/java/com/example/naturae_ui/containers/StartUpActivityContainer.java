@@ -13,9 +13,10 @@ import android.widget.ProgressBar;
 
 import com.example.naturae_ui.fragments.AccountAuthenFragment;
 import com.example.naturae_ui.fragments.CreateAccountFragment;
+import com.example.naturae_ui.fragments.ForgetPasswordFragment;
 import com.example.naturae_ui.fragments.LoginFragment;
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.fragments.ResetPasswordFragment;
+import com.examples.naturaeproto.Naturae;
 
 public class StartUpActivityContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
         CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
@@ -23,7 +24,7 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
     private LoginFragment loginFragment;
     private CreateAccountFragment createAccountFragment;
     private AccountAuthenFragment accountAuthenFragment;
-    private ResetPasswordFragment resetPasswordFragment;
+    private ForgetPasswordFragment forgetPasswordFragment;
 
     private ConstraintLayout startUpTopNav;
 
@@ -54,7 +55,7 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
         loginFragment = LoginFragment.newInstance();
         createAccountFragment = CreateAccountFragment.newInstance();
         accountAuthenFragment = AccountAuthenFragment.newInstance();
-        resetPasswordFragment = ResetPasswordFragment.newInstance();
+        forgetPasswordFragment = ForgetPasswordFragment.newInstance();
 
 
         backButton = findViewById(R.id.back_button);
@@ -92,7 +93,7 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
                 fragmentTransaction.replace(R.id.main_display_container, createAccountFragment);
                 break;
             case FORGOT_PASSWORD:
-                fragmentTransaction.replace(R.id.main_display_container, resetPasswordFragment);
+                fragmentTransaction.replace(R.id.main_display_container, forgetPasswordFragment);
                 break;
             case ACCOUNT_AUTHENTICATION:
                 //Remove the right side button
