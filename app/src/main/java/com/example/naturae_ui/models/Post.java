@@ -19,8 +19,8 @@ public class Post implements Parcelable {
 		title = postStruct.getTitle();
 		species = postStruct.getSpecies();
 		description = postStruct.getDescription();
-		lat = postStruct.getLat();
-		lng = postStruct.getLng();
+		lat = postStruct.getLatitude();
+		lng = postStruct.getLongitude();
 		encodedImage = postStruct.getEncodedImage();
 	}
 
