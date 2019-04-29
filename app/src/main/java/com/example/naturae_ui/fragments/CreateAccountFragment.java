@@ -13,7 +13,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+
 import com.example.naturae_ui.containers.StartUpActivityContainer;
+
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.server.NaturaeUser;
 import com.example.naturae_ui.util.Constants;
@@ -43,7 +45,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
     private TextInputEditText passwordEditText;
     private TextInputEditText confirmPasswordEditText;
     private TextView firstNameErrorTextView, lastNameErrorTextView, emailErrorTextView,
-        passwordErrorTextView, confirmPasswordErrorTextView;
+            passwordErrorTextView, confirmPasswordErrorTextView;
     private Button createAccountButton;
 
     private boolean isFirstNameValid, isLastNameValid, isEmailValid, isPasswordValid, isConfirmPasswordValid;
@@ -264,9 +266,9 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
      * Try to create user account
      */
     private void createAccount(){
-         //Check if first name, last name, email, password, and confirm password is valid
-         //If any of the information is invalid then an error message will appear below the edit text field
-         //If all of the information are valid then it will create an request to the server to create the user
+        //Check if first name, last name, email, password, and confirm password is valid
+        //If any of the information is invalid then an error message will appear below the edit text field
+        //If all of the information are valid then it will create an request to the server to create the user
 
         if(isAllInformationValid()){
             mListener.showProgressBar();
@@ -361,7 +363,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
 
         @Override
         protected Naturae.CreateAccountReply doInBackground(String... params) {
-            Naturae.CreateAccountReply reply;
+            Naturae.CreateAccountReply reply = null;
             try{
                 //Create a channel to connect to the server
                 channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
@@ -381,7 +383,6 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 pw.flush();
-                return null;
             }
             return reply;
 
@@ -406,9 +407,6 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 //If the status code is 150, then there already an account with that email address
                 //Any thing else then the an server error
                 if (reply.getStatus().getCode() == Constants.ACCOUNT_CREATED){
-                    //Start a new thread and cache the user
-                    UserUtilities.cacheUser(activity.get(), new NaturaeUser(firstName, lastName, email,
-                            reply.getAccessToken(), reply.getRefreshToken(), ""));
                     mListener.beginFragment(StartUpActivityContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true, true);
                 }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
                     //Display an error message that an account with the email already exist
@@ -421,7 +419,6 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
             else{
                 Helper.alertDialogErrorMessage(activity.get(), "An error has occurred while communicating with the server. Please try again");
             }
-
         }
     }
 }
