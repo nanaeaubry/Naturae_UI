@@ -173,7 +173,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		mGoogleMap.setOnMarkerClickListener(this);
 		mGoogleMap.setOnCameraIdleListener(this);
 
-		CameraPosition Home = CameraPosition.builder().target(new LatLng(34.055569, -117.182541)).zoom(14).bearing(0).tilt(45).build();
+		CameraPosition Home = CameraPosition.builder().target(new LatLng(33.7701, -118.1937)).zoom(14).bearing(0).tilt(45).build();
 		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Home));
 
 	}
