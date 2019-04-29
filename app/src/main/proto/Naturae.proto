@@ -112,8 +112,8 @@ message PostStruct{
     string title = 3;
     string species = 4;
     string description = 5;
-    float lat = 6;
-    float lng = 7;
+    float latitude = 6;
+    float longitude = 7;
     string encodedImage = 8;
 }
 

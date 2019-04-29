@@ -3,8 +3,6 @@ package com.example.naturae_ui.containers;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,7 +16,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.fragments.MapFragment;
 import com.example.naturae_ui.fragments.FriendFragment;
 import com.example.naturae_ui.fragments.PostFragment;
 import com.example.naturae_ui.fragments.PreviewFragment;
@@ -37,29 +34,22 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-interface GetPostsCompleted {
-	void onGetPostsCompleted(Naturae.GetPostReply reply);
-}
 
-public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener,
-		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted {
+public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener, GoogleMap.OnMarkerClickListener {
 
 	public static final int REQUEST_LOCATION_PERMISSION = 99;
 
 	GoogleMap mGoogleMap;
 	MapView mMapView;
 	FrameLayout mFragmentContainer;
-	Fragment mMapFragment;
 	Fragment mPostFragment;
 	Fragment mPreviewFragment;
 	Fragment mChatFragment;
@@ -68,68 +58,57 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	Marker mMarker;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
 
 		// Load bottom navigation bar
 		navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
-		// Create fragments
-		mMapFragment = new MapFragment();
+
 		mPostFragment = new PostFragment();
 		mProfileFragment = new ProfileFragment();
 		mChatFragment = new FriendFragment();
 		mPreviewFragment = new PreviewFragment();
 
-		// Create fragment container
 		mFragmentContainer = findViewById(R.id.fragment_container);
+
 		mMapView = findViewById(R.id.map);
 		if (mMapView != null) {
 			mMapView.onCreate(null);
 			mMapView.onResume();
 			mMapView.getMapAsync(this);
 		}
-
-		mFragmentContainer.setVisibility(View.VISIBLE);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
 	}
 
-	// Show map when selected on bottom navigation
-	private void showMap() {
+	private void showMap(){
 		mMapView.setVisibility(View.VISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
+		mFragmentContainer.setVisibility(View.GONE);
 	}
 
-	// Show post when selected on bottom navigation
-	private void showPost() {
+	private void showPost(){
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
+		mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPostFragment).commit();
 	}
 
-	// Show preview when selected on map
-	private void showPreview(Post post) {
-		Bundle bundle = new Bundle();
-		bundle.putParcelable("post", post);
+	private void showPreview(){
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
 
-	// Show chat when selected on bottom navigation
-	private void showChat() {
+	private void showChat(){
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
+		mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mChatFragment).commit();
 	}
 
-	// Show profile when selected on bottom navigation
-	private void showProfile() {
+	private void showProfile(){
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
+		mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mProfileFragment).commit();
 
 	}
@@ -139,27 +118,26 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
 			= item -> {
-		switch (item.getItemId()) {
-			case R.id.navigation_map:
-				showMap();
-				break;
-			case R.id.navigation_post:
-				showPost();
-				break;
-			case R.id.navigation_chat:
-				showChat();
-				break;
-			case R.id.navigation_profile:
-				showProfile();
-				break;
-		}
-		return true;
-	};
+				switch (item.getItemId()) {
+					case R.id.navigation_map:
+						showMap();
+						break;
+					case R.id.navigation_post:
+						showPost();
+						break;
+					case R.id.navigation_chat:
+						showChat();
+						break;
+					case R.id.navigation_profile:
+						showProfile();
+						break;
+				}
+				return true;
+			};
 
 
 	/**
 	 * Create map
-	 *
 	 * @param googleMap map to be created
 	 */
 	@Override
@@ -169,76 +147,17 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		mGoogleMap = googleMap;
 		googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 		enableMyLocation();
-
 		mGoogleMap.setOnMarkerClickListener(this);
-		mGoogleMap.setOnCameraIdleListener(this);
 
-		CameraPosition Home = CameraPosition.builder().target(new LatLng(33.7701, -118.1937)).zoom(14).bearing(0).tilt(45).build();
+		CameraPosition Home = CameraPosition.builder().target(new LatLng(34.055569, -117.182541)).zoom(14).bearing(0).tilt(45).build();
 		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Home));
-
-	}
-
-	@Override
-	public void onCameraIdle() {
-		//Get center latitude and longitude values
-		LatLng center = mGoogleMap.getCameraPosition().target;
-		float cLat = (float) center.latitude;
-		float cLng = (float) center.longitude;
-
-		//Get radius of visible map region
-		VisibleRegion visibleRegion = mGoogleMap.getProjection().getVisibleRegion();
-
-		float[] diagonalDistance = new float[1];
-
-		LatLng farLeft = visibleRegion.farLeft;
-		LatLng nearRight = visibleRegion.nearRight;
-
-		Location.distanceBetween(
-				farLeft.latitude,
-				farLeft.longitude,
-				nearRight.latitude,
-				nearRight.longitude,
-				diagonalDistance
-		);
-
-		int meterRadius = (int) diagonalDistance[0] / 2;
-
-		//convert from meters to miles
-		int radius = (int) (meterRadius * 0.00062137);
-
-		new GrpcGetPosts(this, cLat, cLng, radius).execute();
-	}
-
-	@Override
-	public void onGetPostsCompleted(Naturae.GetPostReply reply) {
-		if (reply != null) {
-			if (reply.getStatus().getCode() == Constants.OK) {
-				mGoogleMap.clear();
-				int length = reply.getReplyCount();
-				for (int i = 0; i < length; i++) {
-					Naturae.PostStruct postStruct = reply.getReply(i);
-					float lat = postStruct.getLatitude();
-					float lng = postStruct.getLongitude();
-					String title = postStruct.getTitle();
-					String description = postStruct.getDescription();
-
-					Marker marker = mGoogleMap.addMarker(new MarkerOptions()
-							.position(new LatLng(lat, lng))
-							.title(title)
-							.snippet(description));
-					marker.setTag(new Post(postStruct));
-
-				}
-			}
-		}
-
 	}
 
 	private void enableMyLocation() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+		if (ContextCompat.checkSelfPermission(this,	Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 			mGoogleMap.setMyLocationEnabled(true);
 		} else {
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+			ActivityCompat.requestPermissions(this, new String[]	{Manifest.permission.ACCESS_FINE_LOCATION},	REQUEST_LOCATION_PERMISSION);
 		}
 	}
 
@@ -246,10 +165,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 * Request permission for location
 	 * @param requestCode code that indicates permission being requested
 	 * @param permissions permission needed
-	 * Request posts to load on map
-	 *
-	 * @param requestCode  code that indicates permission being requested
-	 * @param permissions  permission needed
 	 * @param grantResults give access to use location
 	 */
 	@Override
@@ -258,21 +173,20 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		// location data layer.
 		switch (requestCode) {
 			case REQUEST_LOCATION_PERMISSION:
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+				if (grantResults.length > 0	&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					enableMyLocation();
 					break;
 				}
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-	}
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 
-	/**
+    /**
 	 * Create marker when post is created
-	 *
 	 * @param post post that is created
 	 */
 	@Override
@@ -285,13 +199,11 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 	/**
 	 * When a marker is clicked the preview fragment will be shown for the specific marker
-	 *
 	 * @param marker marker chosen
 	 * @return true if marker is clickable.
 	 */
 	@Override
 	public boolean onMarkerClick(Marker marker) {
-		showPreview((Post) marker.getTag());
 
 		return true;
 	}
@@ -302,10 +214,9 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		private final WeakReference<Activity> activity;
 		private ManagedChannel channel;
 
-		public GrpcGetNewAccessToken(Activity activity) {
+		public GrpcGetNewAccessToken(Activity activity){
 			this.activity = new WeakReference<>(activity);
 		}
-
 		@Override
 		protected Naturae.GetAccessTokenReply doInBackground(Void... voids) {
 			Naturae.GetAccessTokenReply reply;
@@ -316,7 +227,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 				Naturae.GetAccessTokenRequest request = Naturae.GetAccessTokenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
 						.setRefreshToken(UserUtilities.getRefreshToken(activity.get())).build();
 				reply = stub.getNewAccessToken(request);
-			} catch (Exception e) {
+			}catch (Exception e){
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
@@ -330,61 +241,13 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		@Override
 		protected void onPostExecute(Naturae.GetAccessTokenReply getAccessTokenReply) {
 			super.onPostExecute(getAccessTokenReply);
-			if (getAccessTokenReply == null) {
+			if (getAccessTokenReply == null){
 				Log.e("Access Token", "Unable to get new access token from the server");
-			} else {
+			}
+			else{
 				//Cache new the access token to the phone
 				UserUtilities.setAccessToken(activity.get(), getAccessTokenReply.getAccessToken());
 			}
 		}
 	}
-
-	//Get posts to put on map
-	private static class GrpcGetPosts extends AsyncTask<Void, Void, Naturae.GetPostReply> {
-
-		private GetPostsCompleted listener;
-		private ManagedChannel channel;
-		private float lat;
-		private float lng;
-		private int radius;
-
-		public GrpcGetPosts(GetPostsCompleted listener, float lat, float lng, int radius) {
-			this.listener = listener;
-			this.lat = lat;
-			this.lng = lng;
-			this.radius = radius;
-		}
-
-		@Override
-		protected Naturae.GetPostReply doInBackground(Void... voids) {
-			Naturae.GetPostReply reply;
-			try {
-				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
-				//Create a stub for with the channel
-				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-				Naturae.GetPostRequest request = Naturae.GetPostRequest.newBuilder()
-						.setAppKey(Constants.NATURAE_APP_KEY)
-						.setLat(lat)
-						.setLng(lng)
-						.setRadius(radius)
-						.build();
-				reply = stub.getPosts(request);
-			} catch (Exception e) {
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-				pw.flush();
-				return null;
-			}
-
-			return reply;
-		}
-
-		@Override
-		protected void onPostExecute(Naturae.GetPostReply getPostReply) {
-			super.onPostExecute(getPostReply);
-			listener.onGetPostsCompleted(getPostReply);
-		}
-	}
 }
-
