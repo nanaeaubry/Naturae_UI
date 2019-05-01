@@ -127,12 +127,12 @@ public class AccountAuthenFragment extends Fragment {
 
     //Create an async task for account authentication
     private static class GrpcAccountAuthen extends AsyncTask<String, Void, Naturae.AccountAuthenReply>{
-        private final AccountAuthenFragment.OnFragmentInteractionListener mListener;
+        private final OnFragmentInteractionListener mListener;
         private final WeakReference<Activity> activity;
         private ManagedChannel channel;
 
         //Create an constructor for the async task
-        private GrpcAccountAuthen(AccountAuthenFragment.OnFragmentInteractionListener mListener, Activity activity){
+        private GrpcAccountAuthen(OnFragmentInteractionListener mListener, Activity activity){
             this.mListener = mListener;
             this.activity = new WeakReference<>(activity);
         }
