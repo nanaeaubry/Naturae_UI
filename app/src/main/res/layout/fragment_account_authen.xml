@@ -48,7 +48,9 @@
             android:id="@+id/verify_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/verify"/>
+            android:text="@string/verify"
+            android:background="@color/buttons"
+            />
 
     </LinearLayout>
 
