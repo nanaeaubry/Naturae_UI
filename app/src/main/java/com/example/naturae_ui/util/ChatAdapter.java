@@ -9,6 +9,7 @@ import android.content.Context;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.models.ChatMessage;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -33,7 +34,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     //Unused
     public void add(ChatMessage message) {
-        this.chatlog.add(message);
+        this.chatlog.add(0, message);
         //Update list and render
     }
     //Unused
