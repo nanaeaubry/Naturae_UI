@@ -4,38 +4,86 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.support.v4.app.Fragment;
 
 import com.example.naturae_ui.models.ChatMessage;
+import com.example.naturae_ui.models.Friend;
+import com.example.naturae_ui.models.MemberData;
 import com.example.naturae_ui.util.*;
 import com.example.naturae_ui.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scaledrone.lib.Listener;
+import com.scaledrone.lib.Room;
+import com.scaledrone.lib.RoomListener;
+import com.scaledrone.lib.Scaledrone;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
 /**
  * Frontend logic of Naturae's real-time messaging service to setup views and connection tasks
  */
-public class ChatFragment extends Fragment implements View.OnClickListener {
+public class ChatFragment extends Fragment implements RoomListener {
     private static final String TAG = "ChatFragment";
+    //todo hide channelID
+    private final String channelID = "rff299Lg3qBpyQxQ";
+    private final String roomName = "observable-room";
     private TextView friendUsernameTitle;
     private EditText messageInput;
+    private View sendButton;
     private String friendUsernameText;
     private ChatAdapter adapter;
-
+    private MemberData thisUser;
+    private Scaledrone scaledrone;
+    List<ChatMessage> chatlog;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
+        //thisUser = new MemberData(UserUtilities.getEmail(getContext()));
+        thisUser = new MemberData("limstevenlbw@gmail.com");
+        chatlog = new LinkedList<ChatMessage>();
+
+        scaledrone = new Scaledrone(channelID, thisUser);
+        scaledrone.connect(new Listener() {
+            @Override
+            public void onOpen() {
+                //Pass RoomListener as a target
+                scaledrone.subscribe(roomName, ChatFragment.this);
+                System.out.println("Scaledrone connection open");
+            }
+
+            @Override
+            public void onOpenFailure(Exception e) {
+                System.err.println(e);
+                //Can potentially happen due to authentication error
+                Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                System.err.println(e);
+                Log.d(TAG, "onFailure: Connection failure");
+            }
+
+            @Override
+            public void onClosed(String reason) {
+                System.err.println(reason);
+            }
+        });
     }
 
     /**
@@ -51,14 +99,35 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         //Set the title of the chat window as the friend's username
         friendUsernameTitle = view.findViewById(R.id.chat_friend_title);
         friendUsernameTitle.setText(friendUsernameText);
+        //todo
+        //Instantiate Avatar?
 
         //Instantiate message textfield for user to type in
         messageInput = view.findViewById(R.id.editText);
+        sendButton = view.findViewById(R.id.sendButton);
 
+        messageInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    Log.d(TAG, "onEditorAction: HELLO");
+                    sendMessage();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        sendButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                sendMessage();
+            }
+        });
+/*
     //************SAMPLE DATA******************************************
         Log.d(TAG, "initRecyclerView: init recyclerview");
 
-        List<ChatMessage> chatlog = new ArrayList<ChatMessage>();
         chatlog.add(new ChatMessage("I used to rule the world\n" +
                 "Seas would rise when I gave the word\n" +
                 "Now in the morning, I sleep alone\n" +
@@ -73,11 +142,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         chatlog.add(new ChatMessage("   Hello it me", "WoozyMango", "sampleTimestamp", true));
         //************SAMPLE DATA******************************************
 
-
+   */
         //Setup adapter
         adapter = new ChatAdapter(getContext(), chatlog);
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager chatLayout = new LinearLayoutManager(getContext());
+        chatLayout.setReverseLayout(true);
+        recyclerView.setLayoutManager(chatLayout);
 
         /*
         chatMessageAdapter.setClickListener(new FriendAdapter.ClickListener() {
@@ -86,7 +157,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 Log.d(TAG, "onItemClick position: " + position);
             }
         });
-        */
+            */
         return view;
     }
 
@@ -100,48 +171,50 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     *
-     * @param view
+     * Obtain the room id for the conversation
      */
+    public void createRoom(){
+            //todo invoke gRPC call to retrieve the room id for the conversation
+    }
+
+    // Successfully connected to a Scaledrone room
     @Override
-    public void onClick(View view){
-
-        switch(view.getId()){
-            case R.id.editText:
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(messageInput, InputMethodManager.SHOW_IMPLICIT);
-                break;
-
-            case R.id.sendButton:
-                sendMessage();
-                break;
-        }
+    public void onOpen(Room room) {
+        Log.d(TAG, "onOpen: Connected to a room successfully");
     }
 
-    public void onConnect(){
-        System.out.println("");
+    // Connecting to Scaledrone room failed
+    @Override
+    public void onOpenFailure(Room room, Exception e) {
+        Log.d(TAG, "onOpenFailure: Unable to connect to a room successfully" + e);
     }
 
-    public void onConnectFailure(){
-        System.err.println("");
-    }
+    // Eventhandler for receiving a message from the Scaledrone room
+    @Override
+    public void onMessage(Room room, com.scaledrone.lib.Message receivedMessage) {
+        final ObjectMapper mapper = new ObjectMapper();
+        try {
+            final MemberData user = mapper.treeToValue(receivedMessage.getMember().getClientData(), MemberData.class);
 
-    //Message Received
-    public void receiveMessage() {
-        // TODO
-        /*
-        try{
-            final ChatMessage message = new ChatMessage(params);
-            runOnUiThread(new Runnable() {
+            //Check if the username matches the current user
+            boolean isSentByUser = user.getUsername().equals(thisUser.getUsername());
+
+            //Construct a new chat message from the received data
+            final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), "timestamp", isSentByUser);
+            Log.d(TAG, "onMessage: " + message.getMessageBody());
+
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ChatAdapter.add(message);
-                    // scroll the ListView to the last added element
-                    chatListView.setSelection(chatListView.getCount() - 1);
+                    adapter.add(message);
+                    adapter.notifyItemInserted(0);
+
                 }
             });
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            Log.d(TAG, "onMessage: Error processing a received message");
         }
-        */
     }
 
     /**
@@ -149,14 +222,14 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
      * Retrieves textfield with id 'editText'
      */
     public void sendMessage(){
-        Log.d(TAG, "Message Sent");
-       // String textMessage = editText.getText().toString();
+        String message = messageInput.getText().toString();
 
-        ///todo
-        //send to server and process
+        if (message.length() > 0) {
+            scaledrone.publish("observable-room", message);
+            messageInput.getText().clear();
+            Log.d(TAG, "Message Sent: " + message);
+        }
 
-        //Clear the input field
-        //editText.getText().clear();
     }
 
 }

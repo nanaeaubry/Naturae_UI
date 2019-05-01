@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground= "?android:attr/selectableItemBackgroundBorderless"
@@ -7,15 +8,47 @@
     android:focusable="true">
 
     <View
+        android:id="@+id/addFriendItem"
+        android:layout_width="40dp"
+        android:layout_height="41dp"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/ic_add_black_24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:scaleType="centerInside"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"
+        />
+
+    <View
+        android:id="@+id/removeFriendItem"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/ic_remove_black_24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:scaleType="centerInside"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"
+        />
+
+    <View
         android:id="@+id/friend_avatar"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="6dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:background="@drawable/chat_avatar_friend"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        />
 
     <TextView
         android:id="@+id/friend_username"
@@ -26,5 +59,6 @@
         android:layout_toRightOf="@id/friend_avatar"
         android:text="woozy_mango"
         android:textColor="#000"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        />
 </RelativeLayout>
