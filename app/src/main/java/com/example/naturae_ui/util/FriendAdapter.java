@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
 import com.example.naturae_ui.R;
@@ -17,6 +19,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     private LayoutInflater inflater;
     private ClickListener clickListener;
     private List<Friend> friendsList;
+    private String listItemViewType;
 
     /**
      * Constructor initializes fields for the friends list
@@ -72,11 +75,31 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView usernameView;
         View avatar;
+        View addFriendButton;
+        View removeFriendButton;
 
         public ViewHolder(View userView){
             super(userView);
             usernameView = userView.findViewById(R.id.friend_username);
             avatar = userView.findViewById(R.id.friend_avatar);
+            addFriendButton = userView.findViewById(R.id.addFriendItem);
+            removeFriendButton = userView.findViewById(R.id.removeFriendItem);
+    /*
+            switch(listItemViewType){
+                case "add":
+                    addFriendButton.setVisibility(View.VISIBLE);
+                    removeFriendButton.setVisibility(View.INVISIBLE);
+                    break;
+                case "remove":
+                    removeFriendButton.setVisibility(View.VISIBLE);
+                    addFriendButton.setVisibility(View.INVISIBLE);
+                    break;
+                default:
+                    addFriendButton.setVisibility(View.INVISIBLE);
+                    removeFriendButton.setVisibility(View.INVISIBLE);
+                    break;
+            }
+            */
             //Registers a callback to be invoked when this item is clicked
             userView.setOnClickListener(this);
         }
@@ -103,5 +126,23 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
      */
     public interface ClickListener {
         void onItemClick(View view, int position, Friend friend);
+    }
+
+    /**
+     * Replace the dataset
+     * @param newList
+     */
+    public void displayNewList(List<Friend> newList){
+        friendsList = new ArrayList<>(newList);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Determine the type of list item to display in the recycler view
+     * "remove" "add" "default"
+     * @param type
+     */
+    public void setListItemViewType(String type){
+        listItemViewType = type;
     }
 }

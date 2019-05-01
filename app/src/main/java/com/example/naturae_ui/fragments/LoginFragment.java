@@ -141,7 +141,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     }
 
     private static class GrpcLogin extends AsyncTask<String, Void, Naturae.LoginReply>{
-        private final LoginFragment.OnFragmentInteractionListener mListener;
+        private final OnFragmentInteractionListener mListener;
         private final WeakReference<Activity> activity;
         private ManagedChannel channel;
 
