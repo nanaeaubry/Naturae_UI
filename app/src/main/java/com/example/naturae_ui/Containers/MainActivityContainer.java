@@ -66,7 +66,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	Fragment mProfileFragment;
 	BottomNavigationView navigation;
 	Marker mMarker;
-	Bundle mBundle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,10 +112,10 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 	// Show preview when selected on map
 	private void showPreview(Post post) {
-		mBundle = new Bundle();
-		mBundle.putParcelable("post", post);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable("post", post);
 		mMapView.setVisibility(View.INVISIBLE);
-		mPreviewFragment.setArguments(mBundle);
+		mPreviewFragment.setArguments(bundle);
 		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
@@ -205,7 +204,10 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 		int meterRadius = (int) diagonalDistance[0] / 2;
 
-		new GrpcGetPostPreview(this, cLat, cLng, meterRadius).execute();
+		//convert from meters to miles
+		int radius = (int) (meterRadius * 0.00062137);
+
+		new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
 	}
 
 	@Override
