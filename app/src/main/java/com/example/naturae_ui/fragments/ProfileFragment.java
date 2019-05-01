@@ -40,7 +40,7 @@ public class ProfileFragment extends Fragment implements LoginFragment.OnFragmen
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_profile, container, false);
         super.onCreate(savedInstanceState);
-
+        System.out.print("hi");
         firstName = mView.findViewById(R.id.first_name_edit_text);
         lastName = mView.findViewById(R.id.last_name_edit_text);
 
