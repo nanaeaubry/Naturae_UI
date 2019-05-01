@@ -14,10 +14,12 @@
 
         <ImageButton
             android:id="@+id/ibProfileImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:maxHeight="120dp"
-            android:maxWidth="120dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:maxHeight="200dp"
+            android:maxWidth="200dp"
+            android:scaleType="fitXY"
+            android:background="@color/cardview_light_background"
             tools:srcCompat="@tools:sample/avatars[0]" />
 
         <TextView
@@ -30,23 +32,26 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            >
 
             <Button
                 android:id="@+id/btChangePass"
-                android:layout_width="wrap_content"
+                android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
-                android:text="Change Password" />
+                android:text="Change Password"
+                android:backgroundTint="@color/buttons"/>
 
             <Button
                 android:id="@+id/btLogout"
-                android:layout_width="wrap_content"
+                android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
-                android:text="Logout" />
+                android:text="Logout"
+                android:backgroundTint="@color/buttons"/>
         </LinearLayout>
 
     </LinearLayout>

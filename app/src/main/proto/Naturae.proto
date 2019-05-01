@@ -14,7 +14,9 @@ service ServerRequests{
     rpc GetNewAccessToken(GetAccessTokenRequest) returns (GetAccessTokenReply){}
     rpc SayHello (HelloRequest) returns (HelloReply){};
     rpc CreatePost (CreatePostRequest) returns (CreatePostReply){};
+    rpc GetPostPreview(GetPostPreviewRequest) returns (GetPostPreviewReply);
     rpc GetPosts (GetPostRequest) returns (GetPostReply){};
+    rpc SearchPost (SearchPostRequest) returns (SearchPostReply);
     rpc ForgetPassword (ForgetPasswordRequest) returns (ForgetPasswordReply){};
     rpc ForgetPasswordVerifyCode (ForgetPasswordVerifyCodeRequest) returns (ForgetPasswordVerifyCodeReply){};
     rpc ForgetPasswordResetPassword (ForgetPasswordNewPasswordRequest) returns (ForgetPasswordNewPasswordReply){};
@@ -99,22 +101,44 @@ message GetPostRequest {
     string appKey = 1;
     float lat = 2;
     float lng = 3;
-    int32 radius = 4; //in miles
+}
+
+message GetPostPreviewRequest{
+    string appKey = 1;
+    float lat = 2;
+    float lng = 3;
+    int32 radius = 4;
+}
+
+message GetPostPreviewReply{
+    Status status = 1;
+    repeated PostStruct reply = 2;
 }
 
 message GetPostReply{
     Status status = 1;
     repeated PostStruct reply = 2;
-
 }
 
 message PostStruct{
-    string title = 3;
-    string species = 4;
-    string description = 5;
-    float latitude = 6;
-    float longitude = 7;
-    string encodedImage = 8;
+    string postID = 1;
+    string title = 2;
+    string species = 3;
+    string description = 4;
+    float latitude = 5;
+    float longitude = 6;
+    string encodedImage = 7;
+}
+
+message SearchPostRequest{
+    string appKey = 1;
+    string search = 2;
+    string filterType = 3;
+}
+
+message SearchPostReply{
+    Status status = 1;
+    repeated PostStruct reply = 2;
 }
 
 message Status {

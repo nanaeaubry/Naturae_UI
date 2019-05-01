@@ -47,6 +47,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 //Test Comment by Nanae
 import io.grpc.ManagedChannel;
@@ -343,6 +344,12 @@ public class PostFragment extends Fragment {
 
 		@Override
 		protected void onPostExecute(Naturae.CreatePostReply createPostReply) {
+			//Shut down the gRPC channel
+			try {
+				channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 			//Check if reply is equal to null. If it's equal to null then there is an error
 			//when communicating with the server
 			if (createPostReply != null) {
