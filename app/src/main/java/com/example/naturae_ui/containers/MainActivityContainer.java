@@ -1,5 +1,5 @@
 package com.example.naturae_ui.containers;
-
+//Test changes
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
