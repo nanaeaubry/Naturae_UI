@@ -13,9 +13,10 @@ public class Post implements Parcelable {
 	public float lng;
 	public String encodedImage;
 
-	public Post(){}
+	public Post() {
+	}
 
-	public Post(Naturae.PostStruct postStruct){
+	public Post(Naturae.PostStruct postStruct) {
 		title = postStruct.getTitle();
 		species = postStruct.getSpecies();
 		description = postStruct.getDescription();

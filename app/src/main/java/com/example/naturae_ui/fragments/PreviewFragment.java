@@ -50,11 +50,6 @@ public class PreviewFragment extends Fragment {
 		mDescription = mView.findViewById(R.id.preview_description);
 		mDescription.setText(mPost.description);
 
-
-
-
-
-
 		return mView;
 	}
 
