@@ -202,10 +202,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 				diagonalDistance
 		);
 
-		int meterRadius = (int) diagonalDistance[0] / 2;
-
-		//convert from meters to miles
-		int radius = (int) (meterRadius * 0.00062137);
+		int radius = (int) diagonalDistance[0] / 2;
 
 		new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
 	}
