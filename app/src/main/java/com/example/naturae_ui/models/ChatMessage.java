@@ -1,14 +1,14 @@
 package com.example.naturae_ui.models;
-
 /**
  * Represents a single message sent by a user or friend
  */
 public class ChatMessage {
     private String messageBody;
-    //timestamp is formed by toString() call of java.sql.Timestamp
-    private String timestamp;
+    private long timestamp;
     private String name;
     private boolean isSentByUser;
+    private String timeElapsed;
+
 
     /**
      * Initalize a text message that was received from the server-end chatlog
@@ -17,11 +17,11 @@ public class ChatMessage {
      * @param timestamp
      * @param isSentByUser
      */
-    public ChatMessage(String messageBody, String name, String timestamp, boolean isSentByUser){
+    public ChatMessage(String messageBody, String name, long timestamp, boolean isSentByUser){
         this.messageBody = messageBody;
-        //this.timestamp = timestamp;
         this.isSentByUser = isSentByUser;
         this.name = name;
+        this.timestamp = timestamp;
     }
 
     /**
@@ -40,10 +40,26 @@ public class ChatMessage {
     }
 
     /**
-     * @return the recorded date-time of when the message was sent
+     * @return the recorded date-time of when the message was sent, converts a unix long value into a proper string format
      */
-    public String getTimestamp(){
+    public long getTimestamp(){
         return timestamp;
+    }
+
+    /**
+     * Set the amount of time that has passed since the message was sent
+     * @param timeElapsed
+     */
+    public void setTimeElapsed(String timeElapsed){
+        this.timeElapsed = timeElapsed;
+    }
+
+    /**
+     * Return the amount of time that has passes since the message was sent
+     * @return
+     */
+    public String getTimeElapsed(){
+        return timeElapsed;
     }
 
     /**

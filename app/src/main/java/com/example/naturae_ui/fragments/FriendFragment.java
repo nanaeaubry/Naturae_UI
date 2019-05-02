@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.naturae_ui.R;
@@ -48,7 +49,9 @@ public class FriendFragment extends Fragment {
     private TextInputEditText searchFieldInput;
     private TextView emptyView;
     private RecyclerView recyclerView;
-
+    private Button returnButton;
+    private View removeButton;
+    private View sortButton;
     /**
      * Called to do initial creation of a fragment. This is called after onAttach(Activity) and before onCreateView
      * Note that this can be called while the fragment's activity is still in the process of being created.
@@ -69,12 +72,17 @@ public class FriendFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_friend, container, false);
+
         searchFieldInput = view.findViewById(R.id.search_field_input);
         emptyView = view.findViewById(R.id.empty_view);
         recyclerView = view.findViewById(R.id.friend_recycler);
         adapter = new FriendAdapter(getContext(), friendsList);
 
-        Log.d(TAG, "initRecyclerView: init onCreateView");
+        //Bottom Toolbar
+        returnButton = view.findViewById(R.id.viewFriendsButton);
+        removeButton = view.findViewById(R.id.removeFriend);
+        sortButton = view.findViewById(R.id.sortFriend);
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -86,6 +94,8 @@ public class FriendFragment extends Fragment {
         searchFieldInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean isSearchInProgress = true;
+
                 if(actionId == EditorInfo.IME_ACTION_DONE){
                     //Retrieve the query the user typed
                     searchQuery = searchFieldInput.getText().toString().trim();
@@ -95,12 +105,33 @@ public class FriendFragment extends Fragment {
                         @Override
                         public void onSearchTaskFinished(List<Friend> searchedFriendsList) {
                             // update UI in Activity here
-                            Log.d(TAG, "onSearchTaskFinished: ");
+
                             // adapter.setListItemViewType("add");
                             adapter.displayNewList(searchedFriendsList);
+                            returnButton.setVisibility(View.VISIBLE);
+                            removeButton.setVisibility(View.GONE);
+                            sortButton.setVisibility(View.GONE);
 
-                            //ONCLICK EVENT DEFINITION
+                            returnButton.setOnClickListener(new View.OnClickListener() {
+                                /**
+                                 * Toggle visibility of remove button, show friendslist on click
+                                 * @param v the button that was selected
+                                 */
+                                public void onClick(View v) {
+                                    adapter.displayNewList(friendsList);
+                                    returnButton.setVisibility(View.GONE);
+                                    removeButton.setVisibility(View.VISIBLE);
+                                    sortButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+
                             adapter.setClickListener(new FriendAdapter.ClickListener() {
+                                /**
+                                 *
+                                 * @param view
+                                 * @param position
+                                 * @param friend
+                                 */
                                 @Override
                                 public void onItemClick(View view, int position, Friend friend) {
                                     Log.d(TAG, "onFriendClick position: " + position);
@@ -112,7 +143,6 @@ public class FriendFragment extends Fragment {
                     search.execute();
                     //Do something with searched friend's list
                     searchFieldInput.getText().clear();
-                    return true;
                 }
                 return false;
             }
@@ -120,10 +150,8 @@ public class FriendFragment extends Fragment {
 
 
         //EXECUTE gRPC SEARCH USER TASK
-        //new GrpcTask(new GrpcTask.SearchUsersRunnable(UserUtilities.getEmail(getContext()), "empty"), getActivity()).execute();
-        //UserUtilities.getEmail(getContext())
-        //limstevenlbw@gmail.com
-        GrpcSearchFriendsTask buildList = new GrpcSearchFriendsTask(new GrpcSearchFriendsTask.SearchUsersRunnable("limstevenlbw@gmail.com", "empty"), getActivity());
+        //GrpcSearchFriendsTask buildList = new GrpcSearchFriendsTask(new GrpcSearchFriendsTask.SearchUsersRunnable("limstevenlbw@gmail.com", "empty"), getActivity());
+        GrpcSearchFriendsTask buildList = new GrpcSearchFriendsTask(new GrpcSearchFriendsTask.SearchUsersRunnable(UserUtilities.getEmail(getContext()), "empty"), getActivity());
         buildList.setListener(new GrpcSearchFriendsTask.AsyncTaskListener() {
             @Override
             public void onSearchFriendsFinished(List<Friend> newFriendsList) {
@@ -195,7 +223,6 @@ public class FriendFragment extends Fragment {
     }
 
     /*************************************************************************************************************************************
-    /**
      * Class sets up Asynchronous Task handling for searching for a search query
      * "Async Generic Types"
      *  -Params, the type of the parameters sent to the task for execution
@@ -239,14 +266,13 @@ public class FriendFragment extends Fragment {
                 PrintWriter pw = new PrintWriter(error);
                 e.printStackTrace(pw);
                 pw.flush();
-                Log.d(TAG,"doInBackground: Error Exception caught while trying to build stubs\n" + error);
+                Log.d(TAG,"doInBackground: Error Exception caught while trying to build a reply: \n" + error);
                 return null;
             }
         }
 
         /**
          * After the Heavy Lifting, you may update info on ui on results within here
-         * Close the connection
          */
         @Override
         protected void onPostExecute(Naturae.UserListReply result) {
@@ -277,12 +303,14 @@ public class FriendFragment extends Fragment {
             }
             else{
                 //Placeholder test
+                /*
                 List<Friend> searchedFriendsList = new ArrayList<Friend>();
                 searchedFriendsList.add(new Friend("Alex"));
                 searchedFriendsList.add(new Friend("Anita"));
                 if (listener != null) {
                     listener.onSearchTaskFinished(searchedFriendsList);
                 }
+                */
 
                 Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to connect with the server, please check your connection");
             }
@@ -340,6 +368,7 @@ public class FriendFragment extends Fragment {
             }
         }
     } //End of Async Task Class
+
 /*************************************************************************************************************************************
     /**
      * Class sets up Asynchronous Task handling for searching for a search query
@@ -360,15 +389,6 @@ public class FriendFragment extends Fragment {
             this.channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
         }
 
-        /**
-         * Before the Heavy Lifting, invoked on the UI thread to setup the async tasks.
-         * Upon completion, doInBackground() follows up
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
         @Override
         protected Naturae.UserListReply doInBackground(Void... nothing) {
             try {
@@ -380,7 +400,7 @@ public class FriendFragment extends Fragment {
                 PrintWriter pw = new PrintWriter(error);
                 e.printStackTrace(pw);
                 pw.flush();
-                Log.d(TAG, "doInBackground: Error Exception caught while trying to build stubs\n" + error);
+                Log.d(TAG, "doInBackground: Error Exception caught while trying to build a reply: \n" + error);
                 return null;
             }
         }
@@ -402,6 +422,7 @@ public class FriendFragment extends Fragment {
                 }
             }
             else{
+               /*
                 Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
                 friendsList.add(new Friend("Jimmy"));
                 friendsList.add(new Friend("Trung"));
@@ -411,6 +432,7 @@ public class FriendFragment extends Fragment {
                 friendsList.add(new Friend("Catherine"));
                 friendsList.add(new Friend("Josh"));
                 friendsList.add(new Friend("Colin"));
+                */
                 Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve your friend's list, please check your connection");
             }
             //Callback function
@@ -431,7 +453,6 @@ public class FriendFragment extends Fragment {
         public interface AsyncTaskListener {
             void onSearchFriendsFinished(List<Friend> newFriendslist);
         }
-
 
         /**
          *  GRPC Service
@@ -463,55 +484,212 @@ public class FriendFragment extends Fragment {
         }
     } //End of Async Task Class
 
+    /*************************************************************************************************************************************
+     /**
+     * Class sets up Asynchronous Task handling for searching for a search query
+     * "Async Generic Types"
+     *  -Params, the type of the parameters sent to the task for execution
+     *  -Progress, the type of progress units published during computation
+     *  -Result, the type of the result of the background computation
+     */
+    private static class GrpcRemoveFriendTask extends AsyncTask<Void, Void, Naturae.FriendReply> {
+        private final RemoveFriendRunnable grpcRunnable;
+        private final WeakReference<Activity> activityReference;
+        private ManagedChannel channel;
+        private AsyncTaskListener listener;
+
+        GrpcRemoveFriendTask(RemoveFriendRunnable grpcRunnable, Activity activity){
+            this.grpcRunnable = grpcRunnable;
+            this.activityReference = new WeakReference<>(activity);
+            this.channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+        }
+
+        /**
+         * Before the Heavy Lifting, invoked on the UI thread to setup the async tasks, Upon completion, doInBackground() follows up
+         */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Naturae.FriendReply doInBackground(Void... nothing) {
+            try {
+                Naturae.FriendReply result = grpcRunnable.run(ServerRequestsGrpc.newBlockingStub(channel));
+                Log.d(TAG, "*Successfully created response*\n");
+                return result;
+            } catch (Exception e) {
+                StringWriter error = new StringWriter();
+                PrintWriter pw = new PrintWriter(error);
+                e.printStackTrace(pw);
+                pw.flush();
+                Log.d(TAG, "doInBackground: Error Exception caught while trying to build a reply: \n" + error);
+                return null;
+            }
+        }
+
+        /**
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Naturae.FriendReply result) {
+            super.onPostExecute(result);
+            Log.d(TAG, "onPostExecute: Made it to onPostExecute");
+
+            if(result != null){
+
+            }
+            else{
+                Helper.alertDialogErrorMessage(activityReference.get(), "Unable to get a reply from the server, please check your connection");
+            }
+            //Callback function
+            listener.onRemoveFriendFinished();
+
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        public void setListener(AsyncTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface AsyncTaskListener {
+            void onRemoveFriendFinished();
+        }
+
+        /**
+         * gRPC runnable for remove friends service
+         */
+        private static class RemoveFriendRunnable {
+            private String sender, receiver;
+
+            /**
+             * Constructor
+             * @param sender    the user list to modify
+             * @param receiver  the user to remove from the friendslist
+             */
+            public RemoveFriendRunnable(String sender, String receiver) {
+                this.sender = sender;
+                this.receiver = receiver;
+            }
+
+            public Naturae.FriendReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+                Naturae.FriendReply reply;
+                //Generate Request as defined by proto definition
+                Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
+                //Send the request to the server and set reply to the server response
+                reply = blockingStub.withDeadlineAfter(2000, TimeUnit.MILLISECONDS).removeFriend(request);
+
+                return reply;
+            }
+        } //End of Async Task Class
+
+    }
+
+    /*************************************************************************************************************************************
+     * ADD Friend gRPC Asynchronous Task
+     */
+    private static class GrpcAddFriendTask extends AsyncTask<Void, Void, Naturae.FriendReply> {
+        private final AddFriendRunnable grpcRunnable;
+        private final WeakReference<Activity> activityReference;
+        private ManagedChannel channel;
+        private AsyncTaskListener listener;
+
+        GrpcAddFriendTask(AddFriendRunnable grpcRunnable, Activity activity){
+            this.grpcRunnable = grpcRunnable;
+            this.activityReference = new WeakReference<>(activity);
+            this.channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+        }
+
+        /**
+         * Before the Heavy Lifting, invoked on the UI thread to setup the async tasks, Upon completion, doInBackground() follows up
+         */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Naturae.FriendReply doInBackground(Void... nothing) {
+            try {
+                Naturae.FriendReply result = grpcRunnable.run(ServerRequestsGrpc.newBlockingStub(channel));
+                Log.d(TAG, "*Successfully created response*\n");
+                return result;
+            } catch (Exception e) {
+                StringWriter error = new StringWriter();
+                PrintWriter pw = new PrintWriter(error);
+                e.printStackTrace(pw);
+                pw.flush();
+                Log.d(TAG, "doInBackground: Error Exception caught while trying to build a reply\n" + error);
+                return null;
+            }
+        }
+
+        /**
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Naturae.FriendReply result) {
+            super.onPostExecute(result);
+
+            if(result != null){
+                //Callback function
+                listener.onAddFriendFinished();
+
+            }
+            else{
+                Helper.alertDialogErrorMessage(activityReference.get(), "Unable to connect to server, please check your connection");
+            }
+
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        public void setListener(AsyncTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface AsyncTaskListener {
+            void onAddFriendFinished();
+        }
+
+        /**
+         * gRPC runnable for remove friends service
+         */
+        private static class AddFriendRunnable {
+            private String sender, receiver;
+
+            /**
+             * Constructor
+             * @param sender    the user list to modify
+             * @param receiver  the user to add
+             */
+            public AddFriendRunnable(String sender, String receiver) {
+                this.sender = sender;
+                this.receiver = receiver;
+            }
+
+            public Naturae.FriendReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+                Naturae.FriendReply reply;
+                //Generate Request as defined by proto definition
+                Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
+                //Send the request to the server and set reply to the server response
+                reply = blockingStub.withDeadlineAfter(2000, TimeUnit.MILLISECONDS).removeFriend(request);
+
+                return reply;
+            }
+        } //End of Async Task Class
+
+    }
 
 }
-
-
-/*
-
-
-private static class AddFriendRunnable implements GrpcRunnable{
-    private String sender, receiver;
-    public AddFriendRunnable(String sender, String receiver){
-        this.sender = sender;
-        this.receiver = receiver;
-    }
-
-    @Override
-    public String run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) {
-        return AddFriend(sender, receiver, blockingStub);
-    }
-
-    private String AddFriend(String sender, String receiver, ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
-        Naturae.FriendReply reply;
-        //Generate Request as defined by proto definition
-        Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
-        //Send the request to the server and set reply to the server response
-        reply = blockingStub.withDeadlineAfter(5000, TimeUnit.MILLISECONDS).addFriend(request);
-        return "";
-    }
-}
-
-
-private static class RemoveFriendRunnable implements GrpcRunnable{
-    private String sender, receiver;
-    public RemoveFriendRunnable(String sender, String receiver){
-        this.sender = sender;
-        this.receiver = receiver;
-    }
-
-    @Override
-    public String run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) {
-        return RemoveFriend(sender, receiver, blockingStub);
-    }
-
-    private String RemoveFriend(String sender, String receiver, ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
-        Naturae.FriendReply reply;
-        //Generate Request as defined by proto definition
-        Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
-        //Send the request to the server and set reply to the server response
-        reply = blockingStub.withDeadlineAfter(5000, TimeUnit.MILLISECONDS).removeFriend(request);
-        return "";
-    }
-}
- */
