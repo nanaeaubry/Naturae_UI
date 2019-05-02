@@ -21,6 +21,7 @@ service ServerRequests{
     rpc ForgetPasswordVerifyCode (ForgetPasswordVerifyCodeRequest) returns (ForgetPasswordVerifyCodeReply){};
     rpc ForgetPasswordResetPassword (ForgetPasswordNewPasswordRequest) returns (ForgetPasswordNewPasswordReply){};
     rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply){};
+	rpc GetProfileImage (ProfileImageRequest) returns (ProfileImageReply){};
 
     /**** Friendslist GRPC Functions ****/
     // Query is sent to the server and a list of matching users is returned
@@ -221,4 +222,14 @@ message ChangePasswordRequest{
 
 message ChangePasswordReply{
     Status status = 1;
+}
+message ProfileImageRequest{
+    string AppKey = 1;
+    string AccessToken = 2;
+    string encodedImage = 3;
+}
+
+message ProfileImageReply{
+    Status status = 1;
+    string encodedImage = 2;
 }
