@@ -1,5 +1,5 @@
 package com.example.naturae_ui.containers;
-//Test changes
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
@@ -42,13 +42,13 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 interface GetPostsCompleted {
-	void onGetPostsCompleted(Naturae.GetPostReply reply);
+	void onGetPostsCompleted(Naturae.GetPostPreviewReply reply);
 }
 
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener,
@@ -115,6 +115,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("post", post);
 		mMapView.setVisibility(View.INVISIBLE);
+		mPreviewFragment.setArguments(bundle);
 		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
@@ -206,14 +207,14 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		//convert from meters to miles
 		int radius = (int) (meterRadius * 0.00062137);
 
-		new GrpcGetPosts(this, cLat, cLng, radius).execute();
+		new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
 	}
 
 	@Override
-	public void onGetPostsCompleted(Naturae.GetPostReply reply) {
+	public void onGetPostsCompleted(Naturae.GetPostPreviewReply reply) {
 		if (reply != null) {
 			if (reply.getStatus().getCode() == Constants.OK) {
-				mGoogleMap.clear();
+//				mGoogleMap.clear();
 				int length = reply.getReplyCount();
 				for (int i = 0; i < length; i++) {
 					Naturae.PostStruct postStruct = reply.getReply(i);
@@ -296,6 +297,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		return true;
 	}
 
+
 	//If the current access token expired then this will request the server to generate a new access token
 	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply>{
 
@@ -340,7 +342,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	}
 
 	//Get posts to put on map
-	private static class GrpcGetPosts extends AsyncTask<Void, Void, Naturae.GetPostReply> {
+	private static class GrpcGetPostPreview extends AsyncTask<Void, Void, Naturae.GetPostPreviewReply> {
 
 		private GetPostsCompleted listener;
 		private ManagedChannel channel;
@@ -348,7 +350,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		private float lng;
 		private int radius;
 
-		public GrpcGetPosts(GetPostsCompleted listener, float lat, float lng, int radius) {
+		public GrpcGetPostPreview(GetPostsCompleted listener, float lat, float lng, int radius) {
 			this.listener = listener;
 			this.lat = lat;
 			this.lng = lng;
@@ -356,19 +358,19 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 
 		@Override
-		protected Naturae.GetPostReply doInBackground(Void... voids) {
-			Naturae.GetPostReply reply;
+		protected Naturae.GetPostPreviewReply doInBackground(Void... voids) {
+			Naturae.GetPostPreviewReply reply;
 			try {
 				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
 				//Create a stub for with the channel
 				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-				Naturae.GetPostRequest request = Naturae.GetPostRequest.newBuilder()
+				Naturae.GetPostPreviewRequest request = Naturae.GetPostPreviewRequest.newBuilder()
 						.setAppKey(Constants.NATURAE_APP_KEY)
 						.setLat(lat)
 						.setLng(lng)
 						.setRadius(radius)
 						.build();
-				reply = stub.getPosts(request);
+				reply = stub.getPostPreview(request);
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
@@ -381,10 +383,17 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		}
 
 		@Override
-		protected void onPostExecute(Naturae.GetPostReply getPostReply) {
-			super.onPostExecute(getPostReply);
-			listener.onGetPostsCompleted(getPostReply);
+		protected void onPostExecute(Naturae.GetPostPreviewReply getPostPreviewReply) {
+			super.onPostExecute(getPostPreviewReply);
+			//Shut down the gRPC channel
+			try {
+				channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			listener.onGetPostsCompleted(getPostPreviewReply);
 		}
 	}
 }
+
 

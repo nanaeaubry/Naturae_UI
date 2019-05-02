@@ -297,7 +297,7 @@ public class PostFragment extends Fragment {
 
 	private static class GrpcCreatePost extends AsyncTask<Void, Void, Naturae.CreatePostReply> {
 
-		private final PostFragment.OnPostListener mListener;
+		private final OnPostListener mListener;
 		private final Post mPost;
 		private final WeakReference<Context> cReference ;
 

@@ -86,7 +86,8 @@
 			android:id="@+id/post_submit"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Post" />
+			android:text="Post"
+			android:background="@color/buttons"/>
 	</LinearLayout>
 
 </LinearLayout>
