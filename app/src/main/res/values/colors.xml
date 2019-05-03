@@ -11,5 +11,6 @@
 	<color name="white">#FFF</color>
 	<color name="colorPrimaryText">#008576</color>
 	<color name="buttons">#88adea</color>
+	<color name="fragmentBackground">#bfc4cc</color>
 
 </resources>
