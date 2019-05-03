@@ -19,7 +19,7 @@
             android:maxHeight="200dp"
             android:maxWidth="200dp"
             android:scaleType="fitXY"
-            android:background="@color/cardview_light_background"
+            android:background="@color/white"
             tools:srcCompat="@tools:sample/avatars[0]" />
 
         <TextView
@@ -42,7 +42,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
                 android:text="Change Password"
-                android:backgroundTint="@color/buttons"/>
+                android:backgroundTint="@color/colorPrimary"/>
 
             <Button
                 android:id="@+id/btLogout"
@@ -51,7 +51,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
                 android:text="Logout"
-                android:backgroundTint="@color/buttons"/>
+                android:backgroundTint="@color/colorPrimary"/>
         </LinearLayout>
 
     </LinearLayout>
