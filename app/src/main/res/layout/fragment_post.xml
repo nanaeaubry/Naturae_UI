@@ -4,28 +4,27 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical"
 	android:layout_above="@+id/navigation"
-	android:background="@color/lightGray">
+	android:background="@color/white">
 
 	<LinearLayout
-		android:layout_width="280dp"
-		android:layout_height="280dp"
+		android:layout_width="304dp"
+		android:layout_height="wrap_content"
 		android:layout_gravity="center"
-		android:paddingTop="10dp"
-		>
+		android:gravity="center"
+		android:orientation="vertical">
 
 		<ImageView
 			android:id="@+id/image_preview"
-			android:layout_width="280dp"
-			android:layout_height="280dp"
+			android:layout_width="300dp"
+			android:layout_height="300dp"
 			android:adjustViewBounds="true"
-			android:rotation="0"
-			android:scaleType="fitXY"
-			android:visibility="gone" />
+			android:padding="20dp"
+			android:scaleType="fitCenter" />
 	</LinearLayout>
 
 	<LinearLayout
-		android:layout_width="373dp"
-		android:layout_height="350dp"
+		android:layout_width="300dp"
+		android:layout_height="300dp"
 		android:layout_gravity="center"
 		android:gravity="center"
 		android:orientation="vertical"
@@ -43,16 +42,20 @@
 			<ImageButton
 				android:id="@+id/open_camera"
 				android:layout_width="126dp"
-				android:layout_height="wrap_content"
+				android:layout_height="50dp"
 				android:clickable="true"
-				android:src="@drawable/ic_photo_camera_black_24dp" />
+				android:src="@drawable/ic_photo_camera_black_24dp"
+				android:background="@color/colorPrimary"
+				android:tint="@color/white"/>
 
 			<ImageButton
 				android:id="@+id/open_photos"
 				android:layout_width="116dp"
-				android:layout_height="wrap_content"
+				android:layout_height="50dp"
 				android:clickable="true"
-				android:src="@drawable/ic_file_upload_black_24dp" />
+				android:src="@drawable/ic_file_upload_black_24dp"
+				android:background="@color/colorPrimary"
+				android:tint="@color/white"/>
 		</LinearLayout>
 
 		<AutoCompleteTextView
@@ -62,32 +65,33 @@
 			android:hint="Title"
 			android:inputType="textNoSuggestions"
 			android:maxLines="1"
-			android:textColor="@color/colorPrimary" />
+			android:textColor="@color/colorPrimaryText" />
 
 		<AutoCompleteTextView
 			android:id="@+id/post_species"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:hint="species"
+			android:hint="Species"
 			android:inputType="textNoSuggestions"
 			android:maxLines="2"
-			android:textColor="@color/colorPrimary" />
+			android:textColor="@color/colorPrimaryText" />
 
 		<AutoCompleteTextView
 			android:id="@+id/post_description"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:hint="description"
+			android:hint="Description"
 			android:inputType="textNoSuggestions"
 			android:maxLines="4"
-			android:textColor="@color/colorPrimary" />
+			android:textColor="@color/colorPrimaryText" />
 
 		<Button
 			android:id="@+id/post_submit"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Post"
-			android:background="@color/buttons"/>
+			android:background="@color/colorPrimary"
+			android:textColor="@color/white"/>
 	</LinearLayout>
 
 </LinearLayout>
