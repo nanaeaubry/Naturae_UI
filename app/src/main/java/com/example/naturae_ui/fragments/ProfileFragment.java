@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.containers.MainActivityContainer;
@@ -46,7 +47,7 @@ import io.grpc.ManagedChannelBuilder;
 
 import static com.example.naturae_ui.fragments.PostFragment.REQUEST_IMAGE_CAPTURE;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment{
     public final static int PICK_PHOTO = 1046;
     View mView;
     EditText firstName;
@@ -63,6 +64,7 @@ public class ProfileFragment extends Fragment {
     ImageView imagePreview;
     File photoFile;
     Uri photoFileUri;
+    Bitmap mSelectedImage = null;
 
 
     @Nullable
@@ -93,6 +95,13 @@ public class ProfileFragment extends Fragment {
                 // Bring up gallery to select a photo
                 startActivityForResult(intent, PICK_PHOTO);
             }
+
+            //Make image a byte array to store in server
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
         });
         bLogout = mView.findViewById(R.id.btLogout);
         bLogout.setOnClickListener(v -> {
@@ -140,11 +149,11 @@ public class ProfileFragment extends Fragment {
                 try {
 
                     Uri photoUri = data.getData();
-                    selectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+                    mSelectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
 
                     // Load the selected image into a preview
                     imagePreview.setVisibility(View.VISIBLE);
-                    imagePreview.setImageBitmap(selectedImage);
+                    imagePreview.setImageBitmap(mSelectedImage);
 
                     readExif(photoUri);
 
@@ -155,13 +164,13 @@ public class ProfileFragment extends Fragment {
 
             case REQUEST_IMAGE_CAPTURE:
                 // by this point we have the camera photo on disk
-                selectedImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                mSelectedImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
 
                 // RESIZE BITMAP, see section below
                 // Load the taken image into a preview
                 ImageView imagePreview = mView.findViewById(R.id.image_preview);
                 imagePreview.setVisibility(View.VISIBLE);
-                imagePreview.setImageBitmap(selectedImage);
+                imagePreview.setImageBitmap(mSelectedImage);
 
                 readExif(photoFileUri);
                 break;
@@ -203,10 +212,12 @@ public class ProfileFragment extends Fragment {
         private final OnFragmentInteractionListener mListener;
         private final WeakReference<Activity> activity;
         private ManagedChannel channel;
+        private String mEncodedImage;
 
-        private GrpcProfileImage(OnFragmentInteractionListener mListener, Activity activity) {
+        private GrpcProfileImage(OnFragmentInteractionListener mListener, Activity activity, String encodedImage) {
             this.mListener = mListener;
             this.activity = new WeakReference<>(activity);
+            this.mEncodedImage = encodedImage;
         }
 
         @Override
@@ -217,14 +228,11 @@ public class ProfileFragment extends Fragment {
                 channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
                 //Create a stub for with the channel
                 ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-
                 //Create an gRPC create account request
                 Naturae.ProfileImageRequest request = Naturae.ProfileImageRequest.newBuilder()
                         .setAppKey(Constants.NATURAE_APP_KEY)
-                        .setAccessToken(UserUtilities.getAccessToken(activity.get())).build();
-                        //todo
-
-
+                        .setAccessToken(UserUtilities.getAccessToken(activity.get()))
+                        .setEncodedImage(mEncodedImage).build();
                 //Send the request to the server and set reply to equal the response back from the server
                 reply = stub.getProfileImage(request);
 
@@ -253,11 +261,10 @@ public class ProfileFragment extends Fragment {
             if (reply != null) {
 
             } else {
+                displayError((String) activity.get().getText(R.string.internet_connection));
 
             }
-
         }
-
         /**
          * Create an dialog box that display the error
          *
@@ -270,7 +277,6 @@ public class ProfileFragment extends Fragment {
                 dialog.cancel();
             }).show();
         }
-
     }
 }
 
