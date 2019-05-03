@@ -53,8 +53,8 @@ public class ChatFragment extends Fragment implements RoomListener {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
-        //thisUser = new MemberData(UserUtilities.getEmail(getContext()));
-        thisUser = new MemberData("limstevenlbw@gmail.com");
+        //thisUser = new MemberData("limstevenlbw@gmail.com");
+        thisUser = new MemberData(UserUtilities.getEmail(getContext()));
         chatlog = new LinkedList<ChatMessage>();
 
         scaledrone = new Scaledrone(channelID, thisUser);
@@ -110,7 +110,6 @@ public class ChatFragment extends Fragment implements RoomListener {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
-                    Log.d(TAG, "onEditorAction: HELLO");
                     sendMessage();
                     return true;
                 }
@@ -198,16 +197,18 @@ public class ChatFragment extends Fragment implements RoomListener {
 
             //Check if the username matches the current user
             boolean isSentByUser = user.getUsername().equals(thisUser.getUsername());
-
+            long timestamp = receivedMessage.getTimestamp();
             //Construct a new chat message from the received data
-            final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), "timestamp", isSentByUser);
+            final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), timestamp, isSentByUser);
             Log.d(TAG, "onMessage: " + message.getMessageBody());
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     adapter.add(message);
-                    adapter.notifyItemInserted(0);
+                    //adapter.notifyItemInserted(0);
+                    //Although inefficient, we refresh the entire list to update timestamps everytime
+                    adapter.notifyDataSetChanged();
 
                 }
             });
