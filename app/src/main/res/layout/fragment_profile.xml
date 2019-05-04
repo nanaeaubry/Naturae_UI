@@ -20,7 +20,7 @@
             android:maxWidth="200dp"
             android:scaleType="fitXY"
             android:background="@color/white"
-            tools:srcCompat="@tools:sample/avatars[0]" />
+            android:src="@drawable/ic_person_black_24dp" />
 
         <TextView
             android:id="@+id/tvProfileName"

@@ -99,14 +99,12 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	// Show map when selected on bottom navigation
 	private void showMap() {
 		mMapView.setVisibility(View.VISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
 	}
 
 	// Show post when selected on bottom navigation
 	private void showPost() {
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPostFragment).commit();
 	}
 
@@ -116,21 +114,18 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		bundle.putParcelable("post", post);
 		mMapView.setVisibility(View.INVISIBLE);
 		mPreviewFragment.setArguments(bundle);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
 
 	// Show chat when selected on bottom navigation
 	private void showChat() {
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mChatFragment).commit();
 	}
 
 	// Show profile when selected on bottom navigation
 	private void showProfile() {
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mProfileFragment).commit();
 
 	}
@@ -211,7 +206,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	public void onGetPostsCompleted(Naturae.GetPostPreviewReply reply) {
 		if (reply != null) {
 			if (reply.getStatus().getCode() == Constants.OK) {
-//				mGoogleMap.clear();
+				mGoogleMap.clear();
 				int length = reply.getReplyCount();
 				for (int i = 0; i < length; i++) {
 					Naturae.PostStruct postStruct = reply.getReply(i);
