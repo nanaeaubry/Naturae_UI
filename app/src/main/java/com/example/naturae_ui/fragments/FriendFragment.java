@@ -1,8 +1,10 @@
 package com.example.naturae_ui.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -12,11 +14,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.models.Friend;
@@ -27,31 +32,39 @@ import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 import com.google.android.gms.tasks.Task;
-
+import android.view.View.OnTouchListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 public class FriendFragment extends Fragment {
     private static final String TAG = "FriendFragment";
+    private String USERNAME;
     private FriendAdapter adapter;
     private List<Friend> friendsList;
     private List<Friend> searchedFriendsList;
     private String searchQuery;
     private TextInputEditText searchFieldInput;
     private TextView emptyView;
+    private TextView friendsListTitle;
     private RecyclerView recyclerView;
     private Button returnButton;
     private View removeButton;
     private View sortButton;
+    private ConstraintLayout layout;
+
+    //Cache to define user sort preferences, false means sort in A-Z normal order
+    private boolean sortListReverse;
     /**
      * Called to do initial creation of a fragment. This is called after onAttach(Activity) and before onCreateView
      * Note that this can be called while the fragment's activity is still in the process of being created.
@@ -61,6 +74,19 @@ public class FriendFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendsList = new ArrayList<Friend>();
+
+        //Testing purposes
+        try{
+            USERNAME = UserUtilities.getEmail(getContext());
+        }
+        catch(NullPointerException e){
+
+        }
+        if(USERNAME == null){
+            //Insert your username here
+            USERNAME = "limstevenlbw@gmail.com";
+        }
+
     }
 
     /**
@@ -76,13 +102,17 @@ public class FriendFragment extends Fragment {
         searchFieldInput = view.findViewById(R.id.search_field_input);
         emptyView = view.findViewById(R.id.empty_view);
         recyclerView = view.findViewById(R.id.friend_recycler);
-        adapter = new FriendAdapter(getContext(), friendsList);
+        friendsListTitle = view.findViewById(R.id.title_friend);
+
+        //Define adapter
+        adapter = new FriendAdapter(getContext(), friendsList, "default");
 
         //Bottom Toolbar
         returnButton = view.findViewById(R.id.viewFriendsButton);
         removeButton = view.findViewById(R.id.removeFriend);
         sortButton = view.findViewById(R.id.sortFriend);
 
+        //Setup Recycler View initial properties
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -90,7 +120,136 @@ public class FriendFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),
                 DividerItemDecoration.VERTICAL));
 
-        //SEARCH FIELD EVENT HANDLER DEFINITION
+        /**
+         * SEARCH HANDLER FOR RETRIEVING THE INITIAL FRIENDS LIST, GET FRIENDS
+         */
+        GrpcSearchFriendsTask buildList = new GrpcSearchFriendsTask(new GrpcSearchFriendsTask.SearchFriendsRunnable(USERNAME, "empty"), getActivity());
+        buildList.setListener(new GrpcSearchFriendsTask.AsyncTaskListener() {
+            @Override
+            public void onSearchFriendsFinished(List<Friend> newFriendsList) {
+                //Update dataset
+                friendsList = new ArrayList<>(newFriendsList);
+
+                if(friendsList.isEmpty()){
+                    //Show the empty list
+                    emptyView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    sortListReverse = UserUtilities.getSortListReverse(getContext());
+                    Collections.sort(friendsList);
+                    if(sortListReverse){
+                        Collections.reverse(friendsList);
+                    }
+                    adapter.displayNewList(friendsList);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                    displayFriendsList();
+                }
+
+            }
+        });
+        buildList.execute();
+
+        //Defining Handlers
+
+        /**
+         * Define Return button
+         */
+        returnButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Toggle visibility of return button, show friendslist on click
+             * @param v the button that was selected
+             */
+            public void onClick(View v) {
+                adapter = new FriendAdapter(getContext(), friendsList, "default");
+                recyclerView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+                returnButton.setVisibility(View.GONE);
+                removeButton.setVisibility(View.VISIBLE);
+                sortButton.setVisibility(View.VISIBLE);
+                friendsListTitle.setText("Your Friends");
+
+                //Hide the list if the friendslist was empty
+                if(friendsList.isEmpty() && emptyView.getVisibility() == View.GONE){
+                    emptyView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
+
+                displayFriendsList();
+            }
+        });
+
+        /**
+         * Toggle Remove Friends Mode
+         */
+        removeButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             *
+             * @param v the button that was selected
+             */
+            public void onClick(View v) {
+                FriendAdapter tempAdapter = new FriendAdapter(getContext(), friendsList, "remove");
+                recyclerView.setAdapter(tempAdapter);
+
+                //Show return button
+                //tempAdapter.displayNewList(friendsList);
+                returnButton.setVisibility(View.VISIBLE);
+                removeButton.setVisibility(View.GONE);
+                sortButton.setVisibility(View.GONE);
+                friendsListTitle.setText("Select Users to Remove");
+
+                //ONCLICK EVENT DEFINITION REMOVE A FRIEND
+                tempAdapter.setClickListener(new FriendAdapter.ClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position, Friend friend) {
+                        Log.d(TAG, "onItemClick: TEST: " + position + " " + friend.getName());
+                        GrpcRemoveFriendTask removeFriend = new GrpcRemoveFriendTask(new GrpcRemoveFriendTask.RemoveFriendRunnable(USERNAME, friend.getName()), getActivity());
+                        removeFriend.setListener(new GrpcRemoveFriendTask.AsyncTaskListener(){
+                            @Override
+                            public void onRemoveFriendFinished() {
+                                Log.d(TAG, "onRemoveFriendFinished: ");
+                                friendsList.remove(friend);
+                                tempAdapter.notifyItemRemoved(position);
+
+                                Toast.makeText(getContext(), friend.getName() + " removed!", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                        removeFriend.execute();
+                    }
+                });
+
+            }
+        });
+
+        /**
+         * Define Sort Button function
+         */
+        sortButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Toggle sort button preference, cache the preference
+             * @param v the button that was selected
+             */
+            public void onClick(View v) {
+                Log.d(TAG, "onFriendClick position: " + "UH SORT BUTTON ACTIVATED");
+                sortListReverse = UserUtilities.getSortListReverse(getContext());
+                UserUtilities.cacheSortFriendsList(getContext(), !sortListReverse);
+                Log.d(TAG, "onFriendClick position: stored cache" + sortListReverse);
+                Collections.sort(friendsList);
+
+                if(sortListReverse){
+                    Collections.reverse(friendsList);
+                }
+                adapter.displayNewList(friendsList);
+                displayFriendsList();
+            }
+        });
+
+
+        /**
+         * SEARCH FIELD EVENT HANDLER DEFINITION FOR ADDING FRIENDS
+         */
         searchFieldInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -99,91 +258,93 @@ public class FriendFragment extends Fragment {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
                     //Retrieve the query the user typed
                     searchQuery = searchFieldInput.getText().toString().trim();
+                    //Execute only if the field is valid
+                    if(searchQuery.length() > 3){
+                        GrpcSearchUsersTask search = new GrpcSearchUsersTask(new GrpcSearchUsersTask.SearchUsersRunnable("", searchQuery), getActivity());
+                        search.setListener(new GrpcSearchUsersTask.AsyncTaskListener() {
+                            @Override
+                            public void onSearchTaskFinished(List<Friend> searchedFriendsList) {
+                                friendsListTitle.setText("Select Users to Add");
+                                adapter = new FriendAdapter(getContext(), searchedFriendsList, "add");
+                                //adapter.displayNewList(searchedFriendsList);
+                                recyclerView.setAdapter(adapter);
 
-                    GrpcSearchUsersTask search = new GrpcSearchUsersTask(new GrpcSearchUsersTask.SearchUsersRunnable("", searchQuery), getActivity());
-                    search.setListener(new GrpcSearchUsersTask.AsyncTaskListener() {
-                        @Override
-                        public void onSearchTaskFinished(List<Friend> searchedFriendsList) {
-                            // update UI in Activity here
-
-                            // adapter.setListItemViewType("add");
-                            adapter.displayNewList(searchedFriendsList);
-                            returnButton.setVisibility(View.VISIBLE);
-                            removeButton.setVisibility(View.GONE);
-                            sortButton.setVisibility(View.GONE);
-
-                            returnButton.setOnClickListener(new View.OnClickListener() {
-                                /**
-                                 * Toggle visibility of remove button, show friendslist on click
-                                 * @param v the button that was selected
-                                 */
-                                public void onClick(View v) {
-                                    adapter.displayNewList(friendsList);
-                                    returnButton.setVisibility(View.GONE);
-                                    removeButton.setVisibility(View.VISIBLE);
-                                    sortButton.setVisibility(View.VISIBLE);
+                                //Show list if the friendslist was empty
+                                if(emptyView.getVisibility() == View.VISIBLE){
+                                    emptyView.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
                                 }
-                            });
 
-                            adapter.setClickListener(new FriendAdapter.ClickListener() {
-                                /**
-                                 *
-                                 * @param view
-                                 * @param position
-                                 * @param friend
-                                 */
-                                @Override
-                                public void onItemClick(View view, int position, Friend friend) {
-                                    Log.d(TAG, "onFriendClick position: " + position);
-                                }
-                            });
-                        }
-                    });
-
-                    search.execute();
-                    //Do something with searched friend's list
+                                returnButton.setVisibility(View.VISIBLE);
+                                removeButton.setVisibility(View.GONE);
+                                sortButton.setVisibility(View.GONE);
+                                adapter.setClickListener(new FriendAdapter.ClickListener() {
+                                    /**
+                                     * When the client user clicks a user in the searched list, send a request to add them
+                                     * @param view
+                                     * @param position
+                                     * @param friend
+                                     */
+                                    @Override
+                                    public void onItemClick(View view, int position, Friend friend) {
+                                        Log.d(TAG, "onItemClick: Adding this friend ->" + friend.getName());
+                                        GrpcAddFriendTask addFriend = new GrpcAddFriendTask(new GrpcAddFriendTask.AddFriendRunnable(USERNAME, friend.getName()), getActivity());
+                                        addFriend.setListener(new GrpcAddFriendTask.AsyncTaskListener(){
+                                            @Override
+                                            public void onAddFriendFinished() {
+                                                Log.d(TAG, "onAddFriendFinished: ");
+                                                searchedFriendsList.remove(friend);
+                                                adapter.notifyItemRemoved(position);
+                                                friendsList.add(friend);
+                                                Toast.makeText(getContext(), friend.getName() + " added!",Toast.LENGTH_SHORT).show();                                              }
+                                        });
+                                        addFriend.execute();
+                                    }
+                                });
+                            }
+                        });
+                        search.execute();
+                    }
+                    else{
+                        return true;
+                    }
+                    //Clear the search field
                     searchFieldInput.getText().clear();
                 }
                 return false;
             }
         });
 
+        //Set close keyboard event to main layout and recycler view
+        layout = view.findViewById(R.id.friends_layout);
 
-        //EXECUTE gRPC SEARCH USER TASK
-        //GrpcSearchFriendsTask buildList = new GrpcSearchFriendsTask(new GrpcSearchFriendsTask.SearchUsersRunnable("limstevenlbw@gmail.com", "empty"), getActivity());
-        GrpcSearchFriendsTask buildList = new GrpcSearchFriendsTask(new GrpcSearchFriendsTask.SearchUsersRunnable(UserUtilities.getEmail(getContext()), "empty"), getActivity());
-        buildList.setListener(new GrpcSearchFriendsTask.AsyncTaskListener() {
+        layout.setOnTouchListener(new View.OnTouchListener(){
             @Override
-            public void onSearchFriendsFinished(List<Friend> newFriendsList) {
-                //Update dataset
-                friendsList = new ArrayList<>(newFriendsList);
-                if(friendsList.isEmpty()){
-                    //Show the empty list
-                    emptyView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                }
-                else{
-                    //todo
-                    //Describe itemviewtypes in adapter
-                    adapter.displayNewList(friendsList);
-                 //   adapter.setListItemViewType("default");
-                    displayFriendsList();
-                }
-
+            public boolean onTouch(View v, MotionEvent event) {
+                InputMethodManager imm = (InputMethodManager)getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                return false;
             }
         });
-        buildList.execute();
+
+        recyclerView.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                InputMethodManager imm = (InputMethodManager)getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                return false;
+            }
+        });
+
 
         return view;
     }
 
     /**
-     * Sets up the default friend's list view
+     * Sets up the default friend's list view onclick event
      */
     public void displayFriendsList(){
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyView.setVisibility(View.GONE);
-
+            friendsListTitle.setText("Your Friends");
             //ONCLICK EVENT DEFINITION
             adapter.setClickListener(new FriendAdapter.ClickListener() {
                 @Override
@@ -291,8 +452,6 @@ public class FriendFragment extends Fragment {
                             usersList.add(new Friend(result.getUsersList().get(i)));
                         }
                     }
-                    //String foundUser = result.getUsersList().get(0);
-                   // Helper.alertDialogErrorMessage(activityReference.get(), "Add User: " + foundUser + "?");
 
                     //If yes, update friend's list
                     if (listener != null) {
@@ -303,14 +462,13 @@ public class FriendFragment extends Fragment {
             }
             else{
                 //Placeholder test
-                /*
                 List<Friend> searchedFriendsList = new ArrayList<Friend>();
                 searchedFriendsList.add(new Friend("Alex"));
                 searchedFriendsList.add(new Friend("Anita"));
+
                 if (listener != null) {
                     listener.onSearchTaskFinished(searchedFriendsList);
                 }
-                */
 
                 Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to connect with the server, please check your connection");
             }
@@ -378,12 +536,12 @@ public class FriendFragment extends Fragment {
      *  -Result, the type of the result of the background computation
      */
     private static class GrpcSearchFriendsTask extends AsyncTask<Void, Void, Naturae.UserListReply> {
-        private final SearchUsersRunnable grpcRunnable;
+        private final SearchFriendsRunnable grpcRunnable;
         private final WeakReference<Activity> activityReference;
         private ManagedChannel channel;
         private AsyncTaskListener listener;
 
-        GrpcSearchFriendsTask(SearchUsersRunnable grpcRunnable, Activity activity){
+        GrpcSearchFriendsTask(SearchFriendsRunnable grpcRunnable, Activity activity){
             this.grpcRunnable = grpcRunnable;
             this.activityReference = new WeakReference<>(activity);
             this.channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
@@ -422,7 +580,7 @@ public class FriendFragment extends Fragment {
                 }
             }
             else{
-               /*
+
                 Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
                 friendsList.add(new Friend("Jimmy"));
                 friendsList.add(new Friend("Trung"));
@@ -432,7 +590,7 @@ public class FriendFragment extends Fragment {
                 friendsList.add(new Friend("Catherine"));
                 friendsList.add(new Friend("Josh"));
                 friendsList.add(new Friend("Colin"));
-                */
+
                 Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve your friend's list, please check your connection");
             }
             //Callback function
@@ -458,7 +616,7 @@ public class FriendFragment extends Fragment {
          *  GRPC Service
          *  Query is sent to the server and a list of matching users is returned
          */
-        private static class SearchUsersRunnable {
+        private static class SearchFriendsRunnable {
             private String user, query;
 
             /**
@@ -466,7 +624,7 @@ public class FriendFragment extends Fragment {
              * @param user the username of the current user of the client
              * @param query the search query inputted by the current user
              */
-            public SearchUsersRunnable(String user, String query){
+            public SearchFriendsRunnable(String user, String query){
                 this.user = user;
                 this.query = query;
             }
@@ -529,7 +687,7 @@ public class FriendFragment extends Fragment {
         }
 
         /**
-         *
+         * Need to remove the entry from friendslist and update the view accordingly
          * @param result
          */
         @Override
@@ -538,13 +696,12 @@ public class FriendFragment extends Fragment {
             Log.d(TAG, "onPostExecute: Made it to onPostExecute");
 
             if(result != null){
-
+                //Callback function
+                listener.onRemoveFriendFinished();
             }
             else{
                 Helper.alertDialogErrorMessage(activityReference.get(), "Unable to get a reply from the server, please check your connection");
             }
-            //Callback function
-            listener.onRemoveFriendFinished();
 
             //Shut down the gRPC channel
             try {
@@ -583,7 +740,7 @@ public class FriendFragment extends Fragment {
                 //Generate Request as defined by proto definition
                 Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
                 //Send the request to the server and set reply to the server response
-                reply = blockingStub.withDeadlineAfter(2000, TimeUnit.MILLISECONDS).removeFriend(request);
+                reply = blockingStub.removeFriend(request);
 
                 return reply;
             }
@@ -618,14 +775,14 @@ public class FriendFragment extends Fragment {
         protected Naturae.FriendReply doInBackground(Void... nothing) {
             try {
                 Naturae.FriendReply result = grpcRunnable.run(ServerRequestsGrpc.newBlockingStub(channel));
-                Log.d(TAG, "*Successfully created response*\n");
+                Log.d(TAG, "*Successfully created add friend response*\n");
                 return result;
             } catch (Exception e) {
                 StringWriter error = new StringWriter();
                 PrintWriter pw = new PrintWriter(error);
                 e.printStackTrace(pw);
                 pw.flush();
-                Log.d(TAG, "doInBackground: Error Exception caught while trying to build a reply\n" + error);
+                Log.d(TAG, "doInBackground: Error Exception caught while trying to build an add friend reply\n" + error);
                 return null;
             }
         }
@@ -641,10 +798,10 @@ public class FriendFragment extends Fragment {
             if(result != null){
                 //Callback function
                 listener.onAddFriendFinished();
-
             }
             else{
-                Helper.alertDialogErrorMessage(activityReference.get(), "Unable to connect to server, please check your connection");
+                Log.d(TAG, "onPostExecute: error: " +  result.getStatus().getMessage());
+                Helper.alertDialogErrorMessage(activityReference.get(), "Unable to add this friend, please check your connection");
             }
 
             //Shut down the gRPC channel
@@ -684,7 +841,7 @@ public class FriendFragment extends Fragment {
                 //Generate Request as defined by proto definition
                 Naturae.FriendRequest request = Naturae.FriendRequest.newBuilder().setSender(sender).setReceiver(receiver).build();
                 //Send the request to the server and set reply to the server response
-                reply = blockingStub.withDeadlineAfter(2000, TimeUnit.MILLISECONDS).removeFriend(request);
+                reply = blockingStub.addFriend(request);
 
                 return reply;
             }

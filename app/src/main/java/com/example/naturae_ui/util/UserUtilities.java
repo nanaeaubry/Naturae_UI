@@ -16,6 +16,7 @@ public class UserUtilities {
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
     private static final String IS_LOGGED_IN = "isLoggedIn";
+    private static final String SORT_LIST_REVERSE = "sortListReverse";
 
 
     /**
@@ -41,6 +42,21 @@ public class UserUtilities {
         editor.putString(LAST_NAME, user.getLastName());
         //Cache if the ser is logged in
         editor.putBoolean(IS_LOGGED_IN, true);
+        // Apply the changes
+        editor.apply();
+    }
+
+    /**
+     *  Caches the user's sort preference for friendslist
+     */
+    public static void cacheSortFriendsList(Context context, boolean sortListReverse){
+        // Retrieve the user's shared preferences folder
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        // Grab the editor to change the information currently stored in the User's shared preferences
+        SharedPreferences.Editor editor = userPreferences.edit();
+        // Cache the user's friendslist sort preference
+        editor.putBoolean(SORT_LIST_REVERSE, sortListReverse);
+
         // Apply the changes
         editor.apply();
     }
@@ -169,6 +185,20 @@ public class UserUtilities {
     public static String getRefreshToken(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
         return userPreferences.getString(REFRESH_TOKEN, null);
+    }
+
+    /**
+     * Retrieves the user's sort preference, returns false if preference is not defined
+     * @return the sort preference either true or false
+     */
+    public static boolean getSortListReverse(Context context){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        try{
+            return userPreferences.getBoolean(SORT_LIST_REVERSE, false);
+        }
+        catch(NullPointerException e){
+            return false;
+        }
     }
 
 }
