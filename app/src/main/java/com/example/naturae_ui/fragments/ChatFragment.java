@@ -1,6 +1,8 @@
 package com.example.naturae_ui.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +20,8 @@ import com.example.naturae_ui.models.Friend;
 import com.example.naturae_ui.models.MemberData;
 import com.example.naturae_ui.util.*;
 import com.example.naturae_ui.R;
+import com.examples.naturaeproto.Naturae;
+import com.examples.naturaeproto.ServerRequestsGrpc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scaledrone.lib.Listener;
@@ -28,8 +32,17 @@ import com.scaledrone.lib.Scaledrone;
 import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 
 
 /**
@@ -232,5 +245,86 @@ public class ChatFragment extends Fragment implements RoomListener {
         }
 
     }
+
+    /**
+     *
+     */
+    private static class GrpcGetRoomTask extends AsyncTask<Void, Void, Naturae.RoomReply> {
+        private final GetRoomRunnable grpcRunnable;
+        private final WeakReference<Activity> activityReference;
+        private ManagedChannel channel;
+        private AsyncTaskListener listener;
+
+        GrpcGetRoomTask(GetRoomRunnable grpcRunnable, Activity activity){
+            this.grpcRunnable = grpcRunnable;
+            this.activityReference = new WeakReference<>(activity);
+            this.channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+        }
+
+        @Override
+        protected Naturae.RoomReply doInBackground(Void... nothing) {
+            try {
+                Naturae.RoomReply result = grpcRunnable.run(ServerRequestsGrpc.newBlockingStub(channel));
+                Log.d(TAG, "*Successfully created Room Reply response*\n");
+                return result;
+            } catch (Exception e) {
+                StringWriter error = new StringWriter();
+                PrintWriter pw = new PrintWriter(error);
+                e.printStackTrace(pw);
+                pw.flush();
+                Log.d(TAG, "doInBackground: Error Exception caught while trying to build a Room Reply: \n" + error);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Naturae.RoomReply result) {
+            super.onPostExecute(result);
+
+            if(result != null){
+
+            }
+            else{
+                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve your friend's list, please check your connection");
+            }
+            //Callback function
+            listener.onGetRoomFinished();
+
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        public void setListener(AsyncTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface AsyncTaskListener {
+            void onGetRoomFinished();
+        }
+
+        private static class GetRoomRunnable {
+            private String user, query;
+
+            public GetRoomRunnable(String user, String query){
+
+            }
+            // gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply)
+            public Naturae.RoomReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+                Naturae.RoomReply reply;
+                //Generate Request as defined by proto definition
+                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1("").setUserOwner1("").build();
+
+                //Send the request to the server and set reply to the server response
+                reply = blockingStub.getRoomName(request);
+                //withDeadlineAfter(15000, TimeUnit.MILLISECONDS)
+                return reply;
+            }
+        }
+    } //End of Async Task Class
+
 
 }

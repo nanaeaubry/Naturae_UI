@@ -5,7 +5,11 @@
     android:id="@+id/friends_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    >
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline2"
@@ -123,11 +127,12 @@
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
         android:scaleType="centerInside"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sortFriend"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewFriendsButton" />
+        app:layout_constraintTop_toBottomOf="@+id/viewFriendsButton"
+        app:layout_constraintVertical_bias="0.066" />
 
     <View
         android:id="@+id/sortFriend"
@@ -140,11 +145,12 @@
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:scaleType="centerInside"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/removeFriend"
-        app:layout_constraintTop_toBottomOf="@+id/viewFriendsButton" />
+        app:layout_constraintTop_toBottomOf="@+id/viewFriendsButton"
+        app:layout_constraintVertical_bias="0.076" />
 
     <Button
         android:id="@+id/viewFriendsButton"
