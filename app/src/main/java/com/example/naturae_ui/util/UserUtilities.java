@@ -192,8 +192,8 @@ public class UserUtilities {
      * @return the sort preference either true or false
      */
     public static boolean getSortListReverse(Context context){
-        SharedPreferences userPreferences = getUserSharedPreferences(context);
         try{
+            SharedPreferences userPreferences = getUserSharedPreferences(context);
             return userPreferences.getBoolean(SORT_LIST_REVERSE, false);
         }
         catch(NullPointerException e){
