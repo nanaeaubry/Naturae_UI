@@ -26,10 +26,11 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
      * @param context
      * @param friendsList
      */
-    public FriendAdapter(Context context, List<Friend> friendsList){
+    public FriendAdapter(Context context, List<Friend> friendsList, String listItemViewType ){
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.friendsList = friendsList;
+        this.listItemViewType = listItemViewType;
     }
 
     /**
@@ -84,7 +85,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
             avatar = userView.findViewById(R.id.friend_avatar);
             addFriendButton = userView.findViewById(R.id.addFriendItem);
             removeFriendButton = userView.findViewById(R.id.removeFriendItem);
-    /*
+
             switch(listItemViewType){
                 case "add":
                     addFriendButton.setVisibility(View.VISIBLE);
@@ -94,12 +95,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
                     removeFriendButton.setVisibility(View.VISIBLE);
                     addFriendButton.setVisibility(View.INVISIBLE);
                     break;
-                default:
-                    addFriendButton.setVisibility(View.INVISIBLE);
-                    removeFriendButton.setVisibility(View.INVISIBLE);
-                    break;
             }
-            */
+
             //Registers a callback to be invoked when this item is clicked
             userView.setOnClickListener(this);
         }
@@ -139,10 +136,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     /**
      * Determine the type of list item to display in the recycler view
-     * "remove" "add" "default"
-     * @param type
+     * "remove", "add", "default"
+     * @return type
      */
-    public void setListItemViewType(String type){
-        listItemViewType = type;
+    public String getViewType(String type) {
+        return listItemViewType;
     }
 }

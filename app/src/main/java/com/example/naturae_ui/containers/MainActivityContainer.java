@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,12 +18,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.fragments.LoginFragment;
-import com.example.naturae_ui.fragments.MapFragment;
+import com.example.naturae_ui.fragments.MapSearchFragment;
 import com.example.naturae_ui.fragments.FriendFragment;
 import com.example.naturae_ui.fragments.PostFragment;
 import com.example.naturae_ui.fragments.PreviewFragment;
@@ -31,6 +36,7 @@ import com.example.naturae_ui.util.Constants;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -42,9 +48,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
@@ -55,7 +63,8 @@ interface GetPostsCompleted {
 }
 
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener,
-		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted, ProfileFragment.OnFragmentInteractionListener {
+		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted, ProfileFragment.OnFragmentInteractionListener,
+    MapSearchFragment.OnDataPass {
 
 	public static final int REQUEST_LOCATION_PERMISSION = 99;
 
@@ -95,7 +104,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
 		// Create fragments
-		mMapFragment = new MapFragment();
+		mMapFragment = new MapSearchFragment();
 		mPostFragment = new PostFragment();
 		mProfileFragment = new ProfileFragment();
 		mChatFragment = new FriendFragment();
@@ -109,7 +118,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 			mMapView.onResume();
 			mMapView.getMapAsync(this);
 		}
-
+		mMapView.requestFocus();
 		mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
 	}
@@ -220,10 +229,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 				diagonalDistance
 		);
 
-		int meterRadius = (int) diagonalDistance[0] / 2;
-
-		//convert from meters to miles
-		int radius = (int) (meterRadius * 0.00062137);
+		int radius = (int) diagonalDistance[0] / 2;
 
 		new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
 	}
@@ -313,6 +319,62 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		showPreview((Post) marker.getTag());
 
 		return true;
+	}
+
+    /**
+     * Implemented to retrieve data passed from the MapSearchFragment
+     * @param data the search query from the user
+     */
+	@Override
+	public void onDataPass(String data) {
+		//Log.d("LOG","hello " + data);
+        String featureName;
+        String addressLine;
+        boolean foundSomething = false;
+		List<Address> addresses = null;
+		Geocoder geocoder = new Geocoder(this);
+
+		try{
+			addresses = geocoder.getFromLocationName(data, 2);
+			if(addresses != null){
+				for(int i = 0; i < addresses.size(); i++){
+                    //Log.d("LOG", "onDataPass: " + addresses.get(i));
+				    Address userAddress = addresses.get(i);
+                    //Update camera position
+					LatLng coordinate = new LatLng(userAddress.getLatitude(), userAddress.getLongitude());
+					CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, 15);
+					mGoogleMap.animateCamera(location);
+
+					featureName = userAddress.getFeatureName();
+					addressLine = userAddress.getAddressLine(0);
+
+					//Display the name of the location
+					if(featureName != null){
+						Toast.makeText(this, featureName, Toast.LENGTH_SHORT).show();
+						foundSomething = true;
+					}
+					else{
+						Toast.makeText(this, addressLine, Toast.LENGTH_SHORT).show();
+                        foundSomething = true;
+					}
+
+					//mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinate, 15));
+					//mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+				}
+			}
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+
+		//If an address was not found, display an error
+		if(!foundSomething){
+            Toast.makeText(this, "Could not find that location", Toast.LENGTH_SHORT).show();
+        }else{
+		    //If something was found, then look for pins at that location
+            onCameraIdle();
+        }
+
 	}
 
 

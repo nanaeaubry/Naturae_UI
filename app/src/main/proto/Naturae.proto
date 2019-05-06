@@ -23,13 +23,22 @@ service ServerRequests{
     rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply){};
 	rpc GetProfileImage (ProfileImageRequest) returns (ProfileImageReply){};
 
-    /**** Friendslist GRPC Functions ****/
+    /**** Friendslist gRPC Functions ****/
     // Query is sent to the server and a list of matching users is returned
     rpc SearchUsers(UserSearchRequest) returns (UserListReply){}
     // Unary client request to add a new friend for the user
     rpc AddFriend(FriendRequest) returns (FriendReply){}
     // Unary client request to remove an existing friend for the user
     rpc RemoveFriend(FriendRequest) returns(FriendReply){}
+
+    /**** Chat gRPC Functions ****/
+    //Ensures that the local and remote logs are up to date
+    //rpc SyncChat(ChatlogRequest) returns (ChatlogReply){}
+    //Sends a single message to update
+    //rpc SendMessage(ChatMessageRequest) returns (ChatMessageReply){}
+
+    rpc GetRoomName(RoomRequest) returns (RoomReply){}
+
 }
 
 message HelloRequest{
@@ -173,6 +182,33 @@ message FriendReply{
     // string accessToken = 1;
     //string refreshToken = 2;
 }
+
+ //Ensures that the local and remote logs are up to date
+ //rpc SyncChat(ChatlogRequest) returns (ChatlogReply){}
+ /*
+message ChatlogRequest{
+    repeated ChatMessage = 1;
+}
+message ChatMessage{
+    string userWhoSentIt = 1;
+    string messageBody = 2;
+    long timestampSent = 3;
+}
+
+message ChatlogReply{
+    repeated ChatMessage = 1;
+}
+*/
+message RoomRequest{
+    string userOwner1 = 1;
+    string userOwner2 = 2;
+}
+
+message RoomReply{
+    string roomName = 1;
+    Status status = 2;
+}
+
 
 message GetAccessTokenRequest{
     string appKey = 1;
