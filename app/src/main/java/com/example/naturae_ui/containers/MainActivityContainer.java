@@ -353,7 +353,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		protected Naturae.GetPostPreviewReply doInBackground(Void... voids) {
 			Naturae.GetPostPreviewReply reply;
 			try {
-				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).maxInboundMessageSize(1745937000).useTransportSecurity().build();
 				//Create a stub for with the channel
 				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
 				Naturae.GetPostPreviewRequest request = Naturae.GetPostPreviewRequest.newBuilder()

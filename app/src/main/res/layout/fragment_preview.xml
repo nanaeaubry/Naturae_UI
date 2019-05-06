@@ -20,6 +20,7 @@
 			android:layout_height="300dp"
 			android:adjustViewBounds="true"
 			android:padding="20dp"
+			android:rotation="90"
 			android:scaleType="fitCenter" />
 
 		<TextView

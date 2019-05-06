@@ -168,6 +168,11 @@ public class PostFragment extends Fragment {
 				post.encodedImage = encodedImage;
 
 				new GrpcCreatePost(listener, post, getActivity()).execute();
+
+				mTitlePost.getText().clear();
+				mSpeciesPost.getText().clear();
+				mDescriptionPost.getText().clear();
+
 			}
 
 		});
@@ -355,6 +360,7 @@ public class PostFragment extends Fragment {
 			if (createPostReply != null) {
 				if(createPostReply.getStatus().getCode() == Constants.OK ){
 					mListener.onPostCreated(mPost);
+
 				}
 			}
 
