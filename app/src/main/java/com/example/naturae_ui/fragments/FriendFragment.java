@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +63,7 @@ public class FriendFragment extends Fragment {
     private View removeButton;
     private View sortButton;
     private ConstraintLayout layout;
+    private ProgressBar progress;
 
     //Cache to define user sort preferences, false means sort in A-Z normal order
     private boolean sortListReverse;
@@ -98,7 +100,7 @@ public class FriendFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_friend, container, false);
-
+        progress = view.findViewById(R.id.progressFriends);
         searchFieldInput = view.findViewById(R.id.search_field_input);
         emptyView = view.findViewById(R.id.empty_view);
         recyclerView = view.findViewById(R.id.friend_recycler);
@@ -129,6 +131,8 @@ public class FriendFragment extends Fragment {
             public void onSearchFriendsFinished(List<Friend> newFriendsList) {
                 //Update dataset
                 friendsList = new ArrayList<>(newFriendsList);
+                //Disable progress bar
+                progress.setVisibility(View.GONE);
 
                 if(friendsList.isEmpty()){
                     //Show the empty list
@@ -584,7 +588,7 @@ public class FriendFragment extends Fragment {
                 }
             }
             else{
-
+         /*
                 Log.d(TAG, "onPostExecute: (REPLY FROM SERVER IS NIL, USING PLACEHOLDER");
                 friendsList.add(new Friend("Jimmy"));
                 friendsList.add(new Friend("Trung"));
@@ -594,7 +598,7 @@ public class FriendFragment extends Fragment {
                 friendsList.add(new Friend("Catherine"));
                 friendsList.add(new Friend("Josh"));
                 friendsList.add(new Friend("Colin"));
-
+           */
                 Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve your friend's list, please check your connection");
             }
             //Callback function

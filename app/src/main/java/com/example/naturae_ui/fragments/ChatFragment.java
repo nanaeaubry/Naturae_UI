@@ -66,8 +66,8 @@ public class ChatFragment extends Fragment implements RoomListener {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
-        //thisUser = new MemberData("limstevenlbw@gmail.com");
-        thisUser = new MemberData(UserUtilities.getEmail(getContext()));
+        thisUser = new MemberData("limstevenlbw@gmail.com");
+       // thisUser = new MemberData(UserUtilities.getEmail(getContext()));
         chatlog = new LinkedList<ChatMessage>();
 
         scaledrone = new Scaledrone(channelID, thisUser);
@@ -247,7 +247,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     }
 
     /**
-     *
+     * Retrieves the room ID so that the users can connect to the proper chatroom
      */
     private static class GrpcGetRoomTask extends AsyncTask<Void, Void, Naturae.RoomReply> {
         private final GetRoomRunnable grpcRunnable;
@@ -285,7 +285,7 @@ public class ChatFragment extends Fragment implements RoomListener {
 
             }
             else{
-                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve your friend's list, please check your connection");
+                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve the room name please check your connection");
             }
             //Callback function
             listener.onGetRoomFinished();
