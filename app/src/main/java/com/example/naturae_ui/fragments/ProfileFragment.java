@@ -14,6 +14,8 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +51,7 @@ import static com.example.naturae_ui.fragments.PostFragment.REQUEST_IMAGE_CAPTUR
 
 public class ProfileFragment extends Fragment{
     public final static int PICK_PHOTO = 1046;
+    Fragment mChangePasswordFragment;
     View mView;
     EditText firstName;
     EditText lastName;
@@ -60,7 +63,6 @@ public class ProfileFragment extends Fragment{
     EditText currentPassword;
     EditText newPassword;
     EditText confirmPassword;
-    Bitmap selectedImage = null;
     ImageView imagePreview;
     File photoFile;
     Uri photoFileUri;
@@ -73,19 +75,27 @@ public class ProfileFragment extends Fragment{
         mView = inflater.inflate(R.layout.fragment_profile, container, false);
         super.onCreate(savedInstanceState);
 
+        mChangePasswordFragment = new ChangePasswordFragment();
+
         firstName = mView.findViewById(R.id.first_name_edit_text);
         lastName = mView.findViewById(R.id.last_name_edit_text);
+        //profileName = mView.findViewById(R.id.tvProfileName);
 
         //profileName.setText(UserUtilities.getFirstName(getContext()) + UserUtilities.getLastName(getContext()));
 
         bChangePass = mView.findViewById(R.id.btChangePass);
         bChangePass.setOnClickListener(v -> {
-            mListener.beginFragment(MainActivityContainer.AuthFragmentType.CHANGE_PASSWORD, true, true);
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            //Acquire container id and switch fragment
+            fragmentTransaction.replace(((ViewGroup)getView().getParent()).getId(), mChangePasswordFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         });
 
 
         ibProfileImage = mView.findViewById(R.id.ibProfileImage);
         ibProfileImage.setOnClickListener(v -> {
+            mSelectedImage = null;
             // Create intent for picking a photo from the gallery
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
@@ -101,6 +111,10 @@ public class ProfileFragment extends Fragment{
             mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+            /*new GrpcProfileImage(mListener,getActivity(),.execute(
+                    mSelectedImage.getText().toString();
+            );*/
 
         });
         bLogout = mView.findViewById(R.id.btLogout);
@@ -209,13 +223,13 @@ public class ProfileFragment extends Fragment{
     }
 
     private static class GrpcProfileImage extends AsyncTask<String, Void, Naturae.ProfileImageReply> {
-        private final OnFragmentInteractionListener mListener;
+        private final OnFragmentInteractionListener listener;
         private final WeakReference<Activity> activity;
         private ManagedChannel channel;
         private String mEncodedImage;
 
-        private GrpcProfileImage(OnFragmentInteractionListener mListener, Activity activity, String encodedImage) {
-            this.mListener = mListener;
+        private GrpcProfileImage(OnFragmentInteractionListener listener, Activity activity, String encodedImage) {
+            this.listener = listener;
             this.activity = new WeakReference<>(activity);
             this.mEncodedImage = encodedImage;
         }
