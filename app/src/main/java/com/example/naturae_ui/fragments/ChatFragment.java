@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -31,6 +32,7 @@ import com.scaledrone.lib.Scaledrone;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.IntToDoubleFunction;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -52,7 +55,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     private static final String TAG = "ChatFragment";
     //todo hide channelID
     private final String channelID = "rff299Lg3qBpyQxQ";
-    private final String roomName = "observable-room";
+    private String roomName;
     private TextView friendUsernameTitle;
     private EditText messageInput;
     private View sendButton;
@@ -60,43 +63,82 @@ public class ChatFragment extends Fragment implements RoomListener {
     private ChatAdapter adapter;
     private MemberData thisUser;
     private Scaledrone scaledrone;
+    private Boolean lostConnection;
+    private String USERNAME;
     List<ChatMessage> chatlog;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
-        thisUser = new MemberData("limstevenlbw@gmail.com");
-       // thisUser = new MemberData(UserUtilities.getEmail(getContext()));
+        //Uncomment and enter username to test
+        //Testing purposes
+        try{
+            USERNAME = UserUtilities.getEmail(getContext());
+        }
+        catch(NullPointerException e){
+
+        }
+        if(USERNAME == null){
+            //Insert your username here
+            Toast.makeText(getContext(),"Unable to get username", Toast.LENGTH_LONG).show();
+            USERNAME = "limstevenlbw@gmail.com";
+        }
+
+        thisUser = new MemberData(USERNAME);
         chatlog = new LinkedList<ChatMessage>();
+        lostConnection = false;
 
-        scaledrone = new Scaledrone(channelID, thisUser);
-        scaledrone.connect(new Listener() {
+        /**
+         * Call asynchronous task to obtain room name
+         */
+        GrpcGetRoomTask roomTask = new GrpcGetRoomTask(new GrpcGetRoomTask.GetRoomRunnable(thisUser.getUsername(), friendUsernameText), getActivity());
+        roomTask.setListener(new GrpcGetRoomTask.AsyncTaskListener(){
             @Override
-            public void onOpen() {
-                //Pass RoomListener as a target
-                scaledrone.subscribe(roomName, ChatFragment.this);
-                System.out.println("Scaledrone connection open");
-            }
+            public void onGetRoomFinished(String room) {
+                //Create the scaledrone observable room
+                roomName = "observable-" + room;
+                scaledrone = new Scaledrone(channelID, thisUser);
+                scaledrone.connect(new Listener() {
+                    @Override
+                    public void onOpen() {
+                        //Pass RoomListener as a target
+                        scaledrone.subscribe(roomName, ChatFragment.this);
+                        System.out.println("Scaledrone connection open");
+                    }
 
-            @Override
-            public void onOpenFailure(Exception e) {
-                System.err.println(e);
-                //Can potentially happen due to authentication error
-                Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
-            }
+                    @Override
+                    public void onOpenFailure(Exception e) {
+                        System.err.println(e);
+                        //Can potentially happen due to authentication error
+                        Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
+                    }
 
-            @Override
-            public void onFailure(Exception e) {
-                System.err.println(e);
-                Log.d(TAG, "onFailure: Connection failure");
-            }
+                    @Override
+                    public void onFailure(Exception e) {
+                        System.err.println(e);
+                        Toast.makeText(getContext(),"Disconnected, attempting to reconnect", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "onFailure: Connection failure");
+                        //Attempt to Reconnect after some time
+                        try{
+                            Thread.sleep(3000);
+                            roomTask.execute();
+                        }catch(InterruptedException ex){
+                            Toast.makeText(getContext(),"Unable to reconnect, please check your connection", Toast.LENGTH_LONG).show();
+                        }
 
-            @Override
-            public void onClosed(String reason) {
-                System.err.println(reason);
+                    }
+
+                    @Override
+                    public void onClosed(String reason) {
+                        System.err.println(reason);
+                    }
+                });
+
             }
         });
+        roomTask.execute();
+
     }
 
     /**
@@ -170,6 +212,22 @@ public class ChatFragment extends Fragment implements RoomListener {
             }
         });
             */
+        try{
+            if(getActivity().getCurrentFocus() != null) {
+
+                recyclerView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                        return false;
+                    }
+                });
+            }
+        }catch(NullPointerException e){
+
+        }
+
         return view;
     }
 
@@ -282,13 +340,14 @@ public class ChatFragment extends Fragment implements RoomListener {
             super.onPostExecute(result);
 
             if(result != null){
+                String roomID = result.getRoomName();
+                //Callback function
+                listener.onGetRoomFinished(roomID);
 
             }
             else{
-                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve the room name please check your connection");
+                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve the conversation, please check your connection");
             }
-            //Callback function
-            listener.onGetRoomFinished();
 
             //Shut down the gRPC channel
             try {
@@ -303,20 +362,21 @@ public class ChatFragment extends Fragment implements RoomListener {
         }
 
         public interface AsyncTaskListener {
-            void onGetRoomFinished();
+            void onGetRoomFinished(String room);
         }
 
         private static class GetRoomRunnable {
-            private String user, query;
+            private String user1, user2;
 
-            public GetRoomRunnable(String user, String query){
-
+            public GetRoomRunnable(String user1, String user2){
+                this.user1 = user1;
+                this.user2 = user2;
             }
             // gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply)
             public Naturae.RoomReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
                 Naturae.RoomReply reply;
                 //Generate Request as defined by proto definition
-                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1("").setUserOwner1("").build();
+                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1(user1).setUserOwner1(user2).build();
 
                 //Send the request to the server and set reply to the server response
                 reply = blockingStub.getRoomName(request);
