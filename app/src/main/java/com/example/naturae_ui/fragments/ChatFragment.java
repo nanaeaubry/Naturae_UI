@@ -52,7 +52,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     private static final String TAG = "ChatFragment";
     //todo hide channelID
     private final String channelID = "rff299Lg3qBpyQxQ";
-    private final String roomName = "observable-room";
+    private String roomName;
     private TextView friendUsernameTitle;
     private EditText messageInput;
     private View sendButton;
@@ -67,36 +67,49 @@ public class ChatFragment extends Fragment implements RoomListener {
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
         thisUser = new MemberData("limstevenlbw@gmail.com");
-       // thisUser = new MemberData(UserUtilities.getEmail(getContext()));
+        //thisUser = new MemberData(UserUtilities.getEmail(getContext()));
         chatlog = new LinkedList<ChatMessage>();
 
-        scaledrone = new Scaledrone(channelID, thisUser);
-        scaledrone.connect(new Listener() {
+        /**
+         * Call asynchronous task to obtain room name
+         */
+        GrpcGetRoomTask roomTask = new GrpcGetRoomTask(new GrpcGetRoomTask.GetRoomRunnable(thisUser.getUsername(), friendUsernameText), getActivity());
+        roomTask.setListener(new GrpcGetRoomTask.AsyncTaskListener(){
             @Override
-            public void onOpen() {
-                //Pass RoomListener as a target
-                scaledrone.subscribe(roomName, ChatFragment.this);
-                System.out.println("Scaledrone connection open");
-            }
+            public void onGetRoomFinished(String room) {
+                //Create the scaledrone observable room
+                roomName = "observable-" + room;
+                scaledrone = new Scaledrone(channelID, thisUser);
+                scaledrone.connect(new Listener() {
+                    @Override
+                    public void onOpen() {
+                        //Pass RoomListener as a target
+                        scaledrone.subscribe(roomName, ChatFragment.this);
+                        System.out.println("Scaledrone connection open");
+                    }
 
-            @Override
-            public void onOpenFailure(Exception e) {
-                System.err.println(e);
-                //Can potentially happen due to authentication error
-                Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
-            }
+                    @Override
+                    public void onOpenFailure(Exception e) {
+                        System.err.println(e);
+                        //Can potentially happen due to authentication error
+                        Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
+                    }
 
-            @Override
-            public void onFailure(Exception e) {
-                System.err.println(e);
-                Log.d(TAG, "onFailure: Connection failure");
-            }
+                    @Override
+                    public void onFailure(Exception e) {
+                        System.err.println(e);
+                        Log.d(TAG, "onFailure: Connection failure");
+                    }
 
-            @Override
-            public void onClosed(String reason) {
-                System.err.println(reason);
+                    @Override
+                    public void onClosed(String reason) {
+                        System.err.println(reason);
+                    }
+                });
+
             }
         });
+
     }
 
     /**
@@ -282,13 +295,14 @@ public class ChatFragment extends Fragment implements RoomListener {
             super.onPostExecute(result);
 
             if(result != null){
+                String roomID = result.getRoomName();
+                //Callback function
+                listener.onGetRoomFinished(roomID);
 
             }
             else{
-                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve the room name please check your connection");
+                Helper.alertDialogErrorMessage(activityReference.get(), "An error occurred while trying to retrieve the conversation, please check your connection");
             }
-            //Callback function
-            listener.onGetRoomFinished();
 
             //Shut down the gRPC channel
             try {
@@ -303,20 +317,21 @@ public class ChatFragment extends Fragment implements RoomListener {
         }
 
         public interface AsyncTaskListener {
-            void onGetRoomFinished();
+            void onGetRoomFinished(String room);
         }
 
         private static class GetRoomRunnable {
-            private String user, query;
+            private String user1, user2;
 
-            public GetRoomRunnable(String user, String query){
-
+            public GetRoomRunnable(String user1, String user2){
+                this.user1 = user1;
+                this.user2 = user2;
             }
             // gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply)
             public Naturae.RoomReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
                 Naturae.RoomReply reply;
                 //Generate Request as defined by proto definition
-                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1("").setUserOwner1("").build();
+                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1(user1).setUserOwner1(user2).build();
 
                 //Send the request to the server and set reply to the server response
                 reply = blockingStub.getRoomName(request);
