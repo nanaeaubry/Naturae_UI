@@ -177,11 +177,10 @@ public class PostFragment extends Fragment {
 
 				new GrpcCreatePost(listener, post, getActivity()).execute();
 
-				mTitlePost.getText().clear();
-				mSpeciesPost.getText().clear();
-				mDescriptionPost.getText().clear();
-
 			}
+			AutoCompleteTextView mTitlePost;
+			AutoCompleteTextView mSpeciesPost;
+			AutoCompleteTextView mDescriptionPost;
 
 		});
 		return mView;
@@ -305,6 +304,7 @@ public class PostFragment extends Fragment {
 
 	public interface OnPostListener {
 		void onPostCreated(Post post);
+
 	}
 
 	private static class GrpcCreatePost extends AsyncTask<Void, Void, Naturae.CreatePostReply> {
