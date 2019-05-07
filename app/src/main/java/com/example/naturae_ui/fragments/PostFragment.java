@@ -159,7 +159,7 @@ public class PostFragment extends Fragment {
 
 				//Make image a byte array to store in server
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-				mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+				mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
 				byte[] byteArray = byteArrayOutputStream.toByteArray();
 				String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
