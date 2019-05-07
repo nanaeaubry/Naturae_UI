@@ -33,6 +33,9 @@
     <string name="no_friend_data_available">You are alone</string>
     <string name="friend_search_hint">Find Friends</string>
 
+    <!--Profile-->
+    <string name="internet_connection">Check your internet connection and try again</string>
+
     <!--Create Account-->
     <string name="invalid_email">Invalid email address</string>
     <string name="invalid_password">Invalid password</string>
