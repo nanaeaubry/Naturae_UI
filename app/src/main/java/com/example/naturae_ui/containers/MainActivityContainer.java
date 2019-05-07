@@ -2,6 +2,7 @@ package com.example.naturae_ui.containers;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import android.location.Address;
@@ -13,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.fragments.LoginFragment;
 import com.example.naturae_ui.fragments.MapSearchFragment;
 import com.example.naturae_ui.fragments.FriendFragment;
 import com.example.naturae_ui.fragments.PostFragment;
@@ -60,7 +63,8 @@ interface GetPostsCompleted {
 }
 
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener,
-		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted, MapSearchFragment.OnDataPass {
+		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted, ProfileFragment.OnFragmentInteractionListener,
+    MapSearchFragment.OnDataPass {
 
 	public static final int REQUEST_LOCATION_PERMISSION = 99;
 
@@ -75,6 +79,21 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	BottomNavigationView navigation;
 	Marker mMarker;
 
+
+	@Override
+	public void beginFragment(AuthFragmentType fragmentType, boolean setTransition, boolean addToBackStack) {
+
+	}
+
+	@Override
+	public void logout() {
+		Intent intent = new Intent(MainActivityContainer.this, StartUpActivityContainer.class);
+		startActivity(intent);
+	}
+
+	public enum AuthFragmentType {
+		CHANGE_PASSWORD
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
