@@ -86,6 +86,7 @@ public class FriendFragment extends Fragment {
         }
         if(USERNAME == null){
             //Insert your username here
+            Toast.makeText(getContext(),"Unable to get username", Toast.LENGTH_LONG).show();
             USERNAME = "limstevenlbw@gmail.com";
         }
 
@@ -322,27 +323,28 @@ public class FriendFragment extends Fragment {
         //Set close keyboard event to main layout and recycler view
         layout = view.findViewById(R.id.friends_layout);
         try{
-            layout.setOnTouchListener(new View.OnTouchListener(){
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-                    return false;
-                }
-            });
+            if(getActivity().getCurrentFocus() != null){
 
-            recyclerView.setOnTouchListener(new View.OnTouchListener(){
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-                    return false;
-                }
-            });
+                layout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                        return false;
+                    }
+                });
+
+                recyclerView.setOnTouchListener(new View.OnTouchListener(){
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        InputMethodManager imm = (InputMethodManager)getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                        return false;
+                    }
+                });
+            }
         }
-        catch(NullPointerException e){
-            //Error on adding onclick, view was not created successfully
-        }
+        catch(NullPointerException E){}
 
 
         return view;

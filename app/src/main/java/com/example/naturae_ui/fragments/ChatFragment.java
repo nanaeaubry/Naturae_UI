@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -31,6 +32,7 @@ import com.scaledrone.lib.Scaledrone;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.IntToDoubleFunction;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -60,15 +63,31 @@ public class ChatFragment extends Fragment implements RoomListener {
     private ChatAdapter adapter;
     private MemberData thisUser;
     private Scaledrone scaledrone;
+    private Boolean lostConnection;
+    private String USERNAME;
     List<ChatMessage> chatlog;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
-        thisUser = new MemberData("limstevenlbw@gmail.com");
-        //thisUser = new MemberData(UserUtilities.getEmail(getContext()));
+        //Uncomment and enter username to test
+        //Testing purposes
+        try{
+            USERNAME = UserUtilities.getEmail(getContext());
+        }
+        catch(NullPointerException e){
+
+        }
+        if(USERNAME == null){
+            //Insert your username here
+            Toast.makeText(getContext(),"Unable to get username", Toast.LENGTH_LONG).show();
+            USERNAME = "limstevenlbw@gmail.com";
+        }
+
+        thisUser = new MemberData(USERNAME);
         chatlog = new LinkedList<ChatMessage>();
+        lostConnection = false;
 
         /**
          * Call asynchronous task to obtain room name
@@ -98,7 +117,16 @@ public class ChatFragment extends Fragment implements RoomListener {
                     @Override
                     public void onFailure(Exception e) {
                         System.err.println(e);
+                        Toast.makeText(getContext(),"Disconnected, attempting to reconnect", Toast.LENGTH_LONG).show();
                         Log.d(TAG, "onFailure: Connection failure");
+                        //Attempt to Reconnect after some time
+                        try{
+                            Thread.sleep(3000);
+                            roomTask.execute();
+                        }catch(InterruptedException ex){
+                            Toast.makeText(getContext(),"Unable to reconnect, please check your connection", Toast.LENGTH_LONG).show();
+                        }
+
                     }
 
                     @Override
@@ -109,6 +137,7 @@ public class ChatFragment extends Fragment implements RoomListener {
 
             }
         });
+        roomTask.execute();
 
     }
 
@@ -183,6 +212,22 @@ public class ChatFragment extends Fragment implements RoomListener {
             }
         });
             */
+        try{
+            if(getActivity().getCurrentFocus() != null) {
+
+                recyclerView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                        return false;
+                    }
+                });
+            }
+        }catch(NullPointerException e){
+
+        }
+
         return view;
     }
 
