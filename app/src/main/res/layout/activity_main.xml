@@ -5,6 +5,14 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	tools:context=".containers.MainActivityContainer">
+	<ProgressBar
+		android:id="@+id/map_progress"
+		style="?android:attr/progressBarStyleLarge"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="8dp"
+		android:visibility="visible"
+		android:layout_centerInParent="true"/>
 
 	<com.google.android.gms.maps.MapView
 		android:id="@+id/map"

@@ -20,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.naturae_ui.R;
@@ -74,6 +75,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	Fragment mProfileFragment;
 	BottomNavigationView navigation;
 	Marker mMarker;
+	ProgressBar mProgressBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
+		mProgressBar = findViewById(R.id.map_progress);
 		// Create fragments
 		mMapFragment = new MapSearchFragment();
 		mPostFragment = new PostFragment();
@@ -168,6 +171,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
+
 		MapsInitializer.initialize(this);
 
 		mGoogleMap = googleMap;
@@ -208,6 +212,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		int radius = (int) diagonalDistance[0] / 2;
 
 		new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
+
 	}
 
 	@Override
@@ -278,8 +283,13 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public void onPostCreated(Post post) {
+		mMapView.setVisibility(View.INVISIBLE);
+		mProgressBar.setVisibility(View.VISIBLE);
 		mMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
 		navigation.setSelectedItemId(R.id.navigation_map);
+		mProgressBar.setVisibility(View.GONE);
+		mMapView.setVisibility(View.VISIBLE);
+
 
 	}
 
