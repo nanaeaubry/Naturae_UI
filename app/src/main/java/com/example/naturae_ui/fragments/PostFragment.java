@@ -30,7 +30,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 
 import com.example.naturae_ui.models.Post;
@@ -63,6 +64,7 @@ public class PostFragment extends Fragment {
 	Uri photoFileUri;
 	private static Context context;
 
+	ProgressBar mProgressBar;
 	View mView;
 	ImageButton mOpenCamera;
 	ImageButton mOpenPhotos;
@@ -73,6 +75,7 @@ public class PostFragment extends Fragment {
 	OnPostListener listener;
 	Bitmap mSelectedImage = null;
 	ImageView mImagePreview;
+	LinearLayout mImagePreviewLayout;
 	float[] latLong = new float[2];
 
 	@Nullable
@@ -81,6 +84,10 @@ public class PostFragment extends Fragment {
 		mView = inflater.inflate(R.layout.fragment_post, container, false);
 		super.onCreate(savedInstanceState);
 		mImagePreview = mView.findViewById(R.id.image_preview);
+		mImagePreviewLayout = mView.findViewById(R.id.image_preview_layout);
+
+		mProgressBar = mView.findViewById(R.id.post_progress);
+		mProgressBar.setVisibility(View.INVISIBLE);
 
 		// Create a File reference for photo capture
 		photoFile = getPhotoFile(photoFileName);
@@ -148,10 +155,11 @@ public class PostFragment extends Fragment {
 							}).show();
 					return;
 				}
+				mProgressBar.setVisibility(View.VISIBLE);
 
 				//Make image a byte array to store in server
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-				mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+				mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
 				byte[] byteArray = byteArrayOutputStream.toByteArray();
 				String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
@@ -168,7 +176,11 @@ public class PostFragment extends Fragment {
 				post.encodedImage = encodedImage;
 
 				new GrpcCreatePost(listener, post, getActivity()).execute();
+
 			}
+			AutoCompleteTextView mTitlePost;
+			AutoCompleteTextView mSpeciesPost;
+			AutoCompleteTextView mDescriptionPost;
 
 		});
 		return mView;
@@ -197,7 +209,7 @@ public class PostFragment extends Fragment {
 					mSelectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
 
 					// Load the selected image into a preview
-					mImagePreview.setVisibility(View.VISIBLE);
+					mImagePreviewLayout.setVisibility(View.VISIBLE);
 					mImagePreview.setImageBitmap(mSelectedImage);
 
 					readExif(photoUri);
@@ -213,9 +225,8 @@ public class PostFragment extends Fragment {
 
 				// RESIZE BITMAP, see section below
 				// Load the taken image into a preview
-				ImageView imagePreview = mView.findViewById(R.id.image_preview);
-				imagePreview.setVisibility(View.VISIBLE);
-				imagePreview.setImageBitmap(mSelectedImage);
+				mImagePreviewLayout.setVisibility(View.VISIBLE);
+				mImagePreview.setImageBitmap(mSelectedImage);
 
 				readExif(photoFileUri);
 				break;
@@ -293,6 +304,7 @@ public class PostFragment extends Fragment {
 
 	public interface OnPostListener {
 		void onPostCreated(Post post);
+
 	}
 
 	private static class GrpcCreatePost extends AsyncTask<Void, Void, Naturae.CreatePostReply> {
@@ -355,6 +367,7 @@ public class PostFragment extends Fragment {
 			if (createPostReply != null) {
 				if(createPostReply.getStatus().getCode() == Constants.OK ){
 					mListener.onPostCreated(mPost);
+
 				}
 			}
 

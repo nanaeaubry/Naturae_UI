@@ -2,6 +2,8 @@ package com.example.naturae_ui.fragments;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +19,9 @@ import android.widget.Toast;
 
 import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class PreviewFragment extends Fragment {
 	View mView;
@@ -57,7 +62,7 @@ public class PreviewFragment extends Fragment {
 		mLikeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(getActivity().getApplicationContext(),"Your rating has been recorded.",Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity().getApplicationContext(), "Your rating has been recorded.", Toast.LENGTH_SHORT).show();
 				mLikeButton.setClickable(false);
 				mDislikeButton.setClickable(false);
 			}
@@ -67,7 +72,7 @@ public class PreviewFragment extends Fragment {
 		mDislikeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(getActivity().getApplicationContext(),"Your rating has been recorded.",Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity().getApplicationContext(), "Your rating has been recorded.", Toast.LENGTH_SHORT).show();
 				mDislikeButton.setClickable(false);
 				mLikeButton.setClickable(false);
 			}
@@ -76,4 +81,7 @@ public class PreviewFragment extends Fragment {
 		return mView;
 	}
 
+
 }
+
+
