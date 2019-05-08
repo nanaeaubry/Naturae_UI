@@ -22,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.naturae_ui.R;
@@ -78,6 +79,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	Fragment mProfileFragment;
 	BottomNavigationView navigation;
 	Marker mMarker;
+	ProgressBar mProgressBar;
 
 
 	@Override
@@ -103,6 +105,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
+		mProgressBar = findViewById(R.id.map_progress);
 		// Create fragments
 		mMapFragment = new MapSearchFragment();
 		mPostFragment = new PostFragment();
@@ -126,14 +129,12 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	// Show map when selected on bottom navigation
 	private void showMap() {
 		mMapView.setVisibility(View.VISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
 	}
 
 	// Show post when selected on bottom navigation
 	private void showPost() {
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPostFragment).commit();
 	}
 
@@ -143,21 +144,18 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		bundle.putParcelable("post", post);
 		mMapView.setVisibility(View.INVISIBLE);
 		mPreviewFragment.setArguments(bundle);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
 	}
 
 	// Show chat when selected on bottom navigation
 	private void showChat() {
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mChatFragment).commit();
 	}
 
 	// Show profile when selected on bottom navigation
 	private void showProfile() {
 		mMapView.setVisibility(View.INVISIBLE);
-		//mFragmentContainer.setVisibility(View.VISIBLE);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mProfileFragment).commit();
 
 	}
@@ -192,6 +190,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
+
 		MapsInitializer.initialize(this);
 
 		mGoogleMap = googleMap;
@@ -232,13 +231,14 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		int radius = (int) diagonalDistance[0] / 2;
 
 		new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
+
 	}
 
 	@Override
 	public void onGetPostsCompleted(Naturae.GetPostPreviewReply reply) {
 		if (reply != null) {
 			if (reply.getStatus().getCode() == Constants.OK) {
-//				mGoogleMap.clear();
+				mGoogleMap.clear();
 				int length = reply.getReplyCount();
 				for (int i = 0; i < length; i++) {
 					Naturae.PostStruct postStruct = reply.getReply(i);
@@ -302,8 +302,13 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	 */
 	@Override
 	public void onPostCreated(Post post) {
+		mMapView.setVisibility(View.INVISIBLE);
+		mProgressBar.setVisibility(View.VISIBLE);
 		mMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
 		navigation.setSelectedItemId(R.id.navigation_map);
+		mProgressBar.setVisibility(View.GONE);
+		mMapView.setVisibility(View.VISIBLE);
+
 
 	}
 
@@ -441,7 +446,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		protected Naturae.GetPostPreviewReply doInBackground(Void... voids) {
 			Naturae.GetPostPreviewReply reply;
 			try {
-				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).maxInboundMessageSize(1745937000).useTransportSecurity().build();
 				//Create a stub for with the channel
 				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
 				Naturae.GetPostPreviewRequest request = Naturae.GetPostPreviewRequest.newBuilder()
