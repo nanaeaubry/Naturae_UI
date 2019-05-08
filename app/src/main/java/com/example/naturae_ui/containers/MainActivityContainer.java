@@ -207,6 +207,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 
 	@Override
 	public void onCameraIdle() {
+
 		//Get center latitude and longitude values
 		LatLng center = mGoogleMap.getCameraPosition().target;
 		float cLat = (float) center.latitude;
@@ -303,12 +304,8 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	@Override
 	public void onPostCreated(Post post) {
 		mMapView.setVisibility(View.INVISIBLE);
-		mProgressBar.setVisibility(View.VISIBLE);
 		mMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
 		navigation.setSelectedItemId(R.id.navigation_map);
-		mProgressBar.setVisibility(View.GONE);
-		mMapView.setVisibility(View.VISIBLE);
-
 
 	}
 

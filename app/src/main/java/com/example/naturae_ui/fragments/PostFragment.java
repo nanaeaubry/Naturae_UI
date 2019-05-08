@@ -64,7 +64,6 @@ public class PostFragment extends Fragment {
 	Uri photoFileUri;
 	private static Context context;
 
-	ProgressBar mProgressBar;
 	View mView;
 	ImageButton mOpenCamera;
 	ImageButton mOpenPhotos;
@@ -85,9 +84,6 @@ public class PostFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		mImagePreview = mView.findViewById(R.id.image_preview);
 		mImagePreviewLayout = mView.findViewById(R.id.image_preview_layout);
-
-		mProgressBar = mView.findViewById(R.id.post_progress);
-		mProgressBar.setVisibility(View.INVISIBLE);
 
 		// Create a File reference for photo capture
 		photoFile = getPhotoFile(photoFileName);
@@ -155,7 +151,6 @@ public class PostFragment extends Fragment {
 							}).show();
 					return;
 				}
-				mProgressBar.setVisibility(View.VISIBLE);
 
 				//Make image a byte array to store in server
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -180,7 +175,7 @@ public class PostFragment extends Fragment {
 				mSpeciesPost.getText().clear();
 				mDescriptionPost.getText().clear();
 
-				Toast.makeText(getContext(),"Post Saved. Creating on Map...",Toast.LENGTH_SHORT);
+				Toast.makeText(getContext(),"Post Saved. Creating on Map...",Toast.LENGTH_SHORT).show();
 			}
 
 
@@ -370,7 +365,6 @@ public class PostFragment extends Fragment {
 			if (createPostReply != null) {
 				if(createPostReply.getStatus().getCode() == Constants.OK ){
 					mListener.onPostCreated(mPost);
-
 				}
 			}
 

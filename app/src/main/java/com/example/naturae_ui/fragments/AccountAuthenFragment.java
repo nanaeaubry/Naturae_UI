@@ -178,11 +178,9 @@ public class AccountAuthenFragment extends Fragment {
             if (result.getStatus().getCode() == Constants.OK){
                 //Cache that the user is able to logged in successfully and user information
                 //Next time the user's open the app the user's don't have to log in again
-                new Thread(()->{
-                    UserUtilities.setIsLoggedIn(activity.get(), true);
-                    UserUtilities.cacheUser(activity.get(), new NaturaeUser(result.getFirstName(), result.getLastName(), result.getEmail(),
+                UserUtilities.setIsLoggedIn(activity.get(), true);
+                UserUtilities.cacheUser(activity.get(), new NaturaeUser(result.getFirstName(), result.getLastName(), result.getEmail(),
                             result.getAccessToken(), result.getRefreshToken(), ""));
-                }).run();
                 //Start the main activity
                 mListener.startMainActivity();
             }
