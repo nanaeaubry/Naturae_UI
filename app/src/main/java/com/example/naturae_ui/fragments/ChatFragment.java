@@ -104,6 +104,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                 //Create the scaledrone observable room
                 roomName = "observable-" + room;
                 scaledrone = new Scaledrone(channelID, thisUser);
+
                 scaledrone.connect(new Listener() {
                     @Override
                     public void onOpen() {
@@ -122,14 +123,13 @@ public class ChatFragment extends Fragment implements RoomListener {
                     @Override
                     public void onFailure(Exception e) {
                         System.err.println(e);
-                        Toast.makeText(getContext(),"Disconnected, attempting to reconnect", Toast.LENGTH_LONG).show();
                         Log.d(TAG, "onFailure: Connection failure");
                         //Attempt to Reconnect after some time
                         try{
                             Thread.sleep(3000);
                             roomTask.execute();
                         }catch(InterruptedException ex){
-                            Toast.makeText(getContext(),"Unable to reconnect, please check your connection", Toast.LENGTH_LONG).show();
+                          //  Toast.makeText(getContext(),"Unable to reconnect, please check your connection", Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -143,6 +143,8 @@ public class ChatFragment extends Fragment implements RoomListener {
             }
         });
         roomTask.execute();
+        //If scaledrone is ready
+
 
     }
 
@@ -183,25 +185,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                 sendMessage();
             }
         });
-/*
-    //************SAMPLE DATA******************************************
-        Log.d(TAG, "initRecyclerView: init recyclerview");
 
-        chatlog.add(new ChatMessage("I used to rule the world\n" +
-                "Seas would rise when I gave the word\n" +
-                "Now in the morning, I sleep alone\n" +
-                "Sweep the streets I used to own", "WoozyMango", "sampleTimestamp", true));
-        chatlog.add(new ChatMessage("I hear Jerusalem Bells Ringing", "WoozyMango", "sampleTimestamp", true));
-        chatlog.add(new ChatMessage("Roman Cavalry and Choirs are singing", "lazerman7", "sampleTimestamp", false));
-        chatlog.add(new ChatMessage("Be my mirror, my sword and shield\n" +
-                "My missionaries in a foreign field\n" +
-                "For some reason I can't explain\n" +
-                "Once you go there was never, never a honest word", "lazerman7", "sampleTimestamp", false));
-        chatlog.add(new ChatMessage(":^)", "WoozyMango", "sampleTimestamp", true));
-        chatlog.add(new ChatMessage("   Hello it me", "WoozyMango", "sampleTimestamp", true));
-        //************SAMPLE DATA******************************************
-
-   */
         //Setup adapter
         adapter = new ChatAdapter(getContext(), chatlog);
         recyclerView.setAdapter(adapter);
@@ -216,7 +200,8 @@ public class ChatFragment extends Fragment implements RoomListener {
                 Log.d(TAG, "onItemClick position: " + position);
             }
         });
-            */
+        */
+
         try{
             if(getActivity().getCurrentFocus() != null) {
 
@@ -302,7 +287,7 @@ public class ChatFragment extends Fragment implements RoomListener {
         String message = messageInput.getText().toString();
 
         if (message.length() > 0) {
-            scaledrone.publish("observable-room", message);
+            scaledrone.publish(roomName, message);
             messageInput.getText().clear();
             Log.d(TAG, "Message Sent: " + message);
         }
@@ -400,3 +385,23 @@ public class ChatFragment extends Fragment implements RoomListener {
 
 
 }
+
+/*
+    //************SAMPLE DATA******************************************
+        Log.d(TAG, "initRecyclerView: init recyclerview");
+
+        chatlog.add(new ChatMessage("I used to rule the world\n" +
+                "Seas would rise when I gave the word\n" +
+                "Now in the morning, I sleep alone\n" +
+                "Sweep the streets I used to own", "WoozyMango", "sampleTimestamp", true));
+        chatlog.add(new ChatMessage("I hear Jerusalem Bells Ringing", "WoozyMango", "sampleTimestamp", true));
+        chatlog.add(new ChatMessage("Roman Cavalry and Choirs are singing", "lazerman7", "sampleTimestamp", false));
+        chatlog.add(new ChatMessage("Be my mirror, my sword and shield\n" +
+                "My missionaries in a foreign field\n" +
+                "For some reason I can't explain\n" +
+                "Once you go there was never, never a honest word", "lazerman7", "sampleTimestamp", false));
+        chatlog.add(new ChatMessage(":^)", "WoozyMango", "sampleTimestamp", true));
+        chatlog.add(new ChatMessage("   Hello it me", "WoozyMango", "sampleTimestamp", true));
+        //************SAMPLE DATA******************************************
+
+   */
