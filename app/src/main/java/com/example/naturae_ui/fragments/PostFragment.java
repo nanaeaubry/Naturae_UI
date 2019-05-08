@@ -32,6 +32,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 
 import com.example.naturae_ui.models.Post;
@@ -50,7 +51,6 @@ import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
-//Test Comment by Nanae
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -176,13 +176,16 @@ public class PostFragment extends Fragment {
 				post.encodedImage = encodedImage;
 
 				new GrpcCreatePost(listener, post, getActivity()).execute();
+				mTitlePost.getText().clear();
+				mSpeciesPost.getText().clear();
+				mDescriptionPost.getText().clear();
 
+				Toast.makeText(getContext(),"Post Saved. Creating on Map...",Toast.LENGTH_SHORT);
 			}
-			AutoCompleteTextView mTitlePost;
-			AutoCompleteTextView mSpeciesPost;
-			AutoCompleteTextView mDescriptionPost;
+
 
 		});
+
 		return mView;
 	}
 
