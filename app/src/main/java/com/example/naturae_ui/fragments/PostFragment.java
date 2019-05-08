@@ -63,7 +63,6 @@ public class PostFragment extends Fragment {
 	public String photoFileName = "photo.jpg";
 	File photoFile;
 	Uri photoFileUri;
-	private static Context context;
 
 	ProgressBar mProgressBar;
 	View mView;
