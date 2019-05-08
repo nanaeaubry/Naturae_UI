@@ -380,16 +380,18 @@ public class ChatFragment extends Fragment implements RoomListener {
             }
             // gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply)
             public Naturae.RoomReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
-                Log.d(TAG, "run: user1" + user1);
-                Log.d(TAG, "run: user2" + user2);
+              //  Log.d(TAG, "run: user1: " + user1);
+              //  Log.d(TAG, "run: user2: " + user2);
                 Naturae.RoomReply reply;
                 //Generate Request as defined by proto definition
-                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1(user1).setUserOwner1(user2).build();
-
+                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1(user1.trim()).setUserOwner2(user2.trim()).build();
+           //     Log.d(TAG, "runREQ: user1: " + request.getUserOwner1());
+               // Log.d(TAG, "runREQ: user2: " + request.getUserOwner2());
                 //Send the request to the server and set reply to the server response
                 reply = blockingStub.getRoomName(request);
-                Log.d(TAG, "run: adas room name" + reply.getRoomName() );
-                Log.d(TAG, "run: adastatus message" + reply.getStatus().getMessage());
+
+               // Log.d(TAG, "run: REPLY NAME "  + reply.getRoomName() );
+               // Log.d(TAG, "run: STATUS FROM REPLY " + reply.getStatus().getMessage());
                 //withDeadlineAfter(15000, TimeUnit.MILLISECONDS)
                 return reply;
             }
