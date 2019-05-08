@@ -37,7 +37,7 @@
         android:visibility="invisible"
         />
 
-    <View
+    <ImageView
         android:id="@+id/friend_avatar"
         android:layout_width="60dp"
         android:layout_height="60dp"

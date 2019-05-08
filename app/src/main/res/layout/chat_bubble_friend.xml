@@ -7,7 +7,7 @@
     android:paddingRight="60dp"
     android:clipToPadding="false">
 
-    <View
+    <ImageView
         android:id="@+id/bubble_friend_avatar"
         android:layout_alignParentLeft="true"
         android:scaleType="centerInside"

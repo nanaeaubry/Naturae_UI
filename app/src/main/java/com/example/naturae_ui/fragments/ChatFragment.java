@@ -71,6 +71,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     private Scaledrone scaledrone;
     private Boolean lostConnection;
     private String USERNAME;
+    private String avatar;
     ArrayList<ChatMessage> chatlog;
 
     @Override
@@ -78,7 +79,8 @@ public class ChatFragment extends Fragment implements RoomListener {
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
         currentUsernameText = getArguments().getString("argCurrentUser");
-
+        //The avatar of the other user
+        avatar = getArguments().getString("friendAvatar");
         thisUser = new MemberData(currentUsernameText);
         chatlog = new ArrayList<ChatMessage>();
 
@@ -102,13 +104,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                     @Override
                     public void onOpen() {
                         //Pass RoomListener as a target
-                        scaledrone.subscribe(roomName, ChatFragment.this, new SubscribeOptions(50)).listenToHistoryEvents(new HistoryRoomListener() {
-                            @Override
-                            public void onHistoryMessage(Room myRoom, com.scaledrone.lib.Message message) {
-                                onMessage(myRoom, message);
-                            }
-                        }); // ask for 50 messages from the history;
-
+                        scaledrone.subscribe(roomName, ChatFragment.this); // ask for 50 messages from the history;
                         System.out.println("Scaledrone connection open");
                     }
 
@@ -178,7 +174,7 @@ public class ChatFragment extends Fragment implements RoomListener {
         });
 
         //Setup adapter
-        adapter = new ChatAdapter(getContext(), chatlog);
+        adapter = new ChatAdapter(getContext(), chatlog, avatar);
         recyclerView.setAdapter(adapter);
         LinearLayoutManager chatLayout = new LinearLayoutManager(getContext());
         chatLayout.setReverseLayout(true);
@@ -252,7 +248,7 @@ public class ChatFragment extends Fragment implements RoomListener {
             boolean isSentByUser = user.getUsername().equals(thisUser.getUsername());
             long timestamp = receivedMessage.getTimestamp();
             //Construct a new chat message from the received data
-            final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), timestamp, isSentByUser);
+            final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), timestamp, isSentByUser, avatar);
             Log.d(TAG, "onMessage: " + message.getMessageBody());
 
             getActivity().runOnUiThread(new Runnable() {
@@ -308,13 +304,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                     @Override
                     public void onOpen() {
                         //Pass RoomListener as a target
-                        Room myRoom = scaledrone.subscribe(roomName, ChatFragment.this, new SubscribeOptions(50)); // ask for 50 messages from the history;
-                        myRoom.listenToHistoryEvents(new HistoryRoomListener() {
-                            @Override
-                            public void onHistoryMessage(Room myRoom, com.scaledrone.lib.Message message) {
-                                onMessage(myRoom, message);
-                            }
-                        });
+                        scaledrone.subscribe(roomName, ChatFragment.this); // ask for 50 messages from the history;
                         System.out.println("Scaledrone connection open");
                     }
 

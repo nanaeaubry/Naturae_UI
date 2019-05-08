@@ -65,6 +65,7 @@ public class FriendFragment extends Fragment {
     private View sortButton;
     private ConstraintLayout layout;
     private ProgressBar progress;
+    private static String defaultAvatar = "http://i.imgur.com/DvpvklR.png";
 
     //Cache to define user sort preferences, false means sort in A-Z normal order
     private boolean sortListReverse;
@@ -361,13 +362,14 @@ public class FriendFragment extends Fragment {
                 @Override
                 public void onItemClick(View view, int position, Friend friend) {
                     Log.d(TAG, "onFriendClick position: " + position);
-
+                    String avatar = friend.getAvatar();
                     //Assemble new Chat Fragment to pass arguments into
                     ChatFragment chatfragment = new ChatFragment();
-                    //Creates a new bundle of capacity 1 to pass in arguments: username
-                    Bundle bundle = new Bundle(2);
+                    //Creates a new bundle of capacity 3 to pass in arguments: username
+                    Bundle bundle = new Bundle(3);
                     bundle.putString("argUsername", friend.getName());
                     bundle.putString("argCurrentUser", USERNAME);
+                    bundle.putString("friendAvatar", avatar);
                     chatfragment.setArguments(bundle);
 
                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -480,7 +482,7 @@ public class FriendFragment extends Fragment {
                     //Fill the searched users list
                     if(result.getUsersCount() > 0){
                         for(int i=0; i< result.getUsersList().size(); i++) {
-                            usersList.add(new Friend(result.getUsersList().get(i)));
+                            usersList.add(new Friend(result.getUsersList().get(i), defaultAvatar));
                         }
                     }
 
@@ -603,7 +605,7 @@ public class FriendFragment extends Fragment {
                 //Fill the list if a list is available
                 if(result.getUsersCount() > 0){
                     for(int i=0; i< result.getUsersList().size(); i++) {
-                        friendsList.add(new Friend(result.getUsersList().get(i)));
+                        friendsList.add(new Friend(result.getUsersList().get(i), defaultAvatar));
                         Log.d(TAG, "" + (friendsList.get(i)));
                     }
                 }
