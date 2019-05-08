@@ -2,6 +2,7 @@ package com.example.naturae_ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -34,11 +35,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntToDoubleFunction;
@@ -66,31 +67,20 @@ public class ChatFragment extends Fragment implements RoomListener {
     private Scaledrone scaledrone;
     private Boolean lostConnection;
     private String USERNAME;
-    List<ChatMessage> chatlog;
+    ArrayList<ChatMessage> chatlog;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
         currentUsernameText = getArguments().getString("argCurrentUser");
-        //Uncomment and enter username to test
-        //Testing purposes
-        /*
-        try{
-            USERNAME = UserUtilities.getEmail(getContext());
-        }
-        catch(NullPointerException e){
-
-        }
-        if(USERNAME == null){
-            //Insert your username here
-            Toast.makeText(getContext(),"Unable to get username", Toast.LENGTH_LONG).show();
-            USERNAME = "limstevenlbw@gmail.com";
-        }
-*/
 
         thisUser = new MemberData(currentUsernameText);
-        chatlog = new LinkedList<ChatMessage>();
+        chatlog = new ArrayList<ChatMessage>();
+
+        //Clone the arrayList from cache, error, java.lang.String cannot be cast to java.util.ArrayList
+        //chatlog = new ArrayList<ChatMessage>(UserUtilities.getChatlog(getContext()));
+
         lostConnection = false;
         Log.d(TAG, "onCreate: user1" + thisUser.getUsername());
         Log.d(TAG, "onCreate: user2" + friendUsernameText);
@@ -127,7 +117,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                         //Attempt to Reconnect after some time
                         try{
                             Thread.sleep(3000);
-                            roomTask.execute();
+                          //  roomTask.execute();
                         }catch(InterruptedException ex){
                           //  Toast.makeText(getContext(),"Unable to reconnect, please check your connection", Toast.LENGTH_LONG).show();
                         }
@@ -266,11 +256,13 @@ public class ChatFragment extends Fragment implements RoomListener {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    adapter.add(message);
+                    chatlog.add(message);
                     //adapter.notifyItemInserted(0);
-                    //Although inefficient, we refresh the entire list to update timestamps everytime
+                    //We refresh the entire list to update timestamps everytime
                     adapter.notifyDataSetChanged();
 
+                    //Update log in userutilities
+                    //UserUtilities.setChatLog(getContext(), chatlog);
                 }
             });
         } catch (JsonProcessingException e) {
