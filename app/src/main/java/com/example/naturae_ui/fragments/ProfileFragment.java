@@ -222,76 +222,76 @@ public class ProfileFragment extends Fragment{
 
     }
 
-    private static class GrpcProfileImage extends AsyncTask<String, Void, Naturae.ProfileImageReply> {
-        private final OnFragmentInteractionListener listener;
-        private final WeakReference<Activity> activity;
-        private ManagedChannel channel;
-        private String mEncodedImage;
-
-        private GrpcProfileImage(OnFragmentInteractionListener listener, Activity activity, String encodedImage) {
-            this.listener = listener;
-            this.activity = new WeakReference<>(activity);
-            this.mEncodedImage = encodedImage;
-        }
-
-        @Override
-        protected Naturae.ProfileImageReply doInBackground(String... params) {
-            Naturae.ProfileImageReply reply;
-            try {
-                //Create a channel to connect to the server
-                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
-                //Create a stub for with the channel
-                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-                //Create an gRPC create account request
-                Naturae.ProfileImageRequest request = Naturae.ProfileImageRequest.newBuilder()
-                        .setAppKey(Constants.NATURAE_APP_KEY)
-                        .setAccessToken(UserUtilities.getAccessToken(activity.get()))
-                        .setEncodedImage(mEncodedImage).build();
-                //Send the request to the server and set reply to equal the response back from the server
-                reply = stub.getProfileImage(request);
-
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                pw.flush();
-                return null;
-            }
-            return reply;
-
-        }
-
-        @Override
-        protected void onPostExecute(Naturae.ProfileImageReply reply) {
-            super.onPostExecute(reply);
-            //Shut down the gRPC channel
-            try {
-                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            //Check if reply is equal to null. If it's equal to null then there was an error with the server or phone
-            //while communicating with the server.
-            if (reply != null) {
-
-            } else {
-                displayError((String) activity.get().getText(R.string.internet_connection));
-
-            }
-        }
-        /**
-         * Create an dialog box that display the error
-         *
-         * @param message the error message to be display
-         */
-        private void displayError(String message) {
-            //Create an instance of Alert Dialog
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity.get());
-            alertDialogBuilder.setTitle("Error").setMessage(message).setPositiveButton(R.string.ok, (dialog, which) -> {
-                dialog.cancel();
-            }).show();
-        }
-    }
+//    private static class GrpcProfileImage extends AsyncTask<String, Void, Naturae.ProfileImageReply> {
+//        private final OnFragmentInteractionListener listener;
+//        private final WeakReference<Activity> activity;
+//        private ManagedChannel channel;
+//        private String mEncodedImage;
+//
+//        private GrpcProfileImage(OnFragmentInteractionListener listener, Activity activity, String encodedImage) {
+//            this.listener = listener;
+//            this.activity = new WeakReference<>(activity);
+//            this.mEncodedImage = encodedImage;
+//        }
+//
+//        @Override
+//        protected Naturae.ProfileImageReply doInBackground(String... params) {
+//            Naturae.ProfileImageReply reply;
+//            try {
+//                //Create a channel to connect to the server
+//                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+//                //Create a stub for with the channel
+//                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+//                //Create an gRPC create account request
+//                Naturae.ProfileImageRequest request = Naturae.ProfileImageRequest.newBuilder()
+//                        .setAppKey(Constants.NATURAE_APP_KEY)
+//                        .setAccessToken(UserUtilities.getAccessToken(activity.get()))
+//                        .setEncodedImage(mEncodedImage).build();
+//                //Send the request to the server and set reply to equal the response back from the server
+//                reply = stub.getProfileImage(request);
+//
+//            } catch (Exception e) {
+//                StringWriter sw = new StringWriter();
+//                PrintWriter pw = new PrintWriter(sw);
+//                e.printStackTrace(pw);
+//                pw.flush();
+//                return null;
+//            }
+//            return reply;
+//
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Naturae.ProfileImageReply reply) {
+//            super.onPostExecute(reply);
+//            //Shut down the gRPC channel
+//            try {
+//                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+//            //Check if reply is equal to null. If it's equal to null then there was an error with the server or phone
+//            //while communicating with the server.
+//            if (reply != null) {
+//
+//            } else {
+//                displayError((String) activity.get().getText(R.string.internet_connection));
+//
+//            }
+//        }
+//        /**
+//         * Create an dialog box that display the error
+//         *
+//         * @param message the error message to be display
+//         */
+//        private void displayError(String message) {
+//            //Create an instance of Alert Dialog
+//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity.get());
+//            alertDialogBuilder.setTitle("Error").setMessage(message).setPositiveButton(R.string.ok, (dialog, which) -> {
+//                dialog.cancel();
+//            }).show();
+//        }
+//    }
 }
 
 
