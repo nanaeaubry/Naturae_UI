@@ -102,13 +102,13 @@ public class ChatFragment extends Fragment implements RoomListener {
                     @Override
                     public void onOpen() {
                         //Pass RoomListener as a target
-                        Room myRoom = scaledrone.subscribe(roomName, ChatFragment.this, new SubscribeOptions(50)); // ask for 50 messages from the history;
-                        myRoom.listenToHistoryEvents(new HistoryRoomListener() {
+                        scaledrone.subscribe(roomName, ChatFragment.this, new SubscribeOptions(50)).listenToHistoryEvents(new HistoryRoomListener() {
                             @Override
                             public void onHistoryMessage(Room myRoom, com.scaledrone.lib.Message message) {
-                               onMessage(myRoom, message);
+                                onMessage(myRoom, message);
                             }
-                        });
+                        }); // ask for 50 messages from the history;
+
                         System.out.println("Scaledrone connection open");
                     }
 
