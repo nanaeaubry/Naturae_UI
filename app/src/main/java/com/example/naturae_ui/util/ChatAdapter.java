@@ -1,14 +1,18 @@
 package com.example.naturae_ui.util;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.content.Context;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.models.ChatMessage;
+import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +27,17 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private ArrayList<ChatMessage> chatlog;
     private Context context;
     private LayoutInflater inflater;
+    private String avatar;
 
     /**
      * Updates the current context of the component
      * @param context
      */
-    public ChatAdapter(Context context, ArrayList<ChatMessage> chatlog) {
+    public ChatAdapter(Context context, ArrayList<ChatMessage> chatlog, String avatar) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.chatlog = chatlog;
+        this.avatar = avatar;
     }
 /*
     public void add(ChatMessage message) {
@@ -212,15 +218,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         TextView messageBody;
         TextView username;
         TextView timestamp;
-        View avatar;
+        ImageView avatarView;
 
         public ViewHolderFriend(View userView){
             super(userView);
             messageBody = userView.findViewById(R.id.bubble_friend_messageBody);
             username = userView.findViewById(R.id.bubble_friend_username);
             timestamp = userView.findViewById(R.id.bubble_friend_timestamp);
-            avatar = userView.findViewById(R.id.bubble_friend_avatar);
-
+            avatarView = userView.findViewById(R.id.bubble_friend_avatar);
+            Picasso.get().load(avatar).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(avatarView);
             //Registers a callback to be invoked when this item is clicked
             // userView.setOnClickListener(this);
         }

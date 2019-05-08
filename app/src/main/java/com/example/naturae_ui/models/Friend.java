@@ -6,14 +6,22 @@ import android.view.View;
  */
 public class Friend implements Comparable<Friend>{
     private String username;
-    private View avatar;
+    private String avatar;
 
-    public Friend(String username){
+    public Friend(String username, String avatar){
         this.username = username;
+        this.avatar = avatar;
     }
 
     public String getName(){
         return username;
+    }
+
+    public String getAvatar(){
+        if(avatar == null || avatar.length() == 0){
+            return "unavailable";
+        }
+        return avatar;
     }
 
     @Override

@@ -26,10 +26,13 @@ import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scaledrone.lib.HistoryRoomListener;
 import com.scaledrone.lib.Listener;
+import com.scaledrone.lib.Message;
 import com.scaledrone.lib.Room;
 import com.scaledrone.lib.RoomListener;
 import com.scaledrone.lib.Scaledrone;
+import com.scaledrone.lib.SubscribeOptions;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;
@@ -41,6 +44,8 @@ import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntToDoubleFunction;
 
@@ -54,7 +59,6 @@ import io.grpc.StatusRuntimeException;
  */
 public class ChatFragment extends Fragment implements RoomListener {
     private static final String TAG = "ChatFragment";
-    //todo hide channelID
     private final String channelID = "rff299Lg3qBpyQxQ";
     private String roomName;
     private TextView friendUsernameTitle;
@@ -67,6 +71,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     private Scaledrone scaledrone;
     private Boolean lostConnection;
     private String USERNAME;
+    private String avatar;
     ArrayList<ChatMessage> chatlog;
 
     @Override
@@ -74,14 +79,14 @@ public class ChatFragment extends Fragment implements RoomListener {
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
         currentUsernameText = getArguments().getString("argCurrentUser");
-
+        //The avatar of the other user
+        avatar = getArguments().getString("friendAvatar");
         thisUser = new MemberData(currentUsernameText);
         chatlog = new ArrayList<ChatMessage>();
 
         //Clone the arrayList from cache, error, java.lang.String cannot be cast to java.util.ArrayList
         //chatlog = new ArrayList<ChatMessage>(UserUtilities.getChatlog(getContext()));
 
-        lostConnection = false;
         Log.d(TAG, "onCreate: user1" + thisUser.getUsername());
         Log.d(TAG, "onCreate: user2" + friendUsernameText);
         /**
@@ -99,7 +104,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                     @Override
                     public void onOpen() {
                         //Pass RoomListener as a target
-                        scaledrone.subscribe(roomName, ChatFragment.this);
+                        scaledrone.subscribe(roomName, ChatFragment.this); // ask for 50 messages from the history;
                         System.out.println("Scaledrone connection open");
                     }
 
@@ -115,13 +120,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                         System.err.println(e);
                         Log.d(TAG, "onFailure: Connection failure");
                         //Attempt to Reconnect after some time
-                        try{
-                            Thread.sleep(3000);
-                          //  roomTask.execute();
-                        }catch(InterruptedException ex){
-                          //  Toast.makeText(getContext(),"Unable to reconnect, please check your connection", Toast.LENGTH_LONG).show();
-                        }
-
+                        tryReconnecting(0);
                     }
 
                     @Override
@@ -133,8 +132,6 @@ public class ChatFragment extends Fragment implements RoomListener {
             }
         });
         roomTask.execute();
-        //If scaledrone is ready
-
 
     }
 
@@ -177,7 +174,7 @@ public class ChatFragment extends Fragment implements RoomListener {
         });
 
         //Setup adapter
-        adapter = new ChatAdapter(getContext(), chatlog);
+        adapter = new ChatAdapter(getContext(), chatlog, avatar);
         recyclerView.setAdapter(adapter);
         LinearLayoutManager chatLayout = new LinearLayoutManager(getContext());
         chatLayout.setReverseLayout(true);
@@ -239,6 +236,7 @@ public class ChatFragment extends Fragment implements RoomListener {
         Log.d(TAG, "onOpenFailure: Unable to connect to a room successfully" + e);
     }
 
+
     // Eventhandler for receiving a message from the Scaledrone room
     @Override
     public void onMessage(Room room, com.scaledrone.lib.Message receivedMessage) {
@@ -250,13 +248,13 @@ public class ChatFragment extends Fragment implements RoomListener {
             boolean isSentByUser = user.getUsername().equals(thisUser.getUsername());
             long timestamp = receivedMessage.getTimestamp();
             //Construct a new chat message from the received data
-            final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), timestamp, isSentByUser);
+            final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), timestamp, isSentByUser, avatar);
             Log.d(TAG, "onMessage: " + message.getMessageBody());
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    chatlog.add(message);
+                    chatlog.add(0, message);
                     //adapter.notifyItemInserted(0);
                     //We refresh the entire list to update timestamps everytime
                     adapter.notifyDataSetChanged();
@@ -284,6 +282,47 @@ public class ChatFragment extends Fragment implements RoomListener {
             Log.d(TAG, "Message Sent: " + message);
         }
 
+    }
+
+    /**
+     * Restablish a scaledrone connection if dropped
+     * @param reconnectAttempt
+     */
+    private void tryReconnecting(final int reconnectAttempt) {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                final Scaledrone drone = new Scaledrone(roomName);
+                drone.connect(new Listener() {
+                    @Override
+                    public void onFailure(Exception ex) {
+                        tryReconnecting(reconnectAttempt + 1);
+                        Log.d(TAG, "!onFailure!: Reconnecting again: attempt: " + (reconnectAttempt + 1));
+                    }
+
+                    @Override
+                    public void onOpen() {
+                        //Pass RoomListener as a target
+                        scaledrone.subscribe(roomName, ChatFragment.this); // ask for 50 messages from the history;
+                        System.out.println("Scaledrone connection open");
+                    }
+
+                    @Override
+                    public void onOpenFailure(Exception e) {
+                        System.err.println(e);
+                        //Can potentially happen due to authentication error
+                        Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
+                    }
+
+                    @Override
+                    public void onClosed(String reason) {
+                        System.err.println(reason);
+                    }
+                });
+            }
+
+        }, reconnectAttempt * 1000);
     }
 
     /**

@@ -66,13 +66,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
+    implementation 'com.squareup.picasso:picasso:2.71828'
     compileOnly 'org.glassfish:javax.annotation:10.0-b28'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.exifinterface:exifinterface:1.1.0-alpha01'
     compile 'com.scaledrone:scaledrone-java:0.6.0'
 // https://mvnrepository.com/artifact/commons-logging/commons-logging
     compile group: 'commons-logging', name: 'commons-logging', version: '1.2'
+    compile 'com.makeramen:roundedimageview:2.3.0'
 
 }
 repositories {
