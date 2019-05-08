@@ -60,6 +60,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     private EditText messageInput;
     private View sendButton;
     private String friendUsernameText;
+    private String currentUsernameText;
     private ChatAdapter adapter;
     private MemberData thisUser;
     private Scaledrone scaledrone;
@@ -71,8 +72,10 @@ public class ChatFragment extends Fragment implements RoomListener {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         friendUsernameText = getArguments().getString("argUsername");
+        currentUsernameText = getArguments().getString("argCurrentUser");
         //Uncomment and enter username to test
         //Testing purposes
+        /*
         try{
             USERNAME = UserUtilities.getEmail(getContext());
         }
@@ -84,15 +87,17 @@ public class ChatFragment extends Fragment implements RoomListener {
             Toast.makeText(getContext(),"Unable to get username", Toast.LENGTH_LONG).show();
             USERNAME = "limstevenlbw@gmail.com";
         }
+*/
 
-        thisUser = new MemberData(USERNAME);
+        thisUser = new MemberData(currentUsernameText);
         chatlog = new LinkedList<ChatMessage>();
         lostConnection = false;
-
+        Log.d(TAG, "onCreate: user1" + thisUser.getUsername());
+        Log.d(TAG, "onCreate: user2" + friendUsernameText);
         /**
          * Call asynchronous task to obtain room name
          */
-        GrpcGetRoomTask roomTask = new GrpcGetRoomTask(new GrpcGetRoomTask.GetRoomRunnable(thisUser.getUsername(), friendUsernameText), getActivity());
+        GrpcGetRoomTask roomTask = new GrpcGetRoomTask(new GrpcGetRoomTask.GetRoomRunnable(currentUsernameText, friendUsernameText), getActivity());
         roomTask.setListener(new GrpcGetRoomTask.AsyncTaskListener(){
             @Override
             public void onGetRoomFinished(String room) {
@@ -250,7 +255,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     // Successfully connected to a Scaledrone room
     @Override
     public void onOpen(Room room) {
-        Log.d(TAG, "onOpen: Connected to a room successfully");
+        Log.d(TAG, "onOpen: Connected to a room successfully:" + roomName + " actual:" + room.getName());
     }
 
     // Connecting to Scaledrone room failed
@@ -343,6 +348,7 @@ public class ChatFragment extends Fragment implements RoomListener {
                 String roomID = result.getRoomName();
                 //Callback function
                 listener.onGetRoomFinished(roomID);
+                Log.d(TAG, "onPostExecute: ROOM NAME " + roomID);
 
             }
             else{
@@ -374,12 +380,18 @@ public class ChatFragment extends Fragment implements RoomListener {
             }
             // gRPC SEARCHUSERS CALL handler, Service (UserSearchRequest) returns (UserListReply)
             public Naturae.RoomReply run(ServerRequestsGrpc.ServerRequestsBlockingStub blockingStub) throws StatusRuntimeException {
+              //  Log.d(TAG, "run: user1: " + user1);
+              //  Log.d(TAG, "run: user2: " + user2);
                 Naturae.RoomReply reply;
                 //Generate Request as defined by proto definition
-                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1(user1).setUserOwner1(user2).build();
-
+                Naturae.RoomRequest request = Naturae.RoomRequest.newBuilder().setUserOwner1(user1.trim()).setUserOwner2(user2.trim()).build();
+           //     Log.d(TAG, "runREQ: user1: " + request.getUserOwner1());
+               // Log.d(TAG, "runREQ: user2: " + request.getUserOwner2());
                 //Send the request to the server and set reply to the server response
                 reply = blockingStub.getRoomName(request);
+
+               // Log.d(TAG, "run: REPLY NAME "  + reply.getRoomName() );
+               // Log.d(TAG, "run: STATUS FROM REPLY " + reply.getStatus().getMessage());
                 //withDeadlineAfter(15000, TimeUnit.MILLISECONDS)
                 return reply;
             }

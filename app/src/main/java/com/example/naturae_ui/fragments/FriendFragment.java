@@ -364,8 +364,9 @@ public class FriendFragment extends Fragment {
                     //Assemble new Chat Fragment to pass arguments into
                     ChatFragment chatfragment = new ChatFragment();
                     //Creates a new bundle of capacity 1 to pass in arguments: username
-                    Bundle bundle = new Bundle(1);
+                    Bundle bundle = new Bundle(2);
                     bundle.putString("argUsername", friend.getName());
+                    bundle.putString("argCurrentUser", USERNAME);
                     chatfragment.setArguments(bundle);
 
                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
