@@ -71,12 +71,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 timeElapsed += "s";
             }
         }
-        else if(seconds > 0){
+        else if(seconds >= 0){
             timeElapsed = "" + seconds + " second";
             if(seconds > 1){
-                if(seconds > 1){
-                    timeElapsed += "s";
-                }
+                timeElapsed += "s";
+            }
+            else if(seconds == 0){
+                return "just now";
             }
         }
         timeElapsed += " ago";
