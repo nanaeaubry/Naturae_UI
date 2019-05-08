@@ -3,9 +3,15 @@ package com.example.naturae_ui.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.naturae_ui.models.ChatMessage;
 import com.example.naturae_ui.server.NaturaeUser;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import android.content.SharedPreferences.Editor;
 
 public class UserUtilities {
     private static final String SHARED_PREF_USER_DATA = "UserData";
@@ -17,6 +23,7 @@ public class UserUtilities {
     private static final String LAST_NAME = "lastName";
     private static final String IS_LOGGED_IN = "isLoggedIn";
     private static final String SORT_LIST_REVERSE = "sortListReverse";
+    private static final String CHAT_LOG = "chatLog";
 
 
     /**
@@ -142,6 +149,20 @@ public class UserUtilities {
     }
 
     /**
+     * Store a user's chatlog as a serialized string
+     */
+    public static void setChatLog(Context context, ArrayList<ChatMessage> chatlog){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        Editor editor = userPreferences.edit();
+        try {
+            editor.putString(CHAT_LOG, ObjectSerializer.serialize(chatlog));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        editor.commit();
+    }
+
+    /**
      * Retrieves the user's first name
      * @return the user's first name
      */
@@ -199,6 +220,21 @@ public class UserUtilities {
         catch(NullPointerException e){
             return false;
         }
+    }
+
+    /**
+     * Retrieves a user's chatlog as an arraylist
+     */
+    public static ArrayList<ChatMessage> getChatlog(Context context){
+        // load stored chatlog from preferences
+        SharedPreferences prefs = getUserSharedPreferences(context);
+        ArrayList<ChatMessage> newLog = new ArrayList<>();
+        try {
+            newLog = (ArrayList<ChatMessage>) ObjectSerializer.deserialize(prefs.getString(CHAT_LOG, ObjectSerializer.serialize(new ArrayList<ChatMessage>())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return newLog;
     }
 
 }

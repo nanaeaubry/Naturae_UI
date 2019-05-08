@@ -70,7 +70,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.exifinterface:exifinterface:1.1.0-alpha01'
     compile 'com.scaledrone:scaledrone-java:0.6.0'
-
+// https://mvnrepository.com/artifact/commons-logging/commons-logging
+    compile group: 'commons-logging', name: 'commons-logging', version: '1.2'
 
 }
 repositories {
