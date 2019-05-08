@@ -50,6 +50,7 @@ import io.grpc.StatusRuntimeException;
 
 public class FriendFragment extends Fragment {
     private static final String TAG = "FriendFragment";
+    //private OnFriendDataPass friendDataPasser;
     private String USERNAME;
     private FriendAdapter adapter;
     private List<Friend> friendsList;
@@ -394,6 +395,25 @@ public class FriendFragment extends Fragment {
         super.onDestroy();
     }
 
+
+
+     /*
+      * Sends a friendslist back to the main activity for processing
+      * @param friendsList the list of friends to datapass back
+
+     public void passData(ArrayList<Friend> friendsList) {
+        friendDataPasser.onFriendDataPass(friendsList);
+    }
+*/
+    /*
+     /**
+      * Interface for messaging between fragment and activity
+      */
+     /*
+    public interface OnFriendDataPass {
+        public void onFriendDataPass(ArrayList<Friend> friendsList);
+    }
+*/
     /*************************************************************************************************************************************
      * Class sets up Asynchronous Task handling for searching for a search query
      * "Async Generic Types"
@@ -474,8 +494,6 @@ public class FriendFragment extends Fragment {
             else{
                 //Placeholder test
                 List<Friend> searchedFriendsList = new ArrayList<Friend>();
-                searchedFriendsList.add(new Friend("Alex"));
-                searchedFriendsList.add(new Friend("Anita"));
 
                 if (listener != null) {
                     listener.onSearchTaskFinished(searchedFriendsList);
