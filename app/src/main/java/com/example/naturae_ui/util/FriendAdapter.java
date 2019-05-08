@@ -1,9 +1,12 @@
 package com.example.naturae_ui.util;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -11,6 +14,9 @@ import java.util.List;
 import android.content.Context;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.models.Friend;
+import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.Picasso;
+import android.view.animation.Transformation;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder>{
     private static final String TAG = "FriendAdapter";
@@ -41,7 +47,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
      */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = inflater.inflate(R.layout.list_item_friend, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
@@ -59,6 +64,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Friend user = friendsList.get(position);
         holder.usernameView.setText(user.getName());
+       String avatarLink = (friendsList.get(position).getAvatar());
+       // Log.d(TAG, "onItemClick: TEST: " + position + " " + friendsList.get(position).getAvatar() + "name " + friendsList.get(position).getName());
+        Picasso.get().load(avatarLink).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(holder.avatar);
     }
 
     /**
@@ -75,9 +83,11 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
      */
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView usernameView;
-        View avatar;
+        ImageView avatar;
         View addFriendButton;
         View removeFriendButton;
+        String avatarLink;
+
 
         public ViewHolder(View userView){
             super(userView);
@@ -99,6 +109,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
             //Registers a callback to be invoked when this item is clicked
             userView.setOnClickListener(this);
+        }
+
+        public void setAvatar(String link){
+            avatarLink = link;
         }
 
         @Override

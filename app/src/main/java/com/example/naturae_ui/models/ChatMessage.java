@@ -8,7 +8,7 @@ public class ChatMessage {
     private String name;
     private boolean isSentByUser;
     private String timeElapsed;
-
+    private String avatar;
 
     /**
      * Initalize a text message that was received from the server-end chatlog
@@ -17,11 +17,12 @@ public class ChatMessage {
      * @param timestamp
      * @param isSentByUser
      */
-    public ChatMessage(String messageBody, String name, long timestamp, boolean isSentByUser){
+    public ChatMessage(String messageBody, String name, long timestamp, boolean isSentByUser, String avatar){
         this.messageBody = messageBody;
         this.isSentByUser = isSentByUser;
         this.name = name;
         this.timestamp = timestamp;
+        this.avatar = avatar;
     }
 
     /**

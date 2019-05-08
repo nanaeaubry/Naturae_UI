@@ -50,6 +50,7 @@ import io.grpc.StatusRuntimeException;
 
 public class FriendFragment extends Fragment {
     private static final String TAG = "FriendFragment";
+    //private OnFriendDataPass friendDataPasser;
     private String USERNAME;
     private FriendAdapter adapter;
     private List<Friend> friendsList;
@@ -64,6 +65,7 @@ public class FriendFragment extends Fragment {
     private View sortButton;
     private ConstraintLayout layout;
     private ProgressBar progress;
+    private static String defaultAvatar = "http://i.imgur.com/DvpvklR.png";
 
     //Cache to define user sort preferences, false means sort in A-Z normal order
     private boolean sortListReverse;
@@ -360,13 +362,14 @@ public class FriendFragment extends Fragment {
                 @Override
                 public void onItemClick(View view, int position, Friend friend) {
                     Log.d(TAG, "onFriendClick position: " + position);
-
+                    String avatar = friend.getAvatar();
                     //Assemble new Chat Fragment to pass arguments into
                     ChatFragment chatfragment = new ChatFragment();
-                    //Creates a new bundle of capacity 1 to pass in arguments: username
-                    Bundle bundle = new Bundle(2);
+                    //Creates a new bundle of capacity 3 to pass in arguments: username
+                    Bundle bundle = new Bundle(3);
                     bundle.putString("argUsername", friend.getName());
                     bundle.putString("argCurrentUser", USERNAME);
+                    bundle.putString("friendAvatar", avatar);
                     chatfragment.setArguments(bundle);
 
                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -394,6 +397,25 @@ public class FriendFragment extends Fragment {
         super.onDestroy();
     }
 
+
+
+     /*
+      * Sends a friendslist back to the main activity for processing
+      * @param friendsList the list of friends to datapass back
+
+     public void passData(ArrayList<Friend> friendsList) {
+        friendDataPasser.onFriendDataPass(friendsList);
+    }
+*/
+    /*
+     /**
+      * Interface for messaging between fragment and activity
+      */
+     /*
+    public interface OnFriendDataPass {
+        public void onFriendDataPass(ArrayList<Friend> friendsList);
+    }
+*/
     /*************************************************************************************************************************************
      * Class sets up Asynchronous Task handling for searching for a search query
      * "Async Generic Types"
@@ -460,7 +482,7 @@ public class FriendFragment extends Fragment {
                     //Fill the searched users list
                     if(result.getUsersCount() > 0){
                         for(int i=0; i< result.getUsersList().size(); i++) {
-                            usersList.add(new Friend(result.getUsersList().get(i)));
+                            usersList.add(new Friend(result.getUsersList().get(i), defaultAvatar));
                         }
                     }
 
@@ -474,8 +496,6 @@ public class FriendFragment extends Fragment {
             else{
                 //Placeholder test
                 List<Friend> searchedFriendsList = new ArrayList<Friend>();
-                searchedFriendsList.add(new Friend("Alex"));
-                searchedFriendsList.add(new Friend("Anita"));
 
                 if (listener != null) {
                     listener.onSearchTaskFinished(searchedFriendsList);
@@ -585,7 +605,7 @@ public class FriendFragment extends Fragment {
                 //Fill the list if a list is available
                 if(result.getUsersCount() > 0){
                     for(int i=0; i< result.getUsersList().size(); i++) {
-                        friendsList.add(new Friend(result.getUsersList().get(i)));
+                        friendsList.add(new Friend(result.getUsersList().get(i), defaultAvatar));
                         Log.d(TAG, "" + (friendsList.get(i)));
                     }
                 }

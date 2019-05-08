@@ -7,7 +7,7 @@
     android:paddingRight="60dp"
     android:clipToPadding="false">
 
-    <View
+    <ImageView
         android:id="@+id/bubble_friend_avatar"
         android:layout_alignParentLeft="true"
         android:scaleType="centerInside"
@@ -43,12 +43,12 @@
         android:id="@+id/bubble_friend_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bubble_friend_messageBody"
+        android:layout_below="@+id/bubble_friend_messageBody"
+        android:layout_marginLeft="-119dp"
         android:layout_toRightOf="@+id/bubble_friend_username"
-        android:layout_marginLeft="15dp"
+        android:paddingBottom="5dp"
         android:text="Sent 5 minutes ago"
         android:textSize="12sp"
-        android:paddingBottom="5dp"
         android:textStyle="italic" />
 
 </RelativeLayout>
