@@ -68,7 +68,7 @@ public class UserUtilities {
      */
     public static boolean isLoggedIn(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
-        return userPreferences.getBoolean(IS_LOGGED_IN, true);
+        return userPreferences.getBoolean(IS_LOGGED_IN, false);
     }
     /**
      *

@@ -191,11 +191,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 //If the status code is equal to 200 then the information the user's entered is correct
                 if (loginReply.getStatus().getCode() == Constants.OK){
                     //Cache the user information
-                    new Thread(()->{
-                        UserUtilities.setIsLoggedIn(activity.get(), true);
-                        UserUtilities.cacheUser(activity.get(), new NaturaeUser(loginReply.getFirstName(), loginReply.getLastName(),
-                                loginReply.getEmail(), loginReply.getAccessToken(), loginReply.getRefreshToken(), ""));
-                    }).run();
+                    UserUtilities.setIsLoggedIn(activity.get(), false);
+                    UserUtilities.cacheUser(activity.get(), new NaturaeUser(loginReply.getFirstName(), loginReply.getLastName(),
+                            loginReply.getEmail(), loginReply.getAccessToken(), loginReply.getRefreshToken(), ""));
                     mListener.startMainActivity();
                 }
                 //If the status code is equal to 103 then the information the user's entered is incorrect

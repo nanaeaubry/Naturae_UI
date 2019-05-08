@@ -65,7 +65,7 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
         rightSideButton = findViewById(R.id.right_side_button);
         progressBar = findViewById(R.id.progressBar);
 
-        beginFragment(AuthFragmentType.LOGIN, true, false);
+        beginFragment(AuthFragmentType.LOGIN, true, true);
         isHomeEnable = true;
 
         backButton.setOnClickListener(v -> onBackPressed());
