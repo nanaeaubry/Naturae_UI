@@ -2,21 +2,22 @@ package com.example.naturae_ui.containers;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
-//test
+
+import com.example.naturae_ui.R;
 import com.example.naturae_ui.fragments.AccountAuthenFragment;
 import com.example.naturae_ui.fragments.CreateAccountFragment;
 import com.example.naturae_ui.fragments.ForgetPasswordFragment;
 import com.example.naturae_ui.fragments.LoginFragment;
-import com.example.naturae_ui.R;
-import com.examples.naturaeproto.Naturae;
+
+//test
 
 public class StartUpActivityContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
         CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
@@ -28,7 +29,7 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
 
     private ConstraintLayout startUpTopNav;
 
-    private Button backButton, rightSideButton;
+    private Button rightSideButton;
     private ProgressBar progressBar;
     private boolean isHomeEnable;
 
@@ -44,9 +45,6 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
 
     }
 
-    public static void test(){
-        System.out.println(197);
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +59,7 @@ public class StartUpActivityContainer extends AppCompatActivity implements Login
         forgetPasswordFragment = ForgetPasswordFragment.newInstance();
 
 
-        backButton = findViewById(R.id.back_button);
+        Button backButton = findViewById(R.id.back_button);
         rightSideButton = findViewById(R.id.right_side_button);
         progressBar = findViewById(R.id.progressBar);
 

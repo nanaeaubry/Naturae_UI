@@ -303,7 +303,6 @@ public class ProfileFragment extends Fragment{
 //        /**
 //         * Create an dialog box that display the error
 //         *
-//         * @param message the error message to be display
 //         */
 //        private void displayError(String message) {
 //            //Create an instance of Alert Dialog
@@ -318,3 +317,5 @@ public class ProfileFragment extends Fragment{
 
 
 
+
+//         * @param message the error message to be display

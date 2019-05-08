@@ -16,7 +16,7 @@ import android.content.SharedPreferences.Editor;
 public class UserUtilities {
     private static final String SHARED_PREF_USER_DATA = "UserData";
     private static final String USER_INFO = "userJson";
-    private static final String EMAIL = "username";
+    private static final String EMAIL = "email";
     private static final String ACCESS_TOKEN = "accessToken";
     private static final String REFRESH_TOKEN = "refreshToken";
     private static final String FIRST_NAME = "firstName";
@@ -120,6 +120,11 @@ public class UserUtilities {
     public static void setLastName(Context context, String name){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
         userPreferences.edit().putString(LAST_NAME, name).apply();
+    }
+
+    public static void setEmail(Context context, String email){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        userPreferences.edit().putString(EMAIL, email).apply();
     }
 
     /**

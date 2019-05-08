@@ -21,7 +21,8 @@ service ServerRequests{
     rpc ForgetPasswordVerifyCode (ForgetPasswordVerifyCodeRequest) returns (ForgetPasswordVerifyCodeReply){};
     rpc ForgetPasswordResetPassword (ForgetPasswordNewPasswordRequest) returns (ForgetPasswordNewPasswordReply){};
     rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply){};
-	rpc GetProfileImage (ProfileImageRequest) returns (ProfileImageReply){};
+    rpc GetProfileImage (GetProfileImageRequest) returns (GetProfileImageReply){};
+    rpc SetProfileImage(SetProfileImageRequest) returns (SetProfileImageReply){};
 
     /**** Friendslist gRPC Functions ****/
     // Query is sent to the server and a list of matching users is returned
@@ -183,20 +184,20 @@ message FriendReply{
     //string refreshToken = 2;
 }
 
- //Ensures that the local and remote logs are up to date
- //rpc SyncChat(ChatlogRequest) returns (ChatlogReply){}
- /*
+//Ensures that the local and remote logs are up to date
+//rpc SyncChat(ChatlogRequest) returns (ChatlogReply){}
+/*
 message ChatlogRequest{
-    repeated ChatMessage = 1;
+   repeated ChatMessage = 1;
 }
 message ChatMessage{
-    string userWhoSentIt = 1;
-    string messageBody = 2;
-    long timestampSent = 3;
+   string userWhoSentIt = 1;
+   string messageBody = 2;
+   long timestampSent = 3;
 }
 
 message ChatlogReply{
-    repeated ChatMessage = 1;
+   repeated ChatMessage = 1;
 }
 */
 message RoomRequest{
@@ -259,13 +260,23 @@ message ChangePasswordRequest{
 message ChangePasswordReply{
     Status status = 1;
 }
-message ProfileImageRequest{
+message SetProfileImageRequest{
     string AppKey = 1;
     string AccessToken = 2;
     string encodedImage = 3;
 }
 
-message ProfileImageReply{
+message SetProfileImageReply{
+    Status status = 1;
+}
+
+message GetProfileImageRequest{
+    string AppKey = 1;
+    string AccessToken = 2;
+}
+
+message GetProfileImageReply{
     Status status = 1;
     string encodedImage = 2;
 }
+
