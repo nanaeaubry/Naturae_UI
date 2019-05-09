@@ -65,8 +65,6 @@ public class FriendFragment extends Fragment {
     private View sortButton;
     private ConstraintLayout layout;
     private ProgressBar progress;
-    private static String defaultAvatar = "http://i.imgur.com/DvpvklR.png";
-
     //Cache to define user sort preferences, false means sort in A-Z normal order
     private boolean sortListReverse;
     /**
@@ -482,7 +480,7 @@ public class FriendFragment extends Fragment {
                     //Fill the searched users list
                     if(result.getUsersCount() > 0){
                         for(int i=0; i< result.getUsersList().size(); i++) {
-                            usersList.add(new Friend(result.getUsersList().get(i), defaultAvatar));
+                            usersList.add(new Friend(result.getUsersList().get(i), result.getAvatars(i)));
                         }
                     }
 
@@ -605,7 +603,7 @@ public class FriendFragment extends Fragment {
                 //Fill the list if a list is available
                 if(result.getUsersCount() > 0){
                     for(int i=0; i< result.getUsersList().size(); i++) {
-                        friendsList.add(new Friend(result.getUsersList().get(i), defaultAvatar));
+                        friendsList.add(new Friend(result.getUsersList().get(i), result.getAvatars(i)));
                         Log.d(TAG, "" + (friendsList.get(i)));
                     }
                 }
