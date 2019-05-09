@@ -5,9 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,7 +13,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Base64;
 import android.util.Log;
@@ -24,15 +21,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.containers.MainActivityContainer;
 import com.example.naturae_ui.util.Constants;
-import com.example.naturae_ui.util.Helper;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
@@ -42,7 +36,6 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
@@ -52,7 +45,6 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import static android.support.constraint.Constraints.TAG;
-import static com.example.naturae_ui.fragments.PostFragment.REQUEST_IMAGE_CAPTURE;
 
 public class ProfileFragment extends Fragment {
     public final static int PICK_PHOTO = 1046;
@@ -94,10 +86,6 @@ public class ProfileFragment extends Fragment {
         lastName = mView.findViewById(R.id.last_name_edit_text);
         profileName = mView.findViewById(R.id.tvProfileName);
         profileEmail = mView.findViewById(R.id.tvProfileEmail);
-
-        //profileName.setText(UserUtilities.getFirstName(getContext()) + UserUtilities.getLastName(getContext()));
-        // profileName.setText("Brian Ashley");
-        //profileEmail.setText("inudraggun01@sbcglobal.net");
 
         profileName.setText(profileNameString);
         profileEmail.setText(profileEmailString);
@@ -278,23 +266,19 @@ public class ProfileFragment extends Fragment {
         @Override
         protected void onPostExecute(Naturae.GetProfileImageReply reply) {
             super.onPostExecute(reply);
-            Log.d("Tag", "onPostExecute: 'this occurred");
-            if (reply != null) {
-                listener.onGetProfileImageCompleted(reply.getEncodedImage());
-                Log.d(TAG, "onPostExecute: ENCODED IMAGE GOT " + reply.getEncodedImage());
-            } else {
-                displayError((String) activity.get().getText(R.string.internet_connection));
-            }
-
             //Shut down the gRPC channel
             try {
                 channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            Log.d("Tag", "onPostExecute: 'this occurred");
             //Check if reply is equal to null. If it's equal to null then there was an error with the server or phone
             //while communicating with the server.
-
+            if (!reply.getEncodedImage().equals("")) {
+                listener.onGetProfileImageCompleted(reply.getEncodedImage());
+                Log.d(TAG, "onPostExecute: ENCODED IMAGE GOT " + reply.getEncodedImage());
+            }
         }
 
         public void setListener(AsyncTaskListener listener) {
