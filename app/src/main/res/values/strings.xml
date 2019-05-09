@@ -35,7 +35,7 @@
 
     <!--Profile-->
     <string name="internet_connection">Check your internet connection and try again</string>
-
+    <string name="header_profile">Profile Name</string>
     <!--Create Account-->
     <string name="invalid_email">Invalid email address</string>
     <string name="invalid_password">Invalid password</string>

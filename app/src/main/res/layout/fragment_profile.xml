@@ -31,8 +31,8 @@
             android:maxWidth="200dp"
             android:scaleType="fitXY"
             android:background="@color/white"
-            android:rotation="90"/>
-            <!--android:src="@drawable/ic_person_black_24dp"/> -->
+            android:rotation="90"
+            android:src="@drawable/ic_person_black_24dp"/>
             <!--tools:srcCompat="@tools:sample/avatars[0]"-->
 
 
