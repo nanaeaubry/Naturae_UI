@@ -112,7 +112,20 @@ public class ProfileFragment extends Fragment {
         });
 
 
+
+
         ibProfileImage = mView.findViewById(R.id.ibProfileImage);
+        //Do something with the encoded image
+        GetProfileImageTask imageTaskGet = new GetProfileImageTask(getActivity());
+        imageTaskGet.setListener(new GetProfileImageTask.AsyncTaskListener(){
+            @Override
+            public void onGetProfileImageCompleted(String encodedImageLink) {
+                //Display
+                Picasso.get().load(encodedImageLink).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
+            }
+        });
+
+        imageTaskGet.execute();
         ibProfileImage.setOnClickListener(v -> {
             //mSelectedImage = null;
             // Create intent for picking a photo from the gallery
@@ -125,16 +138,13 @@ public class ProfileFragment extends Fragment {
                 startActivityForResult(intent, PICK_PHOTO);
             }
 
-<<<<<<< HEAD
-=======
             //Make image a byte array to store in server
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+         //   ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+          //  mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
+//            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            //String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
            // new GrpcProfileImage(mListener,getActivity(), encodedImage).execute();
->>>>>>> 5eab9da3b1aed72841ae6f5569dbf13cbe693a54
 
         });
         bLogout = mView.findViewById(R.id.btLogout);
@@ -205,7 +215,8 @@ public class ProfileFragment extends Fragment {
                                 @Override
                                 public void onGetProfileImageCompleted(String encodedImageLink) {
                                     //Display
-                                    Picasso.get().load(encodedImageLink).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
+                                    ibProfileImage.setRotation(90);
+                                    Picasso.get().load(encodedImageLink).placeholder(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
                                 }
                             });
 
