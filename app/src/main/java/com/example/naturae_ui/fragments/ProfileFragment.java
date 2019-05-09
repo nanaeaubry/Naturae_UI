@@ -99,21 +99,14 @@ public class ProfileFragment extends Fragment {
             fragmentTransaction.commit();
         });
 
-
-
-
         ibProfileImage = mView.findViewById(R.id.ibProfileImage);
         //Do something with the encoded image
         GetProfileImageTask imageTaskGet = new GetProfileImageTask(getActivity());
-        imageTaskGet.setListener(new GetProfileImageTask.AsyncTaskListener(){
-            @Override
-            public void onGetProfileImageCompleted(String encodedImageLink) {
-                //Display
-                Picasso.get().load(encodedImageLink).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
-                ibProfileImage.setRotation(90f);
-            }
+        imageTaskGet.setListener(encodedImageLink -> {
+            //Display
+            Picasso.get().load(encodedImageLink).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
+            ibProfileImage.setRotation(90);
         });
-
         imageTaskGet.execute();
         ibProfileImage.setOnClickListener(v -> {
             //mSelectedImage = null;
@@ -195,22 +188,21 @@ public class ProfileFragment extends Fragment {
                     String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                     SetProfileImageTask imageTask = new SetProfileImageTask(getActivity());
-                    imageTask.setListener(new SetProfileImageTask.AsyncTaskListener(){
-                        @Override
-                        public void onSetProfileImageCompleted() {
-                            //Do something with the encoded image
-                            GetProfileImageTask imageTaskGet = new GetProfileImageTask(getActivity());
-                            imageTaskGet.setListener(new GetProfileImageTask.AsyncTaskListener(){
-                                @Override
-                                public void onGetProfileImageCompleted(String encodedImageLink) {
-                                    //Display
-                                    ibProfileImage.setRotation(90);
-                                    Picasso.get().load(encodedImageLink).placeholder(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
-                                }
-                            });
+                    imageTask.setListener(() -> {
+                        //Do something with the encoded image
+                        GetProfileImageTask imageTaskGet = new GetProfileImageTask(getActivity());
+                        imageTaskGet.setListener(encodedImageLink -> {
+                            //Display
+                            if (!encodedImageLink.isEmpty()){
+                                ibProfileImage.setRotation(90);
+                                Picasso.get().load(encodedImageLink).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
+                            }else{
+                                Picasso.get().load(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
 
-                            imageTaskGet.execute();
-                        }
+                            }
+                        });
+
+                        imageTaskGet.execute();
                     });
 
                     imageTask.execute(encodedImage);

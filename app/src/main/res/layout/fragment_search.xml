@@ -1,70 +1,32 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/friends_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/rounded_edit_text"
+    android:layout_marginTop="10dp"
+    android:layout_marginStart="53dp"
+    android:layout_marginEnd="10dp">
 
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" />
-
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/map_search"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginStart="56dp"
-        android:layout_marginEnd="8dp"
-        android:layout_weight=".70"
+    <com.example.naturae_ui.util.CustomEditText
+        android:id="@+id/map_search_text"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:focusableInTouchMode="true"
+        android:hint="@string/search"
+        android:imeOptions="actionDone"
         android:inputType="text"
-        app:layout_constraintEnd_toStartOf="@+id/map_search_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline4"
-        android:focusableInTouchMode="true">
+        android:paddingStart="5dp"
+        android:layout_weight=".70"
+        android:background="@android:color/transparent"
+        android:textAlignment="viewStart" />
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/map_search_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/search_hint"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:textAlignment="viewStart"
-            android:focusableInTouchMode="true"/>
-    </android.support.design.widget.TextInputLayout>
+    <View
+        android:id="@+id/divider"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/lightGray" />
 
-
-    <Button
-        android:id="@+id/map_search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="56dp"
-        android:layout_weight=".30"
-        android:text="@android:string/search_go"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/map_search"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="411dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintGuide_end="90dp"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

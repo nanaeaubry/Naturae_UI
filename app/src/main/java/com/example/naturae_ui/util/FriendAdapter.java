@@ -1,22 +1,21 @@
 package com.example.naturae_ui.util;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-import android.content.Context;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.models.Friend;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
-import android.view.animation.Transformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder>{
     private static final String TAG = "FriendAdapter";
@@ -64,9 +63,13 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Friend user = friendsList.get(position);
         holder.usernameView.setText(user.getName());
-       String avatarLink = (friendsList.get(position).getAvatar());
+        String avatarLink = (friendsList.get(position).getAvatar());
        // Log.d(TAG, "onItemClick: TEST: " + position + " " + friendsList.get(position).getAvatar() + "name " + friendsList.get(position).getName());
-        Picasso.get().load(avatarLink).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(holder.avatar);
+        System.out.println(avatarLink);
+        Picasso.get().load(avatarLink).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(holder.avatar);
+        if (avatarLink.equals("unavailable")){
+            holder.avatar.setRotation(360);
+        }
     }
 
     /**

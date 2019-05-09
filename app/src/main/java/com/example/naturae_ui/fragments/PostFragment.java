@@ -4,13 +4,11 @@ package com.example.naturae_ui.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.net.Uri;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,24 +18,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
-
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-
-import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.CustomEditText;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
@@ -67,9 +62,9 @@ public class PostFragment extends Fragment {
 	View mView;
 	ImageButton mOpenCamera;
 	ImageButton mOpenPhotos;
-	AutoCompleteTextView mTitlePost;
-	AutoCompleteTextView mSpeciesPost;
-	AutoCompleteTextView mDescriptionPost;
+	CustomEditText mTitlePost;
+	CustomEditText mSpeciesPost;
+	CustomEditText mDescriptionPost;
 	Button mSubmitPost;
 	OnPostListener listener;
 	Bitmap mSelectedImage = null;
@@ -83,7 +78,6 @@ public class PostFragment extends Fragment {
 		mView = inflater.inflate(R.layout.fragment_post, container, false);
 		super.onCreate(savedInstanceState);
 		mImagePreview = mView.findViewById(R.id.image_preview);
-		mImagePreviewLayout = mView.findViewById(R.id.image_preview_layout);
 
 		// Create a File reference for photo capture
 		photoFile = getPhotoFile(photoFileName);
@@ -120,11 +114,34 @@ public class PostFragment extends Fragment {
 		//User enters title of post
 		mTitlePost = mView.findViewById(R.id.post_title);
 
+		mTitlePost.setOnFocusChangeListener((v, hasFocus) -> {
+			if(hasFocus){
+				listener.hideBottomNavBar();
+			}
+		});
+
+		mTitlePost.setOnClickListener(v -> listener.hideBottomNavBar());
+
 		//User enters species of item in photo
 		mSpeciesPost = mView.findViewById(R.id.post_species);
 
+        mSpeciesPost.setOnFocusChangeListener((v, hasFocus) -> {
+            if(hasFocus){
+                listener.hideBottomNavBar();
+            }
+        });
+
+		mSpeciesPost.setOnClickListener(v -> listener.hideBottomNavBar());
+
 		//User enters a description for the post
 		mDescriptionPost = mView.findViewById(R.id.post_description);
+
+        mDescriptionPost.setOnFocusChangeListener((v, hasFocus) -> {
+            if(hasFocus){
+                listener.hideBottomNavBar();
+            }
+        });
+		mDescriptionPost.setOnClickListener(v -> listener.hideBottomNavBar());
 
 		//Button to submit post
 		mSubmitPost = mView.findViewById(R.id.post_submit);
@@ -170,7 +187,6 @@ public class PostFragment extends Fragment {
 		return mView;
 	}
 
-
 	/**
 	 * Get image data and process accordingly based on whether photo is taken with camera
 	 * or uploaded from user gallery
@@ -194,7 +210,6 @@ public class PostFragment extends Fragment {
 					mSelectedImage = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getContext()).getContentResolver(), photoUri);
 
 					// Load the selected image into a preview
-					mImagePreviewLayout.setVisibility(View.VISIBLE);
 					mImagePreview.setImageBitmap(mSelectedImage);
 
 					readExif(photoUri);
@@ -288,7 +303,7 @@ public class PostFragment extends Fragment {
 
 	public interface OnPostListener {
 		void onPostCreated(Post post);
-
+		void hideBottomNavBar();
 	}
 
 	private static class GrpcCreatePost extends AsyncTask<Void, Void, Naturae.CreatePostReply> {

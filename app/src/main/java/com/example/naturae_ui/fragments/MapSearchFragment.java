@@ -1,6 +1,5 @@
 package com.example.naturae_ui.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
@@ -9,8 +8,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -49,8 +48,13 @@ public class MapSearchFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_search, container, false);
 
 		searchFieldInput = view.findViewById(R.id.map_search_text);
-		searchSubmitButton = view.findViewById(R.id.map_search_button);
 
+		searchFieldInput.setOnClickListener(v -> getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING));
+		searchFieldInput.setOnFocusChangeListener((v, hasFocus) -> {
+			if (hasFocus){
+				getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+			}
+		});
 		/**
 		 * SEARCH FIELD EVENT HANDLER
 		 */
@@ -65,28 +69,6 @@ public class MapSearchFragment extends Fragment {
 					searchFieldInput.clearFocus();
 				}
 				return false;
-			}
-		});
-
-		/* Doesn't work >:(
-		searchFieldInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				InputMethodManager inputMethodManager =(InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-				inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
-			}
-		});
-		*/
-
-		/**
-		 * SEARCH BUTTON EVENT HANDLER
-		 */
-		searchSubmitButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String searchQuery = searchFieldInput.getText().toString();
-				passData(searchQuery);
-				searchFieldInput.clearFocus();
 			}
 		});
 
@@ -116,6 +98,7 @@ public class MapSearchFragment extends Fragment {
 	 * Interface for messaging between fragment and activity
 	 */
 	public interface OnDataPass {
-		public void onDataPass(String data);
+	    void onDataPass(String data);
+        void hideKeyboard();
 	}
 }

@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -14,30 +13,31 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.naturae_ui.R;
-import com.example.naturae_ui.fragments.ForgetPasswordFragment;
-import com.example.naturae_ui.fragments.LoginFragment;
-import com.example.naturae_ui.fragments.MapSearchFragment;
+import com.example.naturae_ui.fragments.ChatFragment;
 import com.example.naturae_ui.fragments.FriendFragment;
+import com.example.naturae_ui.fragments.MapSearchFragment;
 import com.example.naturae_ui.fragments.PostFragment;
 import com.example.naturae_ui.fragments.PreviewFragment;
 import com.example.naturae_ui.fragments.ProfileFragment;
 import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.CustomEditText;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,6 +49,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -61,420 +63,473 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 interface GetPostsCompleted {
-	void onGetPostsCompleted(Naturae.GetPostPreviewReply reply);
+    void onGetPostsCompleted(Naturae.GetPostPreviewReply reply);
 }
 
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener,
-		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted, ProfileFragment.OnFragmentInteractionListener,
-    MapSearchFragment.OnDataPass{
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted, ProfileFragment.OnFragmentInteractionListener,
+        MapSearchFragment.OnDataPass, CustomEditText.InteractionListener, ChatFragment.OnFragmentInteractionListener {
 
-	public static final int REQUEST_LOCATION_PERMISSION = 99;
+    public static final int REQUEST_LOCATION_PERMISSION = 99;
 
-	GoogleMap mGoogleMap;
-	MapView mMapView;
-	FrameLayout mFragmentContainer;
-	Fragment mMapFragment;
-	Fragment mPostFragment;
-	Fragment mPreviewFragment;
-	Fragment mChatFragment;
-	Fragment mProfileFragment;
-	BottomNavigationView navigation;
-	Marker mMarker;
+    GoogleMap mGoogleMap;
+    MapView mMapView;
+    FrameLayout mFragmentContainer;
+    Fragment mMapFragment;
+    Fragment mPostFragment;
+    Fragment mPreviewFragment;
+    Fragment mChatFragment;
+    Fragment mProfileFragment;
+    BottomNavigationView navigation;
+    Marker mMarker;
 
+    public enum AuthFragmentType {
+        CHANGE_PASSWORD
+    }
 
-	@Override
-	public void beginFragment(AuthFragmentType fragmentType, boolean setTransition, boolean addToBackStack) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-	}
+        // Load bottom navigation bar
+        navigation = findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
-	@Override
-	public void logout() {
-		Intent intent = new Intent(MainActivityContainer.this, StartUpActivityContainer.class);
-		startActivity(intent);
-	}
+        // Create fragments
+        mMapFragment = new MapSearchFragment();
+        mPostFragment = new PostFragment();
+        mProfileFragment = new ProfileFragment();
+        mChatFragment = new FriendFragment();
+        mPreviewFragment = new PreviewFragment();
 
-	public enum AuthFragmentType {
-		CHANGE_PASSWORD
-	}
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+        // Create fragment container
+        mFragmentContainer = findViewById(R.id.fragment_container);
+        mMapView = findViewById(R.id.map);
+        if (mMapView != null) {
+            mMapView.onCreate(null);
+            mMapView.onResume();
+            mMapView.getMapAsync(this);
+        }
+        mMapView.requestFocus();
 
-		// Load bottom navigation bar
-		navigation = findViewById(R.id.navigation);
-		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
+        View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        // position on right bottom
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        rlp.setMargins(0, 0, 0, 60);
+        mFragmentContainer.setVisibility(View.VISIBLE);
 
-		// Create fragments
-		mMapFragment = new MapSearchFragment();
-		mPostFragment = new PostFragment();
-		mProfileFragment = new ProfileFragment();
-		mChatFragment = new FriendFragment();
-		mPreviewFragment = new PreviewFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
+    }
 
-		// Create fragment container
-		mFragmentContainer = findViewById(R.id.fragment_container);
-		mMapView = findViewById(R.id.map);
-		if (mMapView != null) {
-			mMapView.onCreate(null);
-			mMapView.onResume();
-			mMapView.getMapAsync(this);
-		}
-		mMapView.requestFocus();
-		mFragmentContainer.setVisibility(View.VISIBLE);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
-	}
+    // Show map when selected on bottom navigation
+    private void showMap() {
+        mMapView.setVisibility(View.VISIBLE);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
+    }
 
-	// Show map when selected on bottom navigation
-	private void showMap() {
-		mMapView.setVisibility(View.VISIBLE);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMapFragment).commit();
-	}
+    // Show post when selected on bottom navigation
+    private void showPost() {
+        mMapView.setVisibility(View.INVISIBLE);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPostFragment).commit();
+    }
 
-	// Show post when selected on bottom navigation
-	private void showPost() {
-		mMapView.setVisibility(View.INVISIBLE);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPostFragment).commit();
-	}
+    // Show preview when selected on map
+    private void showPreview(Post post) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("post", post);
+        mMapView.setVisibility(View.INVISIBLE);
+        mPreviewFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
+    }
 
-	// Show preview when selected on map
-	private void showPreview(Post post) {
-		Bundle bundle = new Bundle();
-		bundle.putParcelable("post", post);
-		mMapView.setVisibility(View.INVISIBLE);
-		mPreviewFragment.setArguments(bundle);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mPreviewFragment).commit();
-	}
+    // Show chat when selected on bottom navigation
+    private void showChat() {
+        mMapView.setVisibility(View.INVISIBLE);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mChatFragment).commit();
+    }
 
-	// Show chat when selected on bottom navigation
-	private void showChat() {
-		mMapView.setVisibility(View.INVISIBLE);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mChatFragment).commit();
-	}
+    // Show profile when selected on bottom navigation
+    private void showProfile() {
+        mMapView.setVisibility(View.INVISIBLE);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mProfileFragment).commit();
 
-	// Show profile when selected on bottom navigation
-	private void showProfile() {
-		mMapView.setVisibility(View.INVISIBLE);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mProfileFragment).commit();
+    }
 
-	}
+    @Override
+    public void beginFragment(AuthFragmentType fragmentType, boolean setTransition, boolean addToBackStack) {
 
-	/**
-	 * Enable navigation on bottom bar.
-	 */
-	private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
-			= item -> {
-		switch (item.getItemId()) {
-			case R.id.navigation_map:
-				showMap();
-				break;
-			case R.id.navigation_post:
-				showPost();
-				break;
-			case R.id.navigation_chat:
-				showChat();
-				break;
-			case R.id.navigation_profile:
-				showProfile();
-				break;
-		}
-		return true;
-	};
+    }
+
+    @Override
+    public void logout() {
+        Intent intent = new Intent(MainActivityContainer.this, StartUpActivityContainer.class);
+        startActivity(intent);
+    }
 
 
-	/**
-	 * Create map
-	 *
-	 * @param googleMap map to be created
-	 */
-	@Override
-	public void onMapReady(GoogleMap googleMap) {
+    @Override
+    public void hideBottomNavBar() {
+        navigation.setVisibility(View.GONE);
+    }
 
-		MapsInitializer.initialize(this);
+    @Override
+    public void showNavBar() {
+        navigation.setVisibility(View.VISIBLE);
+    }
 
-		mGoogleMap = googleMap;
-		googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-		enableMyLocation();
+    @Override
+    public void hideKeyboard() {
+        if (getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
 
-		mGoogleMap.setOnMarkerClickListener(this);
-		mGoogleMap.setOnCameraIdleListener(this);
+    }
 
-		CameraPosition Home = CameraPosition.builder().target(new LatLng(33.7701, -118.1937)).zoom(14).bearing(0).tilt(45).build();
-		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Home));
-
-	}
-
-	@Override
-	public void onCameraIdle() {
-
-		//Get center latitude and longitude values
-		LatLng center = mGoogleMap.getCameraPosition().target;
-		float cLat = (float) center.latitude;
-		float cLng = (float) center.longitude;
-
-		//Get radius of visible map region
-		VisibleRegion visibleRegion = mGoogleMap.getProjection().getVisibleRegion();
-
-		float[] diagonalDistance = new float[1];
-
-		LatLng farLeft = visibleRegion.farLeft;
-		LatLng nearRight = visibleRegion.nearRight;
-
-		Location.distanceBetween(
-				farLeft.latitude,
-				farLeft.longitude,
-				nearRight.latitude,
-				nearRight.longitude,
-				diagonalDistance
-		);
-
-		int radius = (int) diagonalDistance[0] / 2;
-
-		new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
-
-	}
-
-	@Override
-	public void onGetPostsCompleted(Naturae.GetPostPreviewReply reply) {
-		if (reply != null) {
-			if (reply.getStatus().getCode() == Constants.OK) {
-				mGoogleMap.clear();
-				int length = reply.getReplyCount();
-				for (int i = 0; i < length; i++) {
-					Naturae.PostStruct postStruct = reply.getReply(i);
-					float lat = postStruct.getLatitude();
-					float lng = postStruct.getLongitude();
-					String title = postStruct.getTitle();
-					String description = postStruct.getDescription();
-
-					Marker marker = mGoogleMap.addMarker(new MarkerOptions()
-							.position(new LatLng(lat, lng))
-							.title(title)
-							.snippet(description));
-					marker.setTag(new Post(postStruct));
-
-				}
-			}
-		}
-
-	}
-
-	private void enableMyLocation() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-			mGoogleMap.setMyLocationEnabled(true);
-		} else {
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
-		}
-	}
-
-	/**
-	 * Request permission for location
-	 * @param requestCode code that indicates permission being requested
-	 * @param permissions permission needed
-	 * Request posts to load on map
-	 *
-	 * @param requestCode  code that indicates permission being requested
-	 * @param permissions  permission needed
-	 * @param grantResults give access to use location
-	 */
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		// Check if location permissions are granted and if so enable the
-		// location data layer.
-		switch (requestCode) {
-			case REQUEST_LOCATION_PERMISSION:
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					enableMyLocation();
-					break;
-				}
-		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-	}
-
-	/**
-	 * Create marker when post is created
-	 *
-	 * @param post post that is created
-	 */
-	@Override
-	public void onPostCreated(Post post) {
-		mMapView.setVisibility(View.INVISIBLE);
-		mMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
-		navigation.setSelectedItemId(R.id.navigation_map);
-
-	}
+    /**
+     * Enable navigation on bottom bar.
+     */
+    private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
+            = item -> {
+        switch (item.getItemId()) {
+            case R.id.navigation_map:
+                showMap();
+                break;
+            case R.id.navigation_post:
+                showPost();
+                break;
+            case R.id.navigation_chat:
+                showChat();
+                break;
+            case R.id.navigation_profile:
+                showProfile();
+                break;
+        }
+        return true;
+    };
 
 
-	/**
-	 * When a marker is clicked the preview fragment will be shown for the specific marker
-	 *
-	 * @param marker marker chosen
-	 * @return true if marker is clickable.
-	 */
-	@Override
-	public boolean onMarkerClick(Marker marker) {
-		showPreview((Post) marker.getTag());
+    /**
+     * Create map
+     *
+     * @param googleMap map to be created
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
 
-		return true;
-	}
+        MapsInitializer.initialize(this);
+
+        mGoogleMap = googleMap;
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        enableMyLocation();
+
+        mGoogleMap.setOnMarkerClickListener(this);
+        mGoogleMap.setOnCameraIdleListener(this);
+        mGoogleMap.setOnMapClickListener(latLng -> {
+            hideKeyboard();
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        });
+        FusedLocationProviderClient mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        try {
+            Task locationResult = mFusedLocationProviderClient.getLastLocation();
+            locationResult.addOnCompleteListener(this, new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    CameraPosition home;
+                    if (task.isSuccessful()) {
+                        // Set the map's camera position to the current location of the device.
+                        Location mLastKnownLocation = (Location) task.getResult();
+                        home = CameraPosition.builder().target(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()))
+                                .zoom(14).bearing(0).tilt(45).build();
+                    } else {
+                        home = CameraPosition.builder().target(new LatLng(33.7701, -118.1937)).zoom(14).bearing(0).tilt(45).build();
+                        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+
+                    }
+                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(home));
+                }
+            });
+
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
+
+
+    }
+
+    @Override
+    public void onCameraIdle() {
+
+        //Get center latitude and longitude values
+        LatLng center = mGoogleMap.getCameraPosition().target;
+        float cLat = (float) center.latitude;
+        float cLng = (float) center.longitude;
+
+        //Get radius of visible map region
+        VisibleRegion visibleRegion = mGoogleMap.getProjection().getVisibleRegion();
+
+        float[] diagonalDistance = new float[1];
+
+        LatLng farLeft = visibleRegion.farLeft;
+        LatLng nearRight = visibleRegion.nearRight;
+
+        Location.distanceBetween(
+                farLeft.latitude,
+                farLeft.longitude,
+                nearRight.latitude,
+                nearRight.longitude,
+                diagonalDistance
+        );
+
+        int radius = (int) diagonalDistance[0] / 2;
+
+        new GrpcGetPostPreview(this, cLat, cLng, radius).execute();
+
+    }
+
+    @Override
+    public void onGetPostsCompleted(Naturae.GetPostPreviewReply reply) {
+        if (reply != null) {
+            if (reply.getStatus().getCode() == Constants.OK) {
+                mGoogleMap.clear();
+                int length = reply.getReplyCount();
+                for (int i = 0; i < length; i++) {
+                    Naturae.PostStruct postStruct = reply.getReply(i);
+                    float lat = postStruct.getLatitude();
+                    float lng = postStruct.getLongitude();
+                    String title = postStruct.getTitle();
+                    String description = postStruct.getDescription();
+
+                    Marker marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(lat, lng))
+                            .title(title)
+                            .snippet(description));
+                    marker.setTag(new Post(postStruct));
+
+                }
+            }
+        }
+
+    }
+
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mGoogleMap.setMyLocationEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+        }
+    }
+
+    /**
+     * Request permission for location
+     *
+     * @param requestCode  code that indicates permission being requested
+     * @param permissions  permission needed
+     *                     Request posts to load on map
+     * @param requestCode  code that indicates permission being requested
+     * @param permissions  permission needed
+     * @param grantResults give access to use location
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // Check if location permissions are granted and if so enable the
+        // location data layer.
+        switch (requestCode) {
+            case REQUEST_LOCATION_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableMyLocation();
+                    break;
+                }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    /**
+     * Create marker when post is created
+     *
+     * @param post post that is created
+     */
+    @Override
+    public void onPostCreated(Post post) {
+        mMapView.setVisibility(View.INVISIBLE);
+        mMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
+        navigation.setSelectedItemId(R.id.navigation_map);
+
+    }
+
+
+    /**
+     * When a marker is clicked the preview fragment will be shown for the specific marker
+     *
+     * @param marker marker chosen
+     * @return true if marker is clickable.
+     */
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        showPreview((Post) marker.getTag());
+        return true;
+    }
 
     /**
      * Implemented to retrieve data passed from the MapSearchFragment
+     *
      * @param data the search query from the user
      */
-	@Override
-	public void onDataPass(String data) {
-		//Log.d("LOG","hello " + data);
+    @Override
+    public void onDataPass(String data) {
+        //Log.d("LOG","hello " + data);
         String featureName;
         String addressLine;
         boolean foundSomething = false;
-		List<Address> addresses = null;
-		Geocoder geocoder = new Geocoder(this);
+        List<Address> addresses = null;
+        Geocoder geocoder = new Geocoder(this);
 
-		try{
-			addresses = geocoder.getFromLocationName(data, 2);
-			if(addresses != null){
-				for(int i = 0; i < addresses.size(); i++){
+        try {
+            addresses = geocoder.getFromLocationName(data, 2);
+            if (addresses != null) {
+                for (int i = 0; i < addresses.size(); i++) {
                     //Log.d("LOG", "onDataPass: " + addresses.get(i));
-				    Address userAddress = addresses.get(i);
+                    Address userAddress = addresses.get(i);
                     //Update camera position
-					LatLng coordinate = new LatLng(userAddress.getLatitude(), userAddress.getLongitude());
-					CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, 15);
-					mGoogleMap.animateCamera(location);
+                    LatLng coordinate = new LatLng(userAddress.getLatitude(), userAddress.getLongitude());
+                    CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, 15);
+                    mGoogleMap.animateCamera(location);
 
-					featureName = userAddress.getFeatureName();
-					addressLine = userAddress.getAddressLine(0);
+                    featureName = userAddress.getFeatureName();
+                    addressLine = userAddress.getAddressLine(0);
 
-					//Display the name of the location
-					if(featureName != null){
-						Toast.makeText(this, featureName, Toast.LENGTH_SHORT).show();
-						foundSomething = true;
-					}
-					else{
-						Toast.makeText(this, addressLine, Toast.LENGTH_SHORT).show();
+                    //Display the name of the location
+                    if (featureName != null) {
+                        Toast.makeText(this, featureName, Toast.LENGTH_SHORT).show();
                         foundSomething = true;
-					}
+                    } else {
+                        Toast.makeText(this, addressLine, Toast.LENGTH_SHORT).show();
+                        foundSomething = true;
+                    }
 
-					//mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinate, 15));
-					//mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-				}
-			}
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
+                    //mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinate, 15));
+                    //mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		//If an address was not found, display an error
-		if(!foundSomething){
+        //If an address was not found, display an error
+        if (!foundSomething) {
             Toast.makeText(this, "Could not find that location", Toast.LENGTH_SHORT).show();
-        }else{
-		    //If something was found, then look for pins at that location
+        } else {
+            //If something was found, then look for pins at that location
             onCameraIdle();
         }
 
-	}
+    }
 
 
-	//If the current access token expired then this will request the server to generate a new access token
-	private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply>{
+    //If the current access token expired then this will request the server to generate a new access token
+    private static class GrpcGetNewAccessToken extends AsyncTask<Void, Void, Naturae.GetAccessTokenReply> {
 
-		private final WeakReference<Activity> activity;
-		private ManagedChannel channel;
+        private final WeakReference<Activity> activity;
+        private ManagedChannel channel;
 
-		public GrpcGetNewAccessToken(Activity activity) {
-			this.activity = new WeakReference<>(activity);
-		}
+        public GrpcGetNewAccessToken(Activity activity) {
+            this.activity = new WeakReference<>(activity);
+        }
 
-		@Override
-		protected Naturae.GetAccessTokenReply doInBackground(Void... voids) {
-			Naturae.GetAccessTokenReply reply;
-			try {
-				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
-				//Create a stub for with the channel
-				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-				Naturae.GetAccessTokenRequest request = Naturae.GetAccessTokenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
-						.setRefreshToken(UserUtilities.getRefreshToken(activity.get())).build();
-				reply = stub.getNewAccessToken(request);
-			} catch (Exception e) {
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-				pw.flush();
-				return null;
-			}
+        @Override
+        protected Naturae.GetAccessTokenReply doInBackground(Void... voids) {
+            Naturae.GetAccessTokenReply reply;
+            try {
+                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+                //Create a stub for with the channel
+                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+                Naturae.GetAccessTokenRequest request = Naturae.GetAccessTokenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
+                        .setRefreshToken(UserUtilities.getRefreshToken(activity.get())).build();
+                reply = stub.getNewAccessToken(request);
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+                return null;
+            }
 
-			return reply;
-		}
+            return reply;
+        }
 
-		@Override
-		protected void onPostExecute(Naturae.GetAccessTokenReply getAccessTokenReply) {
-			super.onPostExecute(getAccessTokenReply);
-			if (getAccessTokenReply == null) {
-				Log.e("Access Token", "Unable to get new access token from the server");
-			} else {
-				//Cache new the access token to the phone
-				UserUtilities.setAccessToken(activity.get(), getAccessTokenReply.getAccessToken());
-			}
-		}
-	}
+        @Override
+        protected void onPostExecute(Naturae.GetAccessTokenReply getAccessTokenReply) {
+            super.onPostExecute(getAccessTokenReply);
+            if (getAccessTokenReply == null) {
+                Log.e("Access Token", "Unable to get new access token from the server");
+            } else {
+                //Cache new the access token to the phone
+                UserUtilities.setAccessToken(activity.get(), getAccessTokenReply.getAccessToken());
+            }
+        }
+    }
 
-	//Get posts to put on map
-	private static class GrpcGetPostPreview extends AsyncTask<Void, Void, Naturae.GetPostPreviewReply> {
+    //Get posts to put on map
+    private static class GrpcGetPostPreview extends AsyncTask<Void, Void, Naturae.GetPostPreviewReply> {
 
-		private GetPostsCompleted listener;
-		private ManagedChannel channel;
-		private float lat;
-		private float lng;
-		private int radius;
+        private GetPostsCompleted listener;
+        private ManagedChannel channel;
+        private float lat;
+        private float lng;
+        private int radius;
 
-		public GrpcGetPostPreview(GetPostsCompleted listener, float lat, float lng, int radius) {
-			this.listener = listener;
-			this.lat = lat;
-			this.lng = lng;
-			this.radius = radius;
-		}
+        public GrpcGetPostPreview(GetPostsCompleted listener, float lat, float lng, int radius) {
+            this.listener = listener;
+            this.lat = lat;
+            this.lng = lng;
+            this.radius = radius;
+        }
 
-		@Override
-		protected Naturae.GetPostPreviewReply doInBackground(Void... voids) {
-			Naturae.GetPostPreviewReply reply;
-			try {
-				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).maxInboundMessageSize(1745937000).useTransportSecurity().build();
-				//Create a stub for with the channel
-				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-				System.out.println("lat: " + lat + "\tlng: " + lng);
-				Naturae.GetPostPreviewRequest request = Naturae.GetPostPreviewRequest.newBuilder()
-						.setAppKey(Constants.NATURAE_APP_KEY)
-						.setLat(lat)
-						.setLng(lng)
-						.setRadius(radius)
-						.build();
-				reply = stub.getPostPreview(request);
-			} catch (Exception e) {
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-				pw.flush();
-				return null;
-			}
-			return reply;
-		}
+        @Override
+        protected Naturae.GetPostPreviewReply doInBackground(Void... voids) {
+            Naturae.GetPostPreviewReply reply;
+            try {
+                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).maxInboundMessageSize(1745937000).useTransportSecurity().build();
+                //Create a stub for with the channel
+                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+                System.out.println("lat: " + lat + "\tlng: " + lng);
+                Naturae.GetPostPreviewRequest request = Naturae.GetPostPreviewRequest.newBuilder()
+                        .setAppKey(Constants.NATURAE_APP_KEY)
+                        .setLat(lat)
+                        .setLng(lng)
+                        .setRadius(radius)
+                        .build();
+                reply = stub.getPostPreview(request);
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+                return null;
+            }
+            return reply;
+        }
 
-		@Override
-		protected void onPostExecute(Naturae.GetPostPreviewReply getPostPreviewReply) {
-			super.onPostExecute(getPostPreviewReply);
-			//Shut down the gRPC channel
-			try {
-				channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-			listener.onGetPostsCompleted(getPostPreviewReply);
-		}
-	}
+        @Override
+        protected void onPostExecute(Naturae.GetPostPreviewReply getPostPreviewReply) {
+            super.onPostExecute(getPostPreviewReply);
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            listener.onGetPostsCompleted(getPostPreviewReply);
+        }
+    }
 }
 
 

@@ -2,53 +2,44 @@ package com.example.naturae_ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.support.v4.app.Fragment;
+import android.widget.TextView;
 
-import com.example.naturae_ui.models.ChatMessage;
-import com.example.naturae_ui.models.Friend;
-import com.example.naturae_ui.models.MemberData;
-import com.example.naturae_ui.util.*;
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.models.ChatMessage;
+import com.example.naturae_ui.models.MemberData;
+import com.example.naturae_ui.util.ChatAdapter;
+import com.example.naturae_ui.util.Constants;
+import com.example.naturae_ui.util.CustomEditText;
+import com.example.naturae_ui.util.Helper;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.scaledrone.lib.HistoryRoomListener;
 import com.scaledrone.lib.Listener;
-import com.scaledrone.lib.Message;
 import com.scaledrone.lib.Room;
 import com.scaledrone.lib.RoomListener;
 import com.scaledrone.lib.Scaledrone;
-import com.scaledrone.lib.SubscribeOptions;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-import java.util.function.IntToDoubleFunction;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -63,7 +54,7 @@ public class ChatFragment extends Fragment implements RoomListener {
     private final String channelID = "rff299Lg3qBpyQxQ";
     private String roomName;
     private TextView friendUsernameTitle;
-    private EditText messageInput;
+    private CustomEditText messageInput;
     private View sendButton;
     private String friendUsernameText;
     private String currentUsernameText;
@@ -74,7 +65,12 @@ public class ChatFragment extends Fragment implements RoomListener {
     private String USERNAME;
     private String avatar;
     private FragmentActivity chatActivity;
+    private OnFragmentInteractionListener mListener;
     ArrayList<ChatMessage> chatlog;
+
+    public interface OnFragmentInteractionListener{
+        void hideBottomNavBar();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -96,43 +92,40 @@ public class ChatFragment extends Fragment implements RoomListener {
          * Call asynchronous task to obtain room name
          */
         GrpcGetRoomTask roomTask = new GrpcGetRoomTask(new GrpcGetRoomTask.GetRoomRunnable(currentUsernameText, friendUsernameText), getActivity());
-        roomTask.setListener(new GrpcGetRoomTask.AsyncTaskListener(){
-            @Override
-            public void onGetRoomFinished(String room) {
-                //Create the scaledrone observable room
-                roomName = "observable-" + room;
-                scaledrone = new Scaledrone(channelID, thisUser);
+        roomTask.setListener(room -> {
+            //Create the scaledrone observable room
+            roomName = "observable-" + room;
+            scaledrone = new Scaledrone(channelID, thisUser);
 
-                scaledrone.connect(new Listener() {
-                    @Override
-                    public void onOpen() {
-                        //Pass RoomListener as a target
-                        scaledrone.subscribe(roomName, ChatFragment.this);
-                        System.out.println("Scaledrone connection open");
-                    }
+            scaledrone.connect(new Listener() {
+                @Override
+                public void onOpen() {
+                    //Pass RoomListener as a target
+                    scaledrone.subscribe(roomName, ChatFragment.this);
+                    System.out.println("Scaledrone connection open");
+                }
 
-                    @Override
-                    public void onOpenFailure(Exception e) {
-                        System.err.println(e);
-                        //Can potentially happen due to authentication error
-                        Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
-                    }
+                @Override
+                public void onOpenFailure(Exception e) {
+                    System.err.println(e);
+                    //Can potentially happen due to authentication error
+                    Log.d(TAG, "onOpenFailure: Unable to open a new room " + e);
+                }
 
-                    @Override
-                    public void onFailure(Exception e) {
-                        System.err.println(e);
-                        Log.d(TAG, "onFailure: Connection failure");
-                        //Attempt to Reconnect after some time
-                        tryReconnecting(0);
-                    }
+                @Override
+                public void onFailure(Exception e) {
+                    System.err.println(e);
+                    Log.d(TAG, "onFailure: Connection failure");
+                    //Attempt to Reconnect after some time
+                    tryReconnecting(0);
+                }
 
-                    @Override
-                    public void onClosed(String reason) {
-                        System.err.println(reason);
-                    }
-                });
+                @Override
+                public void onClosed(String reason) {
+                    System.err.println(reason);
+                }
+            });
 
-            }
         });
         roomTask.execute();
 
@@ -155,18 +148,23 @@ public class ChatFragment extends Fragment implements RoomListener {
         //Instantiate Avatar?
 
         //Instantiate message textfield for user to type in
-        messageInput = view.findViewById(R.id.editText);
+        messageInput = view.findViewById(R.id.message_edit_text);
         sendButton = view.findViewById(R.id.sendButton);
 
-        messageInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    sendMessage();
-                    return true;
-                }
-                return false;
+        messageInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if(hasFocus){
+                mListener.hideBottomNavBar();
             }
+        });
+
+        messageInput.setOnClickListener(v -> mListener.hideBottomNavBar());
+
+        messageInput.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                sendMessage();
+                return true;
+            }
+            return false;
         });
 
         sendButton.setOnClickListener(new View.OnClickListener(){
@@ -209,6 +207,18 @@ public class ChatFragment extends Fragment implements RoomListener {
         }
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+        super.onAttach(context);
     }
 
     /**
