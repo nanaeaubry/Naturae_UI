@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -17,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +36,8 @@ import com.example.naturae_ui.util.Helper;
 import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
+import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -47,27 +51,36 @@ import java.util.concurrent.TimeUnit;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import static android.support.constraint.Constraints.TAG;
 import static com.example.naturae_ui.fragments.PostFragment.REQUEST_IMAGE_CAPTURE;
 
-public class ProfileFragment extends Fragment{
+public class ProfileFragment extends Fragment {
     public final static int PICK_PHOTO = 1046;
     Fragment mChangePasswordFragment;
     View mView;
     EditText firstName;
     EditText lastName;
     TextView profileName;
+    TextView profileEmail;
     Button bLogout;
     Button bChangePass;
-    ImageButton ibProfileImage;
+    ImageView ibProfileImage;
     OnFragmentInteractionListener mListener;
     EditText currentPassword;
     EditText newPassword;
     EditText confirmPassword;
-    ImageView imagePreview;
     File photoFile;
     Uri photoFileUri;
-    Bitmap mSelectedImage = null;
+    Bitmap mSelectedImage;
+    String profileNameString;
+    String profileEmailString;
 
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        profileNameString = (UserUtilities.getFirstName(getContext()) + " " + UserUtilities.getLastName(getContext()));
+        profileEmailString = (UserUtilities.getEmail(getContext()));
+
+    }
 
     @Nullable
     @Override
@@ -79,15 +92,21 @@ public class ProfileFragment extends Fragment{
 
         firstName = mView.findViewById(R.id.first_name_edit_text);
         lastName = mView.findViewById(R.id.last_name_edit_text);
-        //profileName = mView.findViewById(R.id.tvProfileName);
+        profileName = mView.findViewById(R.id.tvProfileName);
+        profileEmail = mView.findViewById(R.id.tvProfileEmail);
 
         //profileName.setText(UserUtilities.getFirstName(getContext()) + UserUtilities.getLastName(getContext()));
+        // profileName.setText("Brian Ashley");
+        //profileEmail.setText("inudraggun01@sbcglobal.net");
+
+        profileName.setText(profileNameString);
+        profileEmail.setText(profileEmailString);
 
         bChangePass = mView.findViewById(R.id.btChangePass);
         bChangePass.setOnClickListener(v -> {
             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
             //Acquire container id and switch fragment
-            fragmentTransaction.replace(((ViewGroup)getView().getParent()).getId(), mChangePasswordFragment);
+            fragmentTransaction.replace(((ViewGroup) getView().getParent()).getId(), mChangePasswordFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });
@@ -95,7 +114,7 @@ public class ProfileFragment extends Fragment{
 
         ibProfileImage = mView.findViewById(R.id.ibProfileImage);
         ibProfileImage.setOnClickListener(v -> {
-            mSelectedImage = null;
+            //mSelectedImage = null;
             // Create intent for picking a photo from the gallery
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
@@ -106,6 +125,8 @@ public class ProfileFragment extends Fragment{
                 startActivityForResult(intent, PICK_PHOTO);
             }
 
+<<<<<<< HEAD
+=======
             //Make image a byte array to store in server
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
@@ -113,6 +134,7 @@ public class ProfileFragment extends Fragment{
             String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
            // new GrpcProfileImage(mListener,getActivity(), encodedImage).execute();
+>>>>>>> 5eab9da3b1aed72841ae6f5569dbf13cbe693a54
 
         });
         bLogout = mView.findViewById(R.id.btLogout);
@@ -164,134 +186,212 @@ public class ProfileFragment extends Fragment{
                     mSelectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
 
                     // Load the selected image into a preview
-                    imagePreview.setVisibility(View.VISIBLE);
-                    imagePreview.setImageBitmap(mSelectedImage);
+                  //  ibProfileImage.setVisibility(View.VISIBLE);
+                    //ibProfileImage.setImageBitmap(mSelectedImage);
 
-                    readExif(photoUri);
+                    //Make image a byte array to store in server
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream.toByteArray();
+                    String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+                    SetProfileImageTask imageTask = new SetProfileImageTask(getActivity());
+                    imageTask.setListener(new SetProfileImageTask.AsyncTaskListener(){
+                        @Override
+                        public void onSetProfileImageCompleted() {
+                            //Do something with the encoded image
+                            GetProfileImageTask imageTaskGet = new GetProfileImageTask(getActivity());
+                            imageTaskGet.setListener(new GetProfileImageTask.AsyncTaskListener(){
+                                @Override
+                                public void onGetProfileImageCompleted(String encodedImageLink) {
+                                    //Display
+                                    Picasso.get().load(encodedImageLink).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
+                                }
+                            });
+
+                            imageTaskGet.execute();
+                        }
+                    });
+
+                    imageTask.execute(encodedImage);
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
-
-            case REQUEST_IMAGE_CAPTURE:
-                // by this point we have the camera photo on disk
-                mSelectedImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-
-                // RESIZE BITMAP, see section below
-                // Load the taken image into a preview
-                ImageView imagePreview = mView.findViewById(R.id.image_preview);
-                imagePreview.setVisibility(View.VISIBLE);
-                imagePreview.setImageBitmap(mSelectedImage);
-
-                readExif(photoFileUri);
-                break;
         }
     }
 
     /**
-     * Read data from image
-     *
-     * @param uri image uri
+     * GET PROFILE IMAGE STUFF
      */
-    void readExif(Uri uri) {
+    private static class GetProfileImageTask extends AsyncTask<String, Void, Naturae.GetProfileImageReply> {
+        private AsyncTaskListener listener;
+        private final WeakReference<Activity> activity;
+        private ManagedChannel channel;
+        private String mEncodedImage;
 
-        try {
-            InputStream is = getContext().getContentResolver().openInputStream(uri);
-            ExifInterface exifInterface = new ExifInterface(is);
+        private GetProfileImageTask(Activity activity) {
+            this.activity = new WeakReference<>(activity);
+        }
 
-            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    imagePreview.setRotation(90);
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    imagePreview.setRotation(180);
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    imagePreview.setRotation(270);
-                default:
-                    imagePreview.setRotation(0);
+        @Override
+        protected Naturae.GetProfileImageReply doInBackground(String... params) {
+            Naturae.GetProfileImageReply reply;
+            try {
+                //Create a channel to connect to the server
+                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+                //Create a stub for with the channel
+                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+                //Create an gRPC create account request
+                Log.d(TAG, "doInBackground: GET PROFILE IMAGE REPLY");
+                Naturae.GetProfileImageRequest request = Naturae.GetProfileImageRequest.newBuilder()
+                        .setAppKey(Constants.NATURAE_APP_KEY)
+                        .setAccessToken(UserUtilities.getAccessToken(activity.get())).build();
+                //Send the request to the server and set reply to equal the response back from the server
+                reply = stub.getProfileImage(request);
+
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+                return null;
+            }
+            return reply;
+
+        }
+
+        @Override
+        protected void onPostExecute(Naturae.GetProfileImageReply reply) {
+            super.onPostExecute(reply);
+            Log.d("Tag", "onPostExecute: 'this occurred");
+            if (reply != null) {
+                listener.onGetProfileImageCompleted(reply.getEncodedImage());
+                Log.d(TAG, "onPostExecute: ENCODED IMAGE GOT " + reply.getEncodedImage());
+            } else {
+                displayError((String) activity.get().getText(R.string.internet_connection));
             }
 
-        } catch (IOException e) {
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            //Check if reply is equal to null. If it's equal to null then there was an error with the server or phone
+            //while communicating with the server.
 
-            e.printStackTrace();
+        }
+
+        public void setListener(AsyncTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface AsyncTaskListener {
+            void onGetProfileImageCompleted(String encodedImage);
+        }
+
+
+        /**
+         * Create an dialog box that display the error
+         */
+        private void displayError(String message) {
+            //Create an instance of Alert Dialog
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity.get());
+            alertDialogBuilder.setTitle("Error").setMessage(message).setPositiveButton(R.string.ok, (dialog, which) -> {
+                dialog.cancel();
+            }).show();
+        }
+    }
+
+    /**
+     * SET PROFILE IMAGE TASK
+     */
+        private static class SetProfileImageTask extends AsyncTask<String, Void, Naturae.SetProfileImageReply> {
+            private SetProfileImageTask.AsyncTaskListener listener;
+            private final WeakReference<Activity> activity;
+            private ManagedChannel channel;
+            private String mEncodedImage;
+            private String encodedImageString;
+
+            private SetProfileImageTask(Activity activity) {
+                this.activity = new WeakReference<>(activity);
+            }
+
+            @Override
+            protected Naturae.SetProfileImageReply doInBackground(String... params) {
+                Naturae.SetProfileImageReply reply;
+                try {
+                    encodedImageString = params[0];
+                    //Create a channel to connect to the server
+                    channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
+                    //Create a stub for with the channel
+                    ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+                    //Create an gRPC create account request
+                    Log.d(TAG, "doInBackground: GET PROFILE IMAGE REPLY");
+                    Naturae.SetProfileImageRequest request = Naturae.SetProfileImageRequest.newBuilder()
+                            .setAppKey(Constants.NATURAE_APP_KEY)
+                            .setAccessToken(UserUtilities.getAccessToken(activity.get()))
+                            .setEncodedImage(encodedImageString)
+                            .build();
+
+                    //Send the request to the server and set reply to equal the response back from the server
+                    reply = stub.setProfileImage(request);
+
+                } catch (Exception e) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    pw.flush();
+                    return null;
+                }
+                return reply;
+
+            }
+
+            @Override
+            protected void onPostExecute(Naturae.SetProfileImageReply reply) {
+                super.onPostExecute(reply);
+                Log.d("Tag", "onPostExecute: 'this occurred SetProfileImageReply");
+                if (reply != null) {
+                    listener.onSetProfileImageCompleted();
+                } else {
+                    displayError((String) activity.get().getText(R.string.internet_connection));
+                }
+
+                //Shut down the gRPC channel
+                try {
+                    channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                //Check if reply is equal to null. If it's equal to null then there was an error with the server or phone
+                //while communicating with the server.
+
+            }
+
+            public void setListener(SetProfileImageTask.AsyncTaskListener listener) {
+                this.listener = listener;
+            }
+
+            public interface AsyncTaskListener {
+                void onSetProfileImageCompleted();
+            }
+
+        /**
+         * Create an dialog box that display the error
+         */
+        private void displayError(String message) {
+            //Create an instance of Alert Dialog
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity.get());
+            alertDialogBuilder.setTitle("Error").setMessage(message).setPositiveButton(R.string.ok, (dialog, which) -> {
+                dialog.cancel();
+            }).show();
         }
 
     }
-
-//    private static class GrpcProfileImage extends AsyncTask<String, Void, Naturae.ProfileImageReply> {
-//        private final OnFragmentInteractionListener listener;
-//        private final WeakReference<Activity> activity;
-//        private ManagedChannel channel;
-//        private String mEncodedImage;
-//
-//        private GrpcProfileImage(OnFragmentInteractionListener listener, Activity activity, String encodedImage) {
-//            this.listener = listener;
-//            this.activity = new WeakReference<>(activity);
-//            this.mEncodedImage = encodedImage;
-//        }
-//
-//        @Override
-//        protected Naturae.ProfileImageReply doInBackground(String... params) {
-//            Naturae.ProfileImageReply reply;
-//            try {
-//                //Create a channel to connect to the server
-//                channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).useTransportSecurity().build();
-//                //Create a stub for with the channel
-//                ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
-//                //Create an gRPC create account request
-//                Naturae.ProfileImageRequest request = Naturae.ProfileImageRequest.newBuilder()
-//                        .setAppKey(Constants.NATURAE_APP_KEY)
-//                        .setAccessToken(UserUtilities.getAccessToken(activity.get()))
-//                        .setEncodedImage(mEncodedImage).build();
-//                //Send the request to the server and set reply to equal the response back from the server
-//                reply = stub.getProfileImage(request);
-//
-//            } catch (Exception e) {
-//                StringWriter sw = new StringWriter();
-//                PrintWriter pw = new PrintWriter(sw);
-//                e.printStackTrace(pw);
-//                pw.flush();
-//                return null;
-//            }
-//            return reply;
-//
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Naturae.ProfileImageReply reply) {
-//            super.onPostExecute(reply);
-//            //Shut down the gRPC channel
-//            try {
-//                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
-//            //Check if reply is equal to null. If it's equal to null then there was an error with the server or phone
-//            //while communicating with the server.
-//            if (reply != null) {
-//
-//            } else {
-//                displayError((String) activity.get().getText(R.string.internet_connection));
-//
-//            }
-//        }
-//        /**
-//         * Create an dialog box that display the error
-//         *
-//         * @param message the error message to be display
-//         */
-//        private void displayError(String message) {
-//            //Create an instance of Alert Dialog
-//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity.get());
-//            alertDialogBuilder.setTitle("Error").setMessage(message).setPositiveButton(R.string.ok, (dialog, which) -> {
-//                dialog.cancel();
-//            }).show();
-//        }
-//    }
 }
-
-
 
 
