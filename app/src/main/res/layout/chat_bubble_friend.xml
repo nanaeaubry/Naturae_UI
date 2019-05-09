@@ -13,7 +13,8 @@
         android:scaleType="centerInside"
         android:background="@drawable/chat_avatar_friend"
         android:layout_width="34dp"
-        android:layout_height="34dp" />
+        android:layout_height="34dp"
+        android:rotation="90"/>
 
     <TextView
         android:id="@+id/bubble_friend_username"

@@ -48,6 +48,7 @@
         android:layout_marginBottom="5dp"
         android:background="@drawable/chat_avatar_friend"
         android:scaleType="centerInside"
+        android:rotation="90"
         />
 
     <TextView

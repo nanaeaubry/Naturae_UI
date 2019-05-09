@@ -168,7 +168,8 @@ message UserSearchRequest{
 //A list of users that matched the parameters provided by the UserSearchRequest
 message UserListReply{
     repeated string users = 1;
-    Status status = 2;
+    repeated string avatars = 2;
+    Status status = 3;
 }
 // The request message containing the users's to perform an action on
 message FriendRequest {
