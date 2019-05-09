@@ -79,7 +79,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	Fragment mProfileFragment;
 	BottomNavigationView navigation;
 	Marker mMarker;
-	ProgressBar mProgressBar;
+//	ProgressBar mProgressBar;
 
 
 	@Override
@@ -105,7 +105,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
-		mProgressBar = findViewById(R.id.map_progress);
+		//mProgressBar = findViewById(R.id.map_progress);
 		// Create fragments
 		mMapFragment = new MapSearchFragment();
 		mPostFragment = new PostFragment();
@@ -303,10 +303,10 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	@Override
 	public void onPostCreated(Post post) {
 		mMapView.setVisibility(View.INVISIBLE);
-		mProgressBar.setVisibility(View.VISIBLE);
+		//mProgressBar.setVisibility(View.VISIBLE);
 		mMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(post.lat, post.lng)).title(post.title).snippet(post.description));
 		navigation.setSelectedItemId(R.id.navigation_map);
-		mProgressBar.setVisibility(View.GONE);
+	//	mProgressBar.setVisibility(View.GONE);
 		mMapView.setVisibility(View.VISIBLE);
 
 
