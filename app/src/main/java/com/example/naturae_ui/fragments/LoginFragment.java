@@ -209,11 +209,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                             true);
                 }
                 else{
+                    //Display communicating with server error
                     Helper.alertDialogErrorMessage(activity.get(), activity.get().getText(R.string.server_error).toString());
                 }
 
             }
             else{
+                //Display communicating with server error
                 Helper.alertDialogErrorMessage(activity.get(), activity.get().getText(R.string.server_error).toString());
             }
 
