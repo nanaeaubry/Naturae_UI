@@ -5,22 +5,16 @@
 	android:layout_above="@+id/navigation"
 	android:layout_gravity="center"
 	android:background="@color/white"
-	android:orientation="vertical">
+	android:orientation="vertical"
+	>
 
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:gravity="center"
-		android:orientation="vertical">
-
-		<ProgressBar
-			android:id="@+id/post_progress"
-			style="?android:attr/progressBarStyleLarge"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:visibility="gone" />
-
-		<LinearLayout
+		android:orientation="vertical"
+		android:id="@+id/scroll_view">
+	<LinearLayout
 			android:id="@+id/image_preview_layout"
 			android:layout_width="300dp"
 			android:layout_height="300dp"

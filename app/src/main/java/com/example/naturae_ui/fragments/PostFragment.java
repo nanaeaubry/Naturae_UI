@@ -64,7 +64,6 @@ public class PostFragment extends Fragment {
 	File photoFile;
 	Uri photoFileUri;
 
-	ProgressBar mProgressBar;
 	View mView;
 	ImageButton mOpenCamera;
 	ImageButton mOpenPhotos;
@@ -86,9 +85,6 @@ public class PostFragment extends Fragment {
 		mImagePreview = mView.findViewById(R.id.image_preview);
 		mImagePreviewLayout = mView.findViewById(R.id.image_preview_layout);
 
-		mProgressBar = mView.findViewById(R.id.post_progress);
-		mProgressBar.setVisibility(View.INVISIBLE);
-
 		// Create a File reference for photo capture
 		photoFile = getPhotoFile(photoFileName);
 
@@ -98,28 +94,28 @@ public class PostFragment extends Fragment {
 		//Button to open camera on user phone
 		mOpenCamera = mView.findViewById(R.id.open_camera);
 		mOpenCamera.setOnClickListener(v -> {
-            Intent  takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
+			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
 
-            if (takePictureIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        });
+			if (takePictureIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
+				startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+			}
+		});
 
 		//Button to open media gallery on user phone
 		mOpenPhotos = mView.findViewById(R.id.open_photos);
 		mOpenPhotos.setOnClickListener(v -> {
-            // Create intent for picking a photo from the gallery
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			// Create intent for picking a photo from the gallery
+			Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-            // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-            // So as long as the result is not null, it's safe to use the intent.
-            if (intent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
-                // Bring up gallery to select a photo
-                startActivityForResult(intent, PICK_PHOTO);
-            }
-        });
+			// If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+			// So as long as the result is not null, it's safe to use the intent.
+			if (intent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
+				// Bring up gallery to select a photo
+				startActivityForResult(intent, PICK_PHOTO);
+			}
+		});
 
 		//User enters title of post
 		mTitlePost = mView.findViewById(R.id.post_title);
@@ -133,48 +129,47 @@ public class PostFragment extends Fragment {
 		//Button to submit post
 		mSubmitPost = mView.findViewById(R.id.post_submit);
 		mSubmitPost.setOnClickListener(v -> {
-            boolean missingData = TextUtils.isEmpty(mTitlePost.getText()) ||
-                    TextUtils.isEmpty(mSpeciesPost.getText()) ||
-                    TextUtils.isEmpty(mDescriptionPost.getText()) ||
-                    mSelectedImage == null;
-            if (missingData) {
-                new AlertDialog.Builder(getContext())
-                        .setTitle("One or more fields are empty").setMessage("Please make sure all fields are correct ")
-                        .setPositiveButton("Ok", (dialog, which) -> {
+			boolean missingData = TextUtils.isEmpty(mTitlePost.getText()) ||
+					TextUtils.isEmpty(mSpeciesPost.getText()) ||
+					TextUtils.isEmpty(mDescriptionPost.getText()) ||
+					mSelectedImage == null;
+			if (missingData) {
+				new AlertDialog.Builder(getContext())
+						.setTitle("One or more fields are empty").setMessage("Please make sure all fields are correct ")
+						.setPositiveButton("Ok", (dialog, which) -> {
 
-                        }).show();
-                return;
-            }
-            mProgressBar.setVisibility(View.VISIBLE);
+						}).show();
+				return;
+			}
 
-            //Make image a byte array to store in server
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+			//Make image a byte array to store in server
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
+			byte[] byteArray = byteArrayOutputStream.toByteArray();
+			String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
 
-            //New post to hold information input by user
-            Post post = new Post();
+			//New post to hold information input by user
+			Post post = new Post();
 
-            //User input will be put in post
-            post.title = mTitlePost.getText().toString();
-            post.species = mSpeciesPost.getText().toString();
-            post.description = mDescriptionPost.getText().toString();
-            post.lat = latLong[0];
-            post.lng = latLong[1];
-            post.encodedImage = encodedImage;
+			//User input will be put in post
+			post.title = mTitlePost.getText().toString();
+			post.species = mSpeciesPost.getText().toString();
+			post.description = mDescriptionPost.getText().toString();
+			post.lat = latLong[0];
+			post.lng = latLong[1];
+			post.encodedImage = encodedImage;
 
-            new GrpcCreatePost(listener, post, Objects.requireNonNull(getActivity())).execute();
-            mTitlePost.getText().clear();
-            mSpeciesPost.getText().clear();
-            mDescriptionPost.getText().clear();
+			new GrpcCreatePost(listener, post, Objects.requireNonNull(getActivity())).execute();
+			mTitlePost.getText().clear();
+			mSpeciesPost.getText().clear();
+			mDescriptionPost.getText().clear();
 
-            Toast.makeText(getContext(),"Post Saved. Creating on Map...",Toast.LENGTH_SHORT);
-        });
-
+			Toast.makeText(getContext(), "Post Saved. Creating on Map...", Toast.LENGTH_LONG).show();
+		});
 		return mView;
 	}
+
 
 	/**
 	 * Get image data and process accordingly based on whether photo is taken with camera
@@ -237,7 +232,7 @@ public class PostFragment extends Fragment {
 
 		// Return the file target for the photo based on filename
 
-        return new File(mediaStorageDir.getPath() + File.separator + fileName);
+		return new File(mediaStorageDir.getPath() + File.separator + fileName);
 	}
 
 	/**
@@ -300,7 +295,7 @@ public class PostFragment extends Fragment {
 
 		private final OnPostListener mListener;
 		private final Post mPost;
-		private final WeakReference<Context> cReference ;
+		private final WeakReference<Context> cReference;
 
 		private ManagedChannel channel;
 
@@ -352,9 +347,8 @@ public class PostFragment extends Fragment {
 			//Check if reply is equal to null. If it's equal to null then there is an error
 			//when communicating with the server
 			if (createPostReply != null) {
-				if(createPostReply.getStatus().getCode() == Constants.OK ){
+				if (createPostReply.getStatus().getCode() == Constants.OK) {
 					mListener.onPostCreated(mPost);
-
 				}
 			}
 

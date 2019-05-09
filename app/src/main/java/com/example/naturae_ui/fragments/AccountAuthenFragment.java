@@ -138,7 +138,7 @@ public class AccountAuthenFragment extends Fragment {
         }
 
         @Override
-        protected Naturae.AccountAuthenReply doInBackground(String... strings) {
+        protected Naturae.AccountAuthenReply doInBackground(String... params) {
             Naturae.AccountAuthenReply reply;
             try{
                 //Create a channel to connect to the server
@@ -147,7 +147,7 @@ public class AccountAuthenFragment extends Fragment {
                 ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
                 //Create a GRPC request to the server for account authentication
                 Naturae.AccountAuthenRequest request = Naturae.AccountAuthenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
-                        .setEmail(UserUtilities.getEmail(activity.get())).build();
+                        .setEmail(UserUtilities.getEmail(activity.get())).setAuthenCode(params[0]).build();
                 //Request the send and set reply equal to the response back from the server
                 reply = stub.accountAuthentication(request);
 
@@ -178,11 +178,9 @@ public class AccountAuthenFragment extends Fragment {
             if (result.getStatus().getCode() == Constants.OK){
                 //Cache that the user is able to logged in successfully and user information
                 //Next time the user's open the app the user's don't have to log in again
-                new Thread(()->{
-                    UserUtilities.setIsLoggedIn(activity.get(), true);
-                    UserUtilities.cacheUser(activity.get(), new NaturaeUser(result.getFirstName(), result.getLastName(), result.getEmail(),
+                UserUtilities.setIsLoggedIn(activity.get(), true);
+                UserUtilities.cacheUser(activity.get(), new NaturaeUser(result.getFirstName(), result.getLastName(), result.getEmail(),
                             result.getAccessToken(), result.getRefreshToken(), ""));
-                }).run();
                 //Start the main activity
                 mListener.startMainActivity();
             }
