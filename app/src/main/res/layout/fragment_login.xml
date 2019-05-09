@@ -120,9 +120,10 @@
                 android:id="@+id/login_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="13dp"
                 android:text="@string/login"
                 android:textSize="18sp"
-                android:background="@color/buttons"/>
+                android:background="@color/lightGray"/>
 
             <Button
                 android:id="@+id/create_account_button"
@@ -130,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/create_account"
                 android:textSize="18sp"
-                android:background="@color/buttons"/>
+                android:background="@color/lightGray"/>
         </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>

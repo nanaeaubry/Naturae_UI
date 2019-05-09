@@ -2,6 +2,7 @@ package com.example.naturae_ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -236,14 +237,15 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
 
                 if (inputString.isEmpty()){
                     isPasswordValid = false;
+                    passwordErrorTextView.setTextColor(Color.BLACK);
                 }
                 else if(Helper.isPasswordValid(inputString)){
                     isPasswordValid = true;
-                    passwordErrorTextView.setVisibility(GONE);
+                    passwordErrorTextView.setTextColor(Color.BLACK);
                 }else{
                     isPasswordValid = false;
-                    passwordErrorTextView.setText(getText(R.string.invalid_password));
-                    passwordErrorTextView.setVisibility(VISIBLE);
+                    passwordErrorTextView.setText(getText(R.string.weak_password));
+                    passwordErrorTextView.setTextColor(Color.RED);
                 }
                 break;
             //Check if confirm password is valid
@@ -319,7 +321,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
         if(!isPasswordValid){
             if(Objects.requireNonNull(passwordEditText.getText()).toString().isEmpty()){
                 passwordErrorTextView.setText(getText(R.string.empty_password));
-                passwordErrorTextView.setVisibility(VISIBLE);
+                passwordErrorTextView.setTextColor(Color.RED);
             }else {
                 checkEditTextFieldValidity(EditTextFieldType.PASSWORD, passwordEditText.getText().toString());
             }

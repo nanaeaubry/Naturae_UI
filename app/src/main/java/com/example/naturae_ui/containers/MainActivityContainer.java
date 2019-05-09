@@ -26,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.fragments.ForgetPasswordFragment;
 import com.example.naturae_ui.fragments.LoginFragment;
 import com.example.naturae_ui.fragments.MapSearchFragment;
 import com.example.naturae_ui.fragments.FriendFragment;
@@ -65,7 +66,7 @@ interface GetPostsCompleted {
 
 public class MainActivityContainer extends AppCompatActivity implements OnMapReadyCallback, PostFragment.OnPostListener,
 		GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener, GetPostsCompleted, ProfileFragment.OnFragmentInteractionListener,
-    MapSearchFragment.OnDataPass {
+    MapSearchFragment.OnDataPass{
 
 	public static final int REQUEST_LOCATION_PERMISSION = 99;
 
@@ -444,6 +445,7 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 				channel = ManagedChannelBuilder.forAddress(Constants.HOST, Constants.PORT).maxInboundMessageSize(1745937000).useTransportSecurity().build();
 				//Create a stub for with the channel
 				ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
+				System.out.println("lat: " + lat + "\tlng: " + lng);
 				Naturae.GetPostPreviewRequest request = Naturae.GetPostPreviewRequest.newBuilder()
 						.setAppKey(Constants.NATURAE_APP_KEY)
 						.setLat(lat)
@@ -458,7 +460,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 				pw.flush();
 				return null;
 			}
-
 			return reply;
 		}
 
