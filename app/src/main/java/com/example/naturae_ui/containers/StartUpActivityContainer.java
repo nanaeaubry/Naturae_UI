@@ -20,7 +20,8 @@ import com.example.naturae_ui.fragments.LoginFragment;
 //test
 
 public class StartUpActivityContainer extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener,
-        CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener{
+        CreateAccountFragment.OnFragmentInteractionListener,  AccountAuthenFragment.OnFragmentInteractionListener,
+        ForgetPasswordFragment.OnFragmentInteractionListener{
 //Hello
     private LoginFragment loginFragment;
     private CreateAccountFragment createAccountFragment;

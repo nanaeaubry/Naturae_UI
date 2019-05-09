@@ -1,6 +1,7 @@
 package com.example.naturae_ui.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.naturae_ui.R;
+import com.example.naturae_ui.containers.StartUpActivityContainer;
 import com.example.naturae_ui.util.Constants;
 import com.example.naturae_ui.util.Helper;
 import com.examples.naturaeproto.Naturae;
@@ -23,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -77,6 +80,17 @@ public class ForgetPasswordFragment extends Fragment implements View.OnClickList
         submitPasswordEmailButton.setOnClickListener(this);
         submitNewPasswordButton.setOnClickListener(this);
 
+        passwordEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus){
+                //Check if the password meet meet the guideline
+                if (Helper.isPasswordValid(passwordEditText.getText().toString())){
+                    weakPasswordTextView.setTextColor(getResources().getColor(R.color.colorInvalid, null));
+                }
+                else{
+                    weakPasswordTextView.setTextColor(Color.BLACK);
+                }
+            }
+        });
 
         return view;
     }
@@ -100,6 +114,9 @@ public class ForgetPasswordFragment extends Fragment implements View.OnClickList
     }
 
     public interface OnFragmentInteractionListener {
+        void beginFragment(StartUpActivityContainer.AuthFragmentType fragmentType, boolean setTransition,
+                           boolean addToBackStack);
+        void onBackPressed();
     }
 
     @Override
@@ -109,7 +126,7 @@ public class ForgetPasswordFragment extends Fragment implements View.OnClickList
                 userEmail = emailEditText.getText().toString();
                 if(Helper.isEmailValid(emailEditText.getText().toString())){
                     invalidEmailTextView.setVisibility(View.GONE);
-                    new GrpcForgetPassword(getEmailLayout, resetPasswordVerificationLayout).execute(
+                    new GrpcForgetPassword(getEmailLayout, resetPasswordVerificationLayout, mListener, invalidEmailTextView).execute(
                             "0",
                             userEmail
                     );
@@ -118,31 +135,41 @@ public class ForgetPasswordFragment extends Fragment implements View.OnClickList
                 }
                 break;
             case R.id.reset_password_submit_authen_code_button:
-                new GrpcForgetPassword(resetPasswordVerificationLayout, newPasswordLayout).execute(
+                new GrpcForgetPassword(resetPasswordVerificationLayout, newPasswordLayout, mListener, invalidAuthenCodeTextView).execute(
                         "1",
                         userEmail,
                         verificationCodeEditText.getText().toString()
                 );
                 break;
             case R.id.reset_password_submit_new_password_button:
-                new GrpcForgetPassword(newPasswordLayout, null).execute(
-                        "2",
-                        userEmail,
-                        passwordEditText.getText().toString()
-                );
+                //Check if password and confirm password match
+                if (passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
+                    new GrpcForgetPassword(newPasswordLayout, null, mListener, weakPasswordTextView).execute(
+                            "2",
+                            userEmail,
+                            passwordEditText.getText().toString()
+                    );
+                }
+                else{
+                    mismatchPasswordTextViuew.setVisibility(View.VISIBLE);
+                }
                 break;
         }
     }
 
     private static class GrpcForgetPassword extends AsyncTask<String, Void, Naturae.Status> {
-
+        private OnFragmentInteractionListener mListener;
         private ManagedChannel channel;
+        private WeakReference<TextView> errorTextView;
         private WeakReference<LinearLayout> currLayout;
         private WeakReference<LinearLayout> nextLayout;
 
-        private GrpcForgetPassword(LinearLayout currLayout, LinearLayout nextLayout){
+        private GrpcForgetPassword(LinearLayout currLayout, LinearLayout nextLayout, OnFragmentInteractionListener mListener,
+                                   TextView errorTextView){
             this.currLayout = new WeakReference<> (currLayout);
             this.nextLayout = new WeakReference<>(nextLayout) ;
+            this.errorTextView = new WeakReference<>(errorTextView);
+            this.mListener = mListener;
         }
 
         @Override
@@ -170,7 +197,6 @@ public class ForgetPasswordFragment extends Fragment implements View.OnClickList
                                 .setVerificationCode(params[2])
                                 .build();
                         reply = stub.forgetPasswordVerifyCode(request).getStatus();
-
                         break;
                     }
                     //Send the new password to the server
@@ -196,13 +222,29 @@ public class ForgetPasswordFragment extends Fragment implements View.OnClickList
 
         @Override
         protected void onPostExecute(Naturae.Status status) {
+            super.onPostExecute(status);
+            //Shut down the gRPC channel
+            try {
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                System.out.println();
+                Thread.currentThread().interrupt();
+            }
+
             if (status.getCode() == Constants.OK){
                 //Remove the current displaying layout
                 currLayout.get().setVisibility(View.GONE);
-                //Display the next layout
-                nextLayout.get().setVisibility(View.VISIBLE);
+                if (nextLayout.get() != null){
+                    //Display the next layout
+                    nextLayout.get().setVisibility(View.VISIBLE);
+                }
+                else{
+                    mListener.onBackPressed();
+                }
             }
-            super.onPostExecute(status);
+            else {
+                errorTextView.get().setVisibility(View.VISIBLE);
+            }
         }
     }
 }

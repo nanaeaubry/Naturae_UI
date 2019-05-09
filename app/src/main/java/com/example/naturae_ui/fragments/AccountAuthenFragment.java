@@ -19,8 +19,6 @@ import com.example.naturae_ui.server.NaturaeUser;
 import com.example.naturae_ui.util.Constants;
 import com.example.naturae_ui.util.Helper;
 import com.example.naturae_ui.util.UserUtilities;
-import com.example.naturae_ui.util.Constants;
-import com.example.naturae_ui.util.UserUtilities;
 import com.examples.naturaeproto.Naturae;
 import com.examples.naturaeproto.ServerRequestsGrpc;
 
@@ -177,8 +175,6 @@ public class AccountAuthenFragment extends Fragment {
             //The program will now bring the user to the main application page
             if (result.getStatus().getCode() == Constants.OK){
                 //Cache that the user is able to logged in successfully and user information
-                //Next time the user's open the app the user's don't have to log in again
-                UserUtilities.setIsLoggedIn(activity.get(), true);
                 UserUtilities.cacheUser(activity.get(), new NaturaeUser(result.getFirstName(), result.getLastName(), result.getEmail(),
                             result.getAccessToken(), result.getRefreshToken(), ""));
                 //Start the main activity
