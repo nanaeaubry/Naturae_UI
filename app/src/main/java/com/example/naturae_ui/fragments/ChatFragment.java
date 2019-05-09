@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -72,11 +73,13 @@ public class ChatFragment extends Fragment implements RoomListener {
     private Boolean lostConnection;
     private String USERNAME;
     private String avatar;
+    private FragmentActivity chatActivity;
     ArrayList<ChatMessage> chatlog;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        chatActivity = getActivity();
         friendUsernameText = getArguments().getString("argUsername");
         currentUsernameText = getArguments().getString("argCurrentUser");
         //The avatar of the other user
@@ -251,7 +254,7 @@ public class ChatFragment extends Fragment implements RoomListener {
             final ChatMessage message = new ChatMessage(receivedMessage.getData().asText(), user.getUsername(), timestamp, isSentByUser, avatar);
             Log.d(TAG, "onMessage: " + message.getMessageBody());
 
-            getActivity().runOnUiThread(new Runnable() {
+            chatActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     chatlog.add(0, message);
