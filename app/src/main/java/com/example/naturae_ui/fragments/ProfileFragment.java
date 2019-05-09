@@ -122,6 +122,7 @@ public class ProfileFragment extends Fragment {
             public void onGetProfileImageCompleted(String encodedImageLink) {
                 //Display
                 Picasso.get().load(encodedImageLink).placeholder(R.drawable.ic_person_black_24dp).error(R.drawable.ic_person_black_24dp).fit().transform(new RoundedTransformationBuilder().borderColor(Color.BLACK).borderWidthDp(1).cornerRadiusDp(30).oval(false).build()).centerCrop().into(ibProfileImage);
+                ibProfileImage.setRotation(90f);
             }
         });
 
