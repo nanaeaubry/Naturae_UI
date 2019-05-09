@@ -3,20 +3,27 @@ package com.example.naturae_ui.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.naturae_ui.models.ChatMessage;
 import com.example.naturae_ui.server.NaturaeUser;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import android.content.SharedPreferences.Editor;
 
 public class UserUtilities {
     private static final String SHARED_PREF_USER_DATA = "UserData";
     private static final String USER_INFO = "userJson";
-    private static final String EMAIL = "username";
+    private static final String EMAIL = "email";
     private static final String ACCESS_TOKEN = "accessToken";
     private static final String REFRESH_TOKEN = "refreshToken";
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
     private static final String IS_LOGGED_IN = "isLoggedIn";
     private static final String SORT_LIST_REVERSE = "sortListReverse";
+    private static final String CHAT_LOG = "chatLog";
 
 
     /**
@@ -68,7 +75,7 @@ public class UserUtilities {
      */
     public static boolean isLoggedIn(Context context){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
-        return userPreferences.getBoolean(IS_LOGGED_IN, true);
+        return userPreferences.getBoolean(IS_LOGGED_IN, false);
     }
     /**
      *
@@ -115,6 +122,11 @@ public class UserUtilities {
         userPreferences.edit().putString(LAST_NAME, name).apply();
     }
 
+    public static void setEmail(Context context, String email){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        userPreferences.edit().putString(EMAIL, email).apply();
+    }
+
     /**
      * Update user's access token id cache
      * @param tokenID user's new access token id
@@ -139,6 +151,20 @@ public class UserUtilities {
     public static void setIsLoggedIn(Context context, boolean currStatus){
         SharedPreferences userPreferences = getUserSharedPreferences(context);
         userPreferences.edit().putBoolean(IS_LOGGED_IN, currStatus).apply();
+    }
+
+    /**
+     * Store a user's chatlog as a serialized string
+     */
+    public static void setChatLog(Context context, ArrayList<ChatMessage> chatlog){
+        SharedPreferences userPreferences = getUserSharedPreferences(context);
+        Editor editor = userPreferences.edit();
+        try {
+            editor.putString(CHAT_LOG, ObjectSerializer.serialize(chatlog));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        editor.commit();
     }
 
     /**
@@ -199,6 +225,21 @@ public class UserUtilities {
         catch(NullPointerException e){
             return false;
         }
+    }
+
+    /**
+     * Retrieves a user's chatlog as an arraylist
+     */
+    public static ArrayList<ChatMessage> getChatlog(Context context){
+        // load stored chatlog from preferences
+        SharedPreferences prefs = getUserSharedPreferences(context);
+        ArrayList<ChatMessage> newLog = new ArrayList<>();
+        try {
+            newLog = (ArrayList<ChatMessage>) ObjectSerializer.deserialize(prefs.getString(CHAT_LOG, ObjectSerializer.serialize(new ArrayList<ChatMessage>())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return newLog;
     }
 
 }

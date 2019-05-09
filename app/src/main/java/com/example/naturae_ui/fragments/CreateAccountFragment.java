@@ -407,6 +407,7 @@ public class CreateAccountFragment extends Fragment implements View.OnFocusChang
                 //If the status code is 150, then there already an account with that email address
                 //Any thing else then the an server error
                 if (reply.getStatus().getCode() == Constants.ACCOUNT_CREATED){
+                    UserUtilities.setEmail(activity.get(), email);
                     mListener.beginFragment(StartUpActivityContainer.AuthFragmentType.ACCOUNT_AUTHENTICATION, true, true);
                 }else if (reply.getStatus().getCode() == Constants.EMAIL_EXIST){
                     //Display an error message that an account with the email already exist

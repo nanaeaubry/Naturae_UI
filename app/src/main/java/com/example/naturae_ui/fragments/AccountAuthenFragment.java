@@ -138,7 +138,7 @@ public class AccountAuthenFragment extends Fragment {
         }
 
         @Override
-        protected Naturae.AccountAuthenReply doInBackground(String... strings) {
+        protected Naturae.AccountAuthenReply doInBackground(String... params) {
             Naturae.AccountAuthenReply reply;
             try{
                 //Create a channel to connect to the server
@@ -147,7 +147,7 @@ public class AccountAuthenFragment extends Fragment {
                 ServerRequestsGrpc.ServerRequestsBlockingStub stub = ServerRequestsGrpc.newBlockingStub(channel);
                 //Create a GRPC request to the server for account authentication
                 Naturae.AccountAuthenRequest request = Naturae.AccountAuthenRequest.newBuilder().setAppKey(Constants.NATURAE_APP_KEY)
-                        .setEmail(UserUtilities.getEmail(activity.get())).build();
+                        .setEmail(UserUtilities.getEmail(activity.get())).setAuthenCode(params[0]).build();
                 //Request the send and set reply equal to the response back from the server
                 reply = stub.accountAuthentication(request);
 

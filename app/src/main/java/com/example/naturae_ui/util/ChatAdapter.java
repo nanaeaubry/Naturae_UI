@@ -10,7 +10,7 @@ import android.content.Context;
 import com.example.naturae_ui.R;
 import com.example.naturae_ui.models.ChatMessage;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -20,7 +20,7 @@ import java.util.Date;
  */
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private static final String TAG = "ChatAdapter";
-    private List<ChatMessage> chatlog;
+    private ArrayList<ChatMessage> chatlog;
     private Context context;
     private LayoutInflater inflater;
 
@@ -28,18 +28,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
      * Updates the current context of the component
      * @param context
      */
-    public ChatAdapter(Context context, List<ChatMessage> chatlog) {
+    public ChatAdapter(Context context, ArrayList<ChatMessage> chatlog) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.chatlog = chatlog;
     }
-
+/*
     public void add(ChatMessage message) {
         this.chatlog.add(0, message);
         //Update list and render
         notifyDataSetChanged();
     }
-
+*/
     public Object getItem(int i) {
         return chatlog.get(i);
     }
@@ -71,12 +71,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 timeElapsed += "s";
             }
         }
-        else if(seconds > 0){
+        else if(seconds >= 0){
             timeElapsed = "" + seconds + " second";
             if(seconds > 1){
-                if(seconds > 1){
-                    timeElapsed += "s";
-                }
+                timeElapsed += "s";
+            }
+            else if(seconds == 0){
+                return "just now";
             }
         }
         timeElapsed += " ago";
@@ -122,12 +123,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         if(viewType == 0){
             view = inflater.inflate(R.layout.chat_bubble_user, parent, false);
-            ViewHolderUser viewHolderUser = new ViewHolderUser(view);
-            return viewHolderUser;
+            ViewHolderUser viewholderUser = new ViewHolderUser(view);
+            return viewholderUser;
         }
         else{
             view = inflater.inflate(R.layout.chat_bubble_friend, parent, false);
-            return new ViewHolderFriend(view);
+            ViewHolderFriend viewholderFriend = new ViewHolderFriend(view);
+            return viewholderFriend;
         }
 
        // Log.d(TAG, "onCreateViewHolder: INVALID VIEWTYPE");
@@ -169,6 +171,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         //chatlog.set(position, message);
 
        // holder.usernameView.setText(user.getName());
+
     }
 
     /**
@@ -215,6 +218,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             super(userView);
             messageBody = userView.findViewById(R.id.bubble_friend_messageBody);
             username = userView.findViewById(R.id.bubble_friend_username);
+            timestamp = userView.findViewById(R.id.bubble_friend_timestamp);
             avatar = userView.findViewById(R.id.bubble_friend_avatar);
 
             //Registers a callback to be invoked when this item is clicked

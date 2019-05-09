@@ -79,7 +79,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 	Fragment mProfileFragment;
 	BottomNavigationView navigation;
 	Marker mMarker;
-	ProgressBar mProgressBar;
 
 
 	@Override
@@ -105,7 +104,6 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
 		navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
-		mProgressBar = findViewById(R.id.map_progress);
 		// Create fragments
 		mMapFragment = new MapSearchFragment();
 		mPostFragment = new PostFragment();
