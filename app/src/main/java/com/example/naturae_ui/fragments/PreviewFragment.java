@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.naturae_ui.models.Post;
 import com.example.naturae_ui.R;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,10 +45,7 @@ public class PreviewFragment extends Fragment {
 
 		mImageView = mView.findViewById(R.id.image_view);
 
-		byte[] decodedString = Base64.decode(mPost.encodedImage, Base64.DEFAULT);
-		Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-		mImageView.setImageBitmap(decodedByte);
-
+		Picasso.get().load(mPost.encodedImage).into(mImageView);
 
 		mTitle = mView.findViewById(R.id.preview_title);
 		mTitle.setText(mPost.title);
