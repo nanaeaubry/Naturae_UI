@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -154,10 +155,14 @@ public class ChatFragment extends Fragment implements RoomListener {
         messageInput.setOnFocusChangeListener((v, hasFocus) -> {
             if(hasFocus){
                 mListener.hideBottomNavBar();
+                getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             }
         });
 
-        messageInput.setOnClickListener(v -> mListener.hideBottomNavBar());
+        messageInput.setOnClickListener(v ->{
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+            mListener.hideBottomNavBar();
+        });
 
         messageInput.setOnEditorActionListener((v, actionId, event) -> {
             if(actionId == EditorInfo.IME_ACTION_DONE){

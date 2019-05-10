@@ -4,14 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.example.naturae_ui.R;
 
@@ -58,18 +56,15 @@ public class MapSearchFragment extends Fragment {
 		/**
 		 * SEARCH FIELD EVENT HANDLER
 		 */
-		searchFieldInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		searchFieldInput.setOnEditorActionListener((v, actionId, event) -> {
 
-				if(actionId == EditorInfo.IME_ACTION_DONE){
-					//Retrieve the query the user typed
-					String searchQuery = searchFieldInput.getText().toString();
-					passData(searchQuery);
-					searchFieldInput.clearFocus();
-				}
-				return false;
+			if(actionId == EditorInfo.IME_ACTION_DONE){
+				//Retrieve the query the user typed
+				String searchQuery = searchFieldInput.getText().toString();
+				passData(searchQuery);
+				searchFieldInput.clearFocus();
 			}
+			return false;
 		});
 
 		return view;

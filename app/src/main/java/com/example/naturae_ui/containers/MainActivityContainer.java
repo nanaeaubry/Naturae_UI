@@ -176,6 +176,11 @@ public class MainActivityContainer extends AppCompatActivity implements OnMapRea
     }
 
     @Override
+    public void showBottomNavBar(){
+        navigation.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void showNavBar() {
         navigation.setVisibility(View.VISIBLE);
     }

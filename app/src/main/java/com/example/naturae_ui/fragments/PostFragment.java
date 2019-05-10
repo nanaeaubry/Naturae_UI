@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -72,6 +73,18 @@ public class PostFragment extends Fragment {
 	LinearLayout mImagePreviewLayout;
 	float[] latLong = new float[2];
 
+
+	@Override
+	public void onResume() {
+		listener.showBottomNavBar();
+		super.onResume();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -89,9 +102,7 @@ public class PostFragment extends Fragment {
 		mOpenCamera = mView.findViewById(R.id.open_camera);
 		mOpenCamera.setOnClickListener(v -> {
 			Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
-
 			if (takePictureIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
 				startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 			}
@@ -102,7 +113,6 @@ public class PostFragment extends Fragment {
 		mOpenPhotos.setOnClickListener(v -> {
 			// Create intent for picking a photo from the gallery
 			Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
 			// If you call startActivityForResult() using an intent that no app can handle, your app will crash.
 			// So as long as the result is not null, it's safe to use the intent.
 			if (intent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
@@ -117,10 +127,13 @@ public class PostFragment extends Fragment {
 		mTitlePost.setOnFocusChangeListener((v, hasFocus) -> {
 			if(hasFocus){
 				listener.hideBottomNavBar();
+				getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 			}
 		});
 
-		mTitlePost.setOnClickListener(v -> listener.hideBottomNavBar());
+		mTitlePost.setOnClickListener((v) -> {
+			listener.hideBottomNavBar();
+		});
 
 		//User enters species of item in photo
 		mSpeciesPost = mView.findViewById(R.id.post_species);
@@ -128,6 +141,7 @@ public class PostFragment extends Fragment {
         mSpeciesPost.setOnFocusChangeListener((v, hasFocus) -> {
             if(hasFocus){
                 listener.hideBottomNavBar();
+				getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             }
         });
 
@@ -139,6 +153,7 @@ public class PostFragment extends Fragment {
         mDescriptionPost.setOnFocusChangeListener((v, hasFocus) -> {
             if(hasFocus){
                 listener.hideBottomNavBar();
+				getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             }
         });
 		mDescriptionPost.setOnClickListener(v -> listener.hideBottomNavBar());
@@ -158,7 +173,6 @@ public class PostFragment extends Fragment {
 						}).show();
 				return;
 			}
-
 			//Make image a byte array to store in server
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			mSelectedImage.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
@@ -295,7 +309,6 @@ public class PostFragment extends Fragment {
 		super.onAttach(context);
 		try {
 			listener = (OnPostListener) context;
-
 		} catch (ClassCastException c) {
 			throw new ClassCastException(context.toString() + " must implement OnPostListener");
 		}
@@ -304,6 +317,7 @@ public class PostFragment extends Fragment {
 	public interface OnPostListener {
 		void onPostCreated(Post post);
 		void hideBottomNavBar();
+		void showBottomNavBar();
 	}
 
 	private static class GrpcCreatePost extends AsyncTask<Void, Void, Naturae.CreatePostReply> {

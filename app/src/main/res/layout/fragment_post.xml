@@ -10,7 +10,9 @@
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
 
         <ImageView
@@ -20,6 +22,8 @@
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:layout_gravity="center"
+            android:focusable="true"
+            android:focusedByDefault="true"
             android:src="@drawable/ic_photo_black_30dp"/>
 
         <LinearLayout
@@ -54,6 +58,7 @@
                     android:background="@color/colorPrimary"
                     android:clickable="true"
                     android:focusable="true"
+                    android:focusedByDefault="true"
                     android:src="@drawable/ic_file_upload_black_24dp"
                     android:tint="@color/white" />
             </LinearLayout>
@@ -63,6 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Title"
+                android:focusedByDefault="false"
                 android:inputType="textNoSuggestions"
                 android:maxLines="1"
                 android:textColor="@color/colorPrimaryText" />
@@ -72,6 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Species"
+                android:focusedByDefault="false"
                 android:inputType="textNoSuggestions"
                 android:maxLines="2"
                 android:textColor="@color/colorPrimaryText" />
@@ -81,6 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Description"
+                android:focusedByDefault="false"
                 android:inputType="textNoSuggestions"
                 android:maxLines="4"
                 android:textColor="@color/colorPrimaryText" />
