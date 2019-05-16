@@ -15,14 +15,15 @@ an Android device to your system and it can be used instead of the virtual emula
 Sync the gradle file and build the application.  
 
 You will require access to a running Naturae Server. View the repository here 
-[Naturae Server](https://github.com/HappyLyfe123)
+ 
+[Naturae Server](https://github.com/HappyLyfe123/Naturae_Server)
 
 ## Built With
-* [Android Studio](https://developer.android.com/studio)
+* [Android Studio](https://developer.android.com/studio) IDE for project development
 * [Google Maps API](https://developers.google.com/maps/documentation/) Used to display the live map and create pins
-* [Google Protobuffers](https://github.com/protocolbuffers/protobuf)
-* [gRPC Java](https://github.com/grpc/grpc-java)
-* [Scaledrone](https://www.scaledrone.com/)
+* [Google Protobuffers](https://github.com/protocolbuffers/protobuf) Defines messages that can be sent
+* [gRPC Java](https://github.com/grpc/grpc-java) Used to send and receive unary messages
+* [Scaledrone](https://www.scaledrone.com/) Implements the live chat
 
 ## Features
 * Login and Registration
