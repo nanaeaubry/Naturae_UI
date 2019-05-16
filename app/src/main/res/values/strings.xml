@@ -4,7 +4,7 @@
     <!--Shared Strings-->
     <string name="google_map_key">Google Map Key</string>
     <string name="app_name">Naturae</string>
-    <string name="API_Key">AIzaSyAoLYtlxsSkFQNJ53Dn-x9VoZsrcwSFmjk</string>
+    <string name="API_Key">ENTER API KEY HERE</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
     <string name="email">Email</string>
